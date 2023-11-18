@@ -12,7 +12,7 @@ namespace AKDEM.OBYS.DataAccess.Configurations
     public class AppUserConfiguration : IEntityTypeConfiguration<AppUser>
     {
         public void Configure(EntityTypeBuilder<AppUser> builder)
-        {
+        {//selam
             throw new NotImplementedException();
         }
     }
