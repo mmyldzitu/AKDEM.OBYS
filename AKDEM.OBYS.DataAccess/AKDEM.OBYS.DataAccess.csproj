@@ -21,4 +21,8 @@
     <ProjectReference Include="..\AKDEM.OBYS.Entities\AKDEM.OBYS.Entities.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Migrations\" />
+  </ItemGroup>
+
 </Project>

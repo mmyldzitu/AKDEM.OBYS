@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="10.1.1" />
+    <PackageReference Include="FluentValidation" Version="10.2.3" />
+    <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="10.2.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\AKDEM.OBYS.DataAccess\AKDEM.OBYS.DataAccess.csproj" />
+    <ProjectReference Include="..\AKDEM.OBYS.Dto\AKDEM.OBYS.Dto.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Mappings\" />
+    <Folder Include="ValidationRules\" />
+  </ItemGroup>
+
+</Project>

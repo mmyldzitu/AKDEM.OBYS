@@ -14,13 +14,15 @@ namespace AKDEM.OBYS.Entities
         public string Password { get; set; }
         public string PhoneNumber { get; set; }
         public bool Status { get; set; }
-
         public string ImagePath { get; set; }
+
+
         public int BranchId { get; set; }
         public AppBranch AppBranch { get; set; }
 
         public int ClassId { get; set; }
         public AppClass AppClass { get; set; }
+
         public List<AppUserRole> AppUserRoles { get; set; }
         public List<AppUserSession> AppUserSessions { get; set; }
         public List<AppWarning> AppWarnings { get; set; }
