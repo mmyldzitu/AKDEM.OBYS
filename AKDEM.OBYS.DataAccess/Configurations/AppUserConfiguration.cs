@@ -12,8 +12,15 @@ namespace AKDEM.OBYS.DataAccess.Configurations
     public class AppUserConfiguration : IEntityTypeConfiguration<AppUser>
     {
         public void Configure(EntityTypeBuilder<AppUser> builder)
-        {//selam
-            throw new NotImplementedException();
+        {
+            builder.Property(x => x.FirstName).HasMaxLength(200).IsRequired();
+            builder.Property(x => x.SecondName).HasMaxLength(200).IsRequired();
+            builder.Property(x => x.Email).HasMaxLength(200).IsRequired();
+            builder.Property(x => x.Password).HasMaxLength(200).IsRequired();
+            // builder.Property(x => x.ImagePath).HasMaxLength(500).IsRequired();
+            builder.HasOne(x => x.AppBranch).WithMany(x => x.AppUsers).HasForeignKey(x => x.BranchId);
+            builder.HasOne(x => x.AppClass).WithMany(x => x.AppUsers).HasForeignKey(x => x.ClassId);
+           
         }
     }
 }

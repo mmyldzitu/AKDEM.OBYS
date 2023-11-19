@@ -1,4 +1,5 @@
-﻿using AKDEM.OBYS.Entities;
+﻿using AKDEM.OBYS.DataAccess.Configurations;
+using AKDEM.OBYS.Entities;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -13,6 +14,19 @@ namespace AKDEM.OBYS.DataAccess.Context
         public AkdemContext(DbContextOptions<AkdemContext> options) :base(options)
         {
 
+        }
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.ApplyConfiguration(new AppBranchConfiguration());
+            modelBuilder.ApplyConfiguration(new AppClassConfiguration());
+            modelBuilder.ApplyConfiguration(new AppLessonConfiguration());
+            modelBuilder.ApplyConfiguration(new AppRoleConfiguration());
+            modelBuilder.ApplyConfiguration(new AppSessionConfiguration());
+            modelBuilder.ApplyConfiguration(new AppUserConfiguration());
+            modelBuilder.ApplyConfiguration(new AppUserRoleConfiguration());
+            modelBuilder.ApplyConfiguration(new AppUserSessionConfiguration());
+            modelBuilder.ApplyConfiguration(new AppUserSessionLessonConfiguration());
+            modelBuilder.ApplyConfiguration(new AppWarningConfiguration());
         }
         public DbSet<AppBranch> AppBranches { get; set; }
         public DbSet<AppClass> AppClasses { get; set; }
