@@ -15,9 +15,4 @@
     <ProjectReference Include="..\AKDEM.OBYS.Dto\AKDEM.OBYS.Dto.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Mappings\" />
-    <Folder Include="ValidationRules\" />
-  </ItemGroup>
-
 </Project>

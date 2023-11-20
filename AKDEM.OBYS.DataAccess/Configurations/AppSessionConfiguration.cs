@@ -14,6 +14,7 @@ namespace AKDEM.OBYS.DataAccess.Configurations
         public void Configure(EntityTypeBuilder<AppSession> builder)
         {
             builder.Property(x => x.Definition).HasMaxLength(200).IsRequired();
+            
         }
     }
 }

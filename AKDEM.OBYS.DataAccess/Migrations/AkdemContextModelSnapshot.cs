@@ -109,6 +109,9 @@ namespace AKDEM.OBYS.DataAccess.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
+                    b.Property<bool>("Status")
+                        .HasColumnType("bit");
+
                     b.HasKey("Id");
 
                     b.ToTable("AppSessions");
@@ -121,10 +124,10 @@ namespace AKDEM.OBYS.DataAccess.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int>("BranchId")
+                    b.Property<int?>("BranchId")
                         .HasColumnType("int");
 
-                    b.Property<int>("ClassId")
+                    b.Property<int?>("ClassId")
                         .HasColumnType("int");
 
                     b.Property<string>("Email")
@@ -300,13 +303,11 @@ namespace AKDEM.OBYS.DataAccess.Migrations
                 {
                     b.HasOne("AKDEM.OBYS.Entities.AppBranch", "AppBranch")
                         .WithMany("AppUsers")
-                        .HasForeignKey("BranchId")
-                        .IsRequired();
+                        .HasForeignKey("BranchId");
 
                     b.HasOne("AKDEM.OBYS.Entities.AppClass", "AppClass")
                         .WithMany("AppUsers")
-                        .HasForeignKey("ClassId")
-                        .IsRequired();
+                        .HasForeignKey("ClassId");
 
                     b.Navigation("AppBranch");
 

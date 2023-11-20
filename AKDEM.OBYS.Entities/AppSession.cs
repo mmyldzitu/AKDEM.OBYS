@@ -9,6 +9,7 @@ namespace AKDEM.OBYS.Entities
     public class AppSession:BaseEntity
     {
         public string Definition { get; set; }
+        public bool Status { get; set; } 
         public List<AppUserSession> AppUserSessions { get; set; }
     }
 }

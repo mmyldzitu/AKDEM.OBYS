@@ -15,4 +15,8 @@
     <ProjectReference Include="..\AKDEM.OBYS.Business\AKDEM.OBYS.Business.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\images\" />
+  </ItemGroup>
+
 </Project>

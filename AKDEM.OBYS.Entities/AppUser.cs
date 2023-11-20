@@ -17,10 +17,10 @@ namespace AKDEM.OBYS.Entities
         public string ImagePath { get; set; }
 
 
-        public int BranchId { get; set; }
+        public int? BranchId { get; set; }
         public AppBranch AppBranch { get; set; }
 
-        public int ClassId { get; set; }
+        public int? ClassId { get; set; }
         public AppClass AppClass { get; set; }
 
         public List<AppUserRole> AppUserRoles { get; set; }

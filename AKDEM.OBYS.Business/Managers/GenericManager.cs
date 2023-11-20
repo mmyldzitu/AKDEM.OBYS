@@ -23,15 +23,15 @@ namespace AKDEM.OBYS.Business.Managers
         private readonly IMapper _mapper;
         private readonly IValidator<CreateDto> _createDtovalidator;
         private readonly IValidator<UpdateDto> _updateDtovalidator;
-        private readonly IValidator<ListDto> _listDtovalidator;
+        
         private readonly IUow _uow;
 
-        public GenericManager(IMapper mapper, IValidator<CreateDto> createDtovalidator, IValidator<UpdateDto> updateDtovalidator, IValidator<ListDto> listDtovalidator, IUow uow)
+        public GenericManager(IMapper mapper, IValidator<CreateDto> createDtovalidator, IValidator<UpdateDto> updateDtovalidator, IUow uow)
         {
             _mapper = mapper;
             _createDtovalidator = createDtovalidator;
             _updateDtovalidator = updateDtovalidator;
-            _listDtovalidator = listDtovalidator;
+           
             _uow = uow;
         }
 
