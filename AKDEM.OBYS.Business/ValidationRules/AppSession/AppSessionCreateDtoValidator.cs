@@ -13,7 +13,7 @@ namespace AKDEM.OBYS.Business.ValidationRules.AppSession
         public AppSessionCreateDtoValidator()
         {
             RuleFor(x => x.Definition).MaximumLength(200).NotEmpty().WithMessage("Lütfen Dönem İsmini Giriniz");
-            RuleFor(x => x.Status).NotEmpty().WithMessage("Lütfen dönem durumunu işaretleyiniz");
+            
 
         }
     }

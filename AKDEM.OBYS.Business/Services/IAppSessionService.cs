@@ -10,5 +10,6 @@ namespace AKDEM.OBYS.Business.Services
 {
    public interface IAppSessionService:IGenericService<AppSessionCreateDto,AppSessionUpdateDto,AppSessionListDto,AppSession>
     {
+        Task SetStatusAsync(int sessionId);
     }
 }

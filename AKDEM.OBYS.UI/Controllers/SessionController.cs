@@ -1,4 +1,6 @@
 ﻿using AKDEM.OBYS.Business.Services;
+using AKDEM.OBYS.Dto.AppSessionDtos;
+using AKDEM.OBYS.UI.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -22,5 +24,21 @@ namespace AKDEM.OBYS.UI.Controllers
             
             return View(response.Data);
         }
+        public async Task<IActionResult> ChangeStatus(int id)
+        {
+            await _appSessionService.SetStatusAsync(id);
+            return RedirectToAction("Index", "Session");
+        }
+        public IActionResult CreateSession()
+        {
+            return View(new AppSessionCreateDto());
+        }
+        [HttpPost]
+        public async Task<IActionResult> CreateSession(AppSessionCreateDto dto)
+        {
+            var response=await _appSessionService.CreateAsync(dto);
+            return this.ResponseRedirectAction(response, "Index");
+        }
+       
     }
 }

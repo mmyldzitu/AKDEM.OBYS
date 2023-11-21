@@ -12,18 +12,33 @@
             <th>Dönem Adı</th>
             <th>Durumu</th>
             <th>İşlem</th>
+            <th>Not</th>
         </tr>
     </thead>
     <tbody>
         @foreach (var item in Model)
         {
-            <tr>
-                <td>@item.Definition</td>
-                <td>@(item.Status? "Aktif":"Pasif")</td>
-                <td><a href="#">@(item.Status? "Pasifleştir":"Aktifleştir")</a></td>
-            </tr>
+        <tr>
+            <td>@item.Definition</td>
+
+
+            <td>@(item.Status? "Aktif":"Pasif")</td>
+            @if (item.Status)
+            {
+                <td><a asp-action="ChangeStatus" asp-controller="Session" asp-route-id="@item.Id" class="btn btn-danger">Pasifleştir</a></td>
+                <td>---</td>
+            }
+            else
+            {
+                <td><a asp-action="ChangeStatus" asp-controller="Session" asp-route-id="@item.Id" class="btn btn-primary">Aktifleştir</a></td>
+                <td>Döneme dair Ekleme/Silme/Güncelleme İşlemleri YAPILAMAZ!</td>
+
+
+
+            }
+        </tr>
         }
     </tbody>
 
 </table>
-<button href="#" class="mt-2 btn btn-primary">Yeni Dönem Ekle</button>
+<a asp-action="CreateSession" asp-controller="Session" class="mt-2 btn btn-primary">Yeni Dönem Ekle</a>

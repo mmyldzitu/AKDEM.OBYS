@@ -14,7 +14,7 @@ namespace AKDEM.OBYS.Business.ValidationRules.AppSession
         {
             RuleFor(x => x.Id).NotEmpty();
             RuleFor(x => x.Definition).MaximumLength(200).NotEmpty().WithMessage("Lütfen Dönem İsmini Giriniz");
-            RuleFor(x => x.Status).NotEmpty().WithMessage("Lütfen dönem durumunu işaretleyiniz");
+            
 
         }
     }
