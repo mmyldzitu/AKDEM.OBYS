@@ -1,4 +1,10 @@
 using AKDEM.OBYS.Business.DependencyResolvers;
+using AKDEM.OBYS.Business.Helpers;
+using AKDEM.OBYS.UI.Mappings;
+using AKDEM.OBYS.UI.Models;
+using AKDEM.OBYS.UI.ValidationRules;
+using AutoMapper;
+using FluentValidation;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -27,7 +33,21 @@ namespace AKDEM.OBYS.UI
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDependencies(Configuration);
+            services.AddTransient<IValidator<AppBranchCreateModel>, AppBranchCreateModelValidator>();
+            services.AddTransient<IValidator<AppTeacherUpdateModel>, AppTeacherUpdateModelValidator>();
             services.AddControllersWithViews();
+
+            var profiles = ProfileHelper.GetProfiles();
+
+            profiles.Add(new AppBranchProfile());
+            profiles.Add(new AppTeacherProfile());
+
+
+            var configuration = new MapperConfiguration(opt => {
+                opt.AddProfiles(profiles);
+            });
+            var mapper = configuration.CreateMapper();
+            services.AddSingleton(mapper);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

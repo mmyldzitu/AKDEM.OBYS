@@ -56,5 +56,7 @@ namespace AKDEM.OBYS.Business.Managers
             var dto = _mapper.Map<List<AppTeacherListDto>>(teacherList);
             return new Response<List<AppTeacherListDto>>(ResponseType.Success, dto);
         }
+
+        
     }
 }

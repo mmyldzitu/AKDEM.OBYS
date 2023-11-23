@@ -1,11 +1,13 @@
 ﻿using AKDEM.OBYS.Business.Managers;
 using AKDEM.OBYS.Business.Mappings;
 using AKDEM.OBYS.Business.Services;
+using AKDEM.OBYS.Business.ValidationRules.AppBranch;
 using AKDEM.OBYS.Business.ValidationRules.AppLesson;
 using AKDEM.OBYS.Business.ValidationRules.AppSession;
 using AKDEM.OBYS.Business.ValidationRules.AppUser;
 using AKDEM.OBYS.DataAccess.Context;
 using AKDEM.OBYS.DataAccess.UnitOfWork;
+using AKDEM.OBYS.Dto.AppBranchDtos;
 using AKDEM.OBYS.Dto.AppLessonDtos;
 using AKDEM.OBYS.Dto.AppSessionDtos;
 using AKDEM.OBYS.Dto.AppUserDtos;
@@ -35,20 +37,13 @@ namespace AKDEM.OBYS.Business.DependencyResolvers
             }
                 );
 
-           var mapperConfiguration =new MapperConfiguration(opt =>
-            {
-                opt.AddProfile(new AppSessionProfile());
-                opt.AddProfile(new AppLessonProfile());
-                opt.AddProfile(new AppUserProfile());
-                
-            });
-            var mapper = mapperConfiguration.CreateMapper();
-            services.AddSingleton(mapper);
+           
 
 
             services.AddScoped<IUow, Uow>();
             services.AddScoped<IAppSessionService, AppSessionManager>();
             services.AddScoped<IAppUserService, AppUserManager>();
+            services.AddScoped<IAppBranchService, AppBranchManager>();
 
             services.AddTransient<IValidator<AppLessonCreateDto>, AppLessonCreateDtoValidator>();
             services.AddTransient<IValidator<AppSessionCreateDto>, AppSessionCreateDtoValidator>();
@@ -56,7 +51,12 @@ namespace AKDEM.OBYS.Business.DependencyResolvers
 
             services.AddTransient<IValidator<AppTeacherCreateDto>, AppTeacherCreateDtoValidator>();
             services.AddTransient<IValidator<AppTeacherUpdateDto>, AppTeacherUpdateDtoValidator>();
+            services.AddTransient<IValidator<AppBranchCreateDto>, AppBranchCreateDtoValidator>();
+            services.AddTransient<IValidator<AppBranchUpdateDto>, AppBranchUpdateDtoValidator>();
+            
+
             //dependecy injectionlar ve validaionlar buraya
         }
+       
     }
 }

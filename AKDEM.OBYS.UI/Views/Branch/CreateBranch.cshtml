@@ -1,0 +1,24 @@
+﻿@model AppBranchCreateModel
+@{
+    Layout = "_Layout";
+}
+<div class="container-fluid">
+    <form asp-action="CreateBranch" asp-controller="Branch" method="post">
+        <div class="mb-3">
+            <label>Şube İsmi :</label>
+            <input asp-for="Definition" type="text" class="form-control" placeholder="Örnek: 1-A" />
+        </div>
+        <div class="mb-3">
+            <label>Sınıf :</label>
+            <select asp-for="ClassId" asp-items="@ViewBag.classes" class="form-control-sm"></select>
+        </div>
+
+
+        <div class="mb-3">
+            <button class="btn btn-primary" type="submit">Oluştur</button>
+        </div>
+        <div class="mb-3 text-bg-danger" asp-validation-summary="All">
+
+        </div>
+    </form>
+</div>

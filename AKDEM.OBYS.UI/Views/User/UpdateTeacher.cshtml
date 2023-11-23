@@ -5,7 +5,10 @@
 }
 <div class="container-fluid">
     <form asp-action="UpdateTeacher" asp-controller="User" method="post" enctype="multipart/form-data">
-        <input asp-for="Id" type="hidden"/>
+        <input asp-for="Id" type="hidden" />
+        <input asp-for="ImagePath2" type="hidden" />
+        <input asp-for="Password" type="hidden" />
+        
 
         <div class="mb-3">
             <label>İsim :</label>
@@ -25,15 +28,25 @@
         </div>
         <div class="mb-3">
             <label>Görsel :</label>
-            <input type="file" asp-for="ImagePath" class="form-control" />
-        </div>
+            <div class="mb-2">
+                <img src="@Model.ImagePath2" height="150" width="150" />
 
+            </div>
+            <input type="file" asp-for="ImagePath" class="form-control" />
+
+
+           
+
+        </div>
+        
 
         <div class="mb-3">
-            <button class="btn btn-primary" type="submit">Oluştur</button>
+            <button class="btn btn-primary" type="submit">Güncelle</button>
         </div>
         <div class="mb-3 text-bg-danger" asp-validation-summary="All">
 
         </div>
     </form>
 </div>
+
+
