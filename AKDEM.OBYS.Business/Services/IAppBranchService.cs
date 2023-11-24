@@ -11,6 +11,7 @@ namespace AKDEM.OBYS.Business.Services
    public interface IAppBranchService: IGenericService<AppBranchCreateDto, AppBranchUpdateDto, AppBranchListDto, AppBranch>
     {
         Task<List<AppBranchListDto>> GetList();
+        Task<List<AppBranchListDto>> GetClasses(int id);
     }
     
 }

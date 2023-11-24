@@ -35,12 +35,16 @@ namespace AKDEM.OBYS.UI
             services.AddDependencies(Configuration);
             services.AddTransient<IValidator<AppBranchCreateModel>, AppBranchCreateModelValidator>();
             services.AddTransient<IValidator<AppTeacherUpdateModel>, AppTeacherUpdateModelValidator>();
+            services.AddTransient<IValidator<AppStudentCreateModel>, AppStudentCreateModelValidator>();
+            
+            services.AddTransient<IValidator<AppStudentUpdateModel>, AppStudentUpdateModelValidator>();
             services.AddControllersWithViews();
 
             var profiles = ProfileHelper.GetProfiles();
 
             profiles.Add(new AppBranchProfile());
             profiles.Add(new AppTeacherProfile());
+            profiles.Add(new AppStudentProfile());
 
 
             var configuration = new MapperConfiguration(opt => {

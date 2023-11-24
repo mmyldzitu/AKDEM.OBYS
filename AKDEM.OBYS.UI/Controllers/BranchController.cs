@@ -30,6 +30,7 @@ namespace AKDEM.OBYS.UI.Controllers
 
         public IActionResult Index()
         {
+            
             var list = new List<AppClassListDto>();
             var items = Enum.GetValues(typeof(ClassType));
             foreach (int item in items)
@@ -40,27 +41,16 @@ namespace AKDEM.OBYS.UI.Controllers
                     Definition = Enum.GetName(typeof(ClassType), item)
                 });
             }
-            ViewBag.classes = new SelectList(list, "Id", "Definition");
-            //var response = await _appBranchService.GetList();
-            //return View(response);
-            return View();
+            ViewBag.classes = new SelectList(list, "ClassId", "Definition");
+            
+            return View(new AppBranchListDto());
 
         }
 
-        public IActionResult CreateBranch()
+        public IActionResult CreateBranch(int id)
         {
-            var items = Enum.GetValues(typeof(ClassType));
-            var list = new List<AppClassListDto>();
-            foreach( int item in items)
-            {
-                list.Add(new AppClassListDto
-                {
-                    ClassId = item,
-                    Definition = Enum.GetName(typeof(ClassType), item)
-                });
-            }
-            ViewBag.classes = new SelectList(list, "ClassId", "Definition");
-            return View(new AppBranchCreateModel());
+           
+            return View(new AppBranchCreateModel { ClassId=id});
         }
 
         [HttpPost]
@@ -69,26 +59,18 @@ namespace AKDEM.OBYS.UI.Controllers
             var result = _branchCreateModelValidator.Validate(model);
             if (result.IsValid)
             {
+                ViewBag.classId = model.ClassId;
                 var dto = _mapper.Map<AppBranchCreateDto>(model);
                 var createResponse = await _appBranchService.CreateAsync(dto);
-                return this.ResponseRedirectAction(createResponse, "Index");
+                return this.ResponseRedirectAction(createResponse,"Index");
             }
             foreach( var error in result.Errors)
             {
                 ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
             }
-            var items = Enum.GetValues(typeof(ClassType));
-            var list = new List<AppClassListDto>();
-            foreach (int item in items)
-            {
-                list.Add(new AppClassListDto
-                {
-                    ClassId = item,
-                    Definition = Enum.GetName(typeof(ClassType), item)
-                });
-            }
-            ViewBag.classes = new SelectList(list, "ClassId", "Definition");
+            
             return View(model);
         }
+        
     }
 }

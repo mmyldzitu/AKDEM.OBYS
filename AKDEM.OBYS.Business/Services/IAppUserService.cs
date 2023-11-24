@@ -1,4 +1,5 @@
 ﻿using AKDEM.OBYS.Common;
+using AKDEM.OBYS.Common.Enums;
 using AKDEM.OBYS.Dto.AppUserDtos;
 using AKDEM.OBYS.Entities;
 using System;
@@ -11,8 +12,11 @@ namespace AKDEM.OBYS.Business.Services
 {
    public  interface IAppUserService:IGenericService<AppTeacherCreateDto,AppTeacherUpdateDto,AppTeacherListDto,AppUser>
     {
-        Task<IResponse<AppTeacherCreateDto>> CreateWithRoleAsync(AppTeacherCreateDto dto, int roleId);
+        Task<IResponse<AppTeacherCreateDto>> CreateTeacherWithRoleAsync(AppTeacherCreateDto dto, int roleId);
         Task<IResponse<List<AppTeacherListDto>>> GetAllTeacherAsync(int roleId);
+
+        Task<List<AppStudentListDto>> GetAllStudentAsync(RoleType type);
+        Task<IResponse<AppStudentCreateDto>> CreateStudentWithRoleAsync(AppStudentCreateDto dto, int roleId);
 
     }
 }

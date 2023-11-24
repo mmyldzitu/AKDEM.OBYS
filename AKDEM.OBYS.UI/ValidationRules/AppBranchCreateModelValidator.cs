@@ -12,7 +12,7 @@ namespace AKDEM.OBYS.UI.ValidationRules
         public AppBranchCreateModelValidator()
         {
             RuleFor(x => x.Definition).NotEmpty().WithMessage("Lütfen Şube İsmini Giriniz");
-            RuleFor(x => x.ClassId).NotEmpty().WithMessage("Lütfen Şube İiçin Bir Sınıf Seçiniz");
+            RuleFor(x => x.ClassId).NotEmpty();
         }
     }
 }

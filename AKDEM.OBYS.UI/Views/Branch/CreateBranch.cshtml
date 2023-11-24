@@ -4,21 +4,21 @@
 }
 <div class="container-fluid">
     <form asp-action="CreateBranch" asp-controller="Branch" method="post">
+        <input asp-for="ClassId" type="hidden" />
+
         <div class="mb-3">
             <label>Şube İsmi :</label>
-            <input asp-for="Definition" type="text" class="form-control" placeholder="Örnek: 1-A" />
+            <input asp-for="Definition" type="text" class="form-control" width="20" placeholder="Örnek: 1/A" />
         </div>
-        <div class="mb-3">
-            <label>Sınıf :</label>
-            <select asp-for="ClassId" asp-items="@ViewBag.classes" class="form-control-sm"></select>
-        </div>
+        
+            
 
 
-        <div class="mb-3">
-            <button class="btn btn-primary" type="submit">Oluştur</button>
-        </div>
-        <div class="mb-3 text-bg-danger" asp-validation-summary="All">
+            <div class="mb-3">
+                <button class="btn btn-primary" type="submit">Oluştur</button>
+            </div>
+            <div class="mb-3 text-bg-danger" asp-validation-summary="All">
 
-        </div>
-    </form>
+            </div>
+</form>
 </div>

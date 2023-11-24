@@ -53,6 +53,8 @@ namespace AKDEM.OBYS.Business.DependencyResolvers
             services.AddTransient<IValidator<AppTeacherUpdateDto>, AppTeacherUpdateDtoValidator>();
             services.AddTransient<IValidator<AppBranchCreateDto>, AppBranchCreateDtoValidator>();
             services.AddTransient<IValidator<AppBranchUpdateDto>, AppBranchUpdateDtoValidator>();
+            services.AddTransient<IValidator<AppStudentUpdateDto>, AppStudentUpdateDtoValidator>();
+            services.AddTransient<IValidator<AppStudentCreateDto>, AppStudentCreateDtoValidator>();
             
 
             //dependecy injectionlar ve validaionlar buraya

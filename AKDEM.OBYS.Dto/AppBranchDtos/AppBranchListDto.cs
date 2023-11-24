@@ -13,6 +13,7 @@ namespace AKDEM.OBYS.Dto.AppBranchDtos
         public int Id { get; set; }
         public string Definition { get; set; }
         public int ClassId { get; set; }
+        
         public AppClassListDto AppClass { get; set; }
     }
 }

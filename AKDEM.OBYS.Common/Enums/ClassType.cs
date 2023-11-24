@@ -12,6 +12,7 @@ namespace AKDEM.OBYS.Common.Enums
         Bir=2,
         iki=3,
         Üç=4,
-        Dört=5
+        Dört=5,
+        Tamamı=6
     }
 }

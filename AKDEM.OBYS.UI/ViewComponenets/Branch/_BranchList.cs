@@ -16,10 +16,23 @@ namespace AKDEM.OBYS.UI.ViewComponenets.Branch
         {
             _appBranchService = appBranchService;
         }
-        public IViewComponentResult Invoke(int id)
+        public async Task<IViewComponentResult> InvokeAsync(int id)
         {
-            var response = _appBranchService
-            return View(response);
+            ViewBag.classId = id;
+
+            if (id == 6)
+            {
+                var Alllist = await _appBranchService.GetList();
+                return View(Alllist);
+
+            }
+            else
+            {
+                var list = await _appBranchService.GetClasses(id);
+
+                return View(list);
+            }
+            
         }
     }
 }

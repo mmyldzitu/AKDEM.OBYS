@@ -1,0 +1,74 @@
+﻿@model AppStudentCreateModel
+@{
+    Layout = "_Layout";
+}
+<div class="container-fluid">
+    <form asp-action="CreateStudent" asp-controller="User" method="post" enctype="multipart/form-data">
+
+        <div class="mb-3">
+            <label>İsim :</label>
+            <input asp-for="FirstName" type="text" class="form-control" />
+        </div>
+        <div class="mb-3">
+            <label>Soyisim :</label>
+            <input asp-for="SecondName" type="text" class="form-control" />
+        </div>
+        <div class="mb-3">
+            <label class="form-check-label">Mail Adresi :</label>
+            <input asp-for="Email" type="email" class="form-control" />
+        </div>
+        <div class="mb-3">
+            <label>Telefon Numarası :</label>
+            <input asp-for="PhoneNumber" type="tel" class="form-control" />
+        </div>
+        <div class="mb-3">
+            <label>Görsel :</label>
+            <input type="file" asp-for="ImagePath" class="form-control" />
+        </div>
+        <br />
+
+        <div class="mb-3">
+
+            <label>Şube :</label>
+
+            <select asp-for="ClassId" onchange="setInputDisplay()" asp-items="@ViewBag.classes" class="form form-control-sm">
+                <option value="0">Bir Sınıf Seçiniz</option>
+            </select>
+
+
+        </div>
+        <br />
+
+        <div class="mb-3" id="branchDiv" style="display:block">
+
+            <label>Şube :</label>
+
+            <select asp-for="BranchId" onchange="setInputDisplay()" data-class="" asp-items="@ViewBag.branches" class="form form-control-sm">
+                <option value="0">Bir Şube Seçiniz</option>
+            </select>
+
+
+        </div>
+
+        <div class="mb-3">
+            <button class="btn btn-primary" type="submit">Kaydet</button>
+        </div>
+        <div class="mb-3 text-bg-danger" asp-validation-summary="All">
+
+        </div>
+    </form>
+</div>
+@section script {
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+    <script>
+        // İl seçimi değiştiğinde
+        $("#ClassId").change(function () {
+            var secilensinif = $(this).val(); // Seçilen ilin değerini al
+
+            // İlgili ilçeleri gizle, sadece seçilen il ile eşleşenleri göster
+            $("#branchId").hide().filter('[data-class="' + secilensinif + '"]').show();
+        });
+    </script>
+
+}

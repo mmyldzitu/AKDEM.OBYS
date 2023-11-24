@@ -32,5 +32,11 @@ namespace AKDEM.OBYS.Business.Managers
             return _mapper.Map<List<AppBranchListDto>>(list);
         }
         
+        public async Task<List<AppBranchListDto>> GetClasses(int id)
+        {
+            var query = _uow.GetRepositry<AppBranch>().GetQuery();
+            var list = await query.Include(x => x.AppClass).Where(x => x.ClassId == id).ToListAsync();
+            return _mapper.Map<List<AppBranchListDto>>(list);
+        }
     }
 }
