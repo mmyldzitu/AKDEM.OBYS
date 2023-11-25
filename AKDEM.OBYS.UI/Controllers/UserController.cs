@@ -23,7 +23,7 @@ namespace AKDEM.OBYS.UI.Controllers
     {
         private readonly IAppUserService _appUserService;
         private readonly IAppBranchService _appBranchService;
-        
+
         private readonly IMapper _mapper;
         private readonly IValidator<AppTeacherUpdateModel> _teacherUpdateModelValidator;
 
@@ -160,6 +160,7 @@ namespace AKDEM.OBYS.UI.Controllers
         }
         public async Task <IActionResult> CreateStudent()
         {
+
             var list = new List<AppClassListDto>();
             var items = Enum.GetValues(typeof(ClassType));
             foreach (int item in items)
@@ -172,22 +173,22 @@ namespace AKDEM.OBYS.UI.Controllers
             }
             ViewBag.classes = new SelectList(list, "ClassId", "Definition");
 
-            
+
             var list2 = new List<AppBranchListDto>();
             var items2 = await _appBranchService.GetList();
             foreach (var item in items2)
             {
                 list2.Add(new AppBranchListDto
                 {
-                     Id = item.Id,
-                     ClassId=item.ClassId,
+                     Id=item.Id,
+
                     Definition = item.Definition
-                });
+                });;
             }
             ViewBag.branches = new SelectList(list2, "Id", "Definition");
             
 
-            return View(new AppStudentCreateModel());
+            return View(new AppStudentCreateModel ());
         }
         [HttpPost]
         public async Task<IActionResult> CreateStudent(AppStudentCreateModel model)
@@ -225,7 +226,20 @@ namespace AKDEM.OBYS.UI.Controllers
 
 
         }
-        
+        [HttpGet]
+        public async Task<IActionResult> GetBranches(int ClassId)
+        {
+            
+
+            var branches = await _appBranchService.GetClasses(ClassId); // Şubeleri getiren bir metot veya servis çağırılmalı
+            var branchList = branches.Select(s => new SelectListItem
+            {
+                Value = s.Id.ToString(),   // Şubenin Id'si
+                Text = s.Definition           // Şubenin Adı
+            }).ToList();
+            return Json(branchList);
+        }
+
 
 
     }

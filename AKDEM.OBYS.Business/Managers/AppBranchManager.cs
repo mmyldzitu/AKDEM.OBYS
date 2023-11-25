@@ -38,5 +38,6 @@ namespace AKDEM.OBYS.Business.Managers
             var list = await query.Include(x => x.AppClass).Where(x => x.ClassId == id).ToListAsync();
             return _mapper.Map<List<AppBranchListDto>>(list);
         }
+        
     }
 }

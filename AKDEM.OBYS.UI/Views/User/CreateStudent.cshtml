@@ -27,32 +27,40 @@
         </div>
         <br />
 
+
+
         <div class="mb-3">
 
-            <label>Şube :</label>
-
-            <select asp-for="ClassId" onchange="setInputDisplay()" asp-items="@ViewBag.classes" class="form form-control-sm">
-                <option value="0">Bir Sınıf Seçiniz</option>
+            <label>Sınıf :</label>
+            <select id="classes" onchange="setInputDisplay()" asp-for="ClassId" asp-items="ViewBag.classes">
+                <option value="">-- Sınıf Seçin --</option>
             </select>
-
 
         </div>
         <br />
 
-        <div class="mb-3" id="branchDiv" style="display:block">
+
+
+
+        <div class="mb-3" style="display:none" id="branchDiv">
 
             <label>Şube :</label>
 
-            <select asp-for="BranchId" onchange="setInputDisplay()" data-class="" asp-items="@ViewBag.branches" class="form form-control-sm">
-                <option value="0">Bir Şube Seçiniz</option>
+            <select id="branches"  asp-for="BranchId" asp-items="ViewBag.branches">
+                <option value="">-- Şube Seçin --</option>
             </select>
-
-
         </div>
+
+
+
+        <br />
 
         <div class="mb-3">
             <button class="btn btn-primary" type="submit">Kaydet</button>
         </div>
+
+
+
         <div class="mb-3 text-bg-danger" asp-validation-summary="All">
 
         </div>
@@ -60,15 +68,43 @@
 </div>
 @section script {
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-
     <script>
-        // İl seçimi değiştiğinde
-        $("#ClassId").change(function () {
-            var secilensinif = $(this).val(); // Seçilen ilin değerini al
+        $(document).ready(function () {
+            $('#classes').change(function () {
+                var sinifId = $(this).val();
 
-            // İlgili ilçeleri gizle, sadece seçilen il ile eşleşenleri göster
-            $("#branchId").hide().filter('[data-class="' + secilensinif + '"]').show();
+                // AJAX kullanarak seçilen sınıfa ait şubeleri getir
+                $.get('/User/GetBranches', { classId: sinifId }, function (data) {
+                    // Şubeleri güncelle
+                    $('#branches').empty();
+                    $('#branches').append($('<option>', {
+                        value: '',
+                        text: '-- Şube Seçin --'
+                    }));
+                    $.each(data, function (index, item) {
+                        $('#branches').append($('<option>', {
+                            value: item.value,
+                            text: item.text
+                        }));
+                    });
+                });
+            });
         });
-    </script>
 
+        /*setInputDisplay()*/
+        function setInputDisplay() {
+            var selectElement = document.getElementById("classes");
+            
+            selectedDiv = document.getElementById("branchDiv");
+            selectedDiv.style.display = "block";
+
+   
+        }
+
+    </script>
 }
+
+
+
+
+

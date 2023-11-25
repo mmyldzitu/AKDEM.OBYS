@@ -1,6 +1,7 @@
 ﻿using AKDEM.OBYS.Dto.AppBranchDtos;
 using AKDEM.OBYS.Dto.AppClassDtos;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,8 +19,12 @@ namespace AKDEM.OBYS.UI.Models
         public bool Status { get; set; } = true;
         public IFormFile ImagePath { get; set; }
         
-        public int ClassId { get; set; }
+       
         
         public int BranchId { get; set; }
+        public int ClassId { get; set; }
+        public List<SelectListItem> Classes { get; set; }
+        public List<SelectListItem> Branches { get; set; }
+
     }
 }

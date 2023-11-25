@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace AKDEM.OBYS.UI.Controllers
@@ -30,7 +31,7 @@ namespace AKDEM.OBYS.UI.Controllers
 
         public IActionResult Index()
         {
-            
+
             var list = new List<AppClassListDto>();
             var items = Enum.GetValues(typeof(ClassType));
             foreach (int item in items)
@@ -42,35 +43,56 @@ namespace AKDEM.OBYS.UI.Controllers
                 });
             }
             ViewBag.classes = new SelectList(list, "ClassId", "Definition");
-            
+
             return View(new AppBranchListDto());
 
         }
 
         public IActionResult CreateBranch(int id)
         {
-           
-            return View(new AppBranchCreateModel { ClassId=id});
+
+            return View(new AppBranchCreateModel { ClassId = id });
         }
 
         [HttpPost]
         public async Task<IActionResult> CreateBranch(AppBranchCreateModel model)
         {
+            model.Definition = $"{model.Class}/{model.Branch}";
             var result = _branchCreateModelValidator.Validate(model);
             if (result.IsValid)
             {
                 ViewBag.classId = model.ClassId;
                 var dto = _mapper.Map<AppBranchCreateDto>(model);
                 var createResponse = await _appBranchService.CreateAsync(dto);
-                return this.ResponseRedirectAction(createResponse,"Index");
+                return this.ResponseRedirectAction(createResponse, "Index");
             }
-            foreach( var error in result.Errors)
+            foreach (var error in result.Errors)
             {
                 ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
             }
-            
+
             return View(model);
         }
-        
+        [HttpGet]
+        public async Task<IActionResult> GetBranches(int ClassId)
+        {
+            if (ClassId == 6)
+            {
+                var allbranches = await _appBranchService.GetList();
+                return Json(allbranches);
+            }
+
+            var branches = await _appBranchService.GetClasses(ClassId);
+            foreach(var item in branches)
+            {
+                Console.WriteLine(item.AppClass.Definition);
+            }
+            return Json(branches);
+        }
+
     }
+
 }
+
+    
+
