@@ -9,7 +9,10 @@ namespace AKDEM.OBYS.UI.Extensions
 {
     public static class ControllerExtensions
     {
-        public static IActionResult ResponseRedirectAction<T>(this Controller controller, IResponse<T> response, string actionName, string controllerName="")
+      
+
+
+        public static IActionResult ResponseRedirectAction<T>(this Controller controller, IResponse<T> response, string actionName, string controllerName = "",int parameter=0)
         {
 
             if (response.ResponseType == ResponseType.NotFound)
@@ -18,22 +21,37 @@ namespace AKDEM.OBYS.UI.Extensions
             }
             if (response.ResponseType == ResponseType.ValidationError)
             {
-                foreach(var item in response.ValidationErrors)
+                foreach (var item in response.ValidationErrors)
                 {
                     controller.ModelState.AddModelError(item.PropertyName, item.ErrorMessage);
                 }
                 return controller.View(response.Data);
             }
-            if (string.IsNullOrWhiteSpace(controllerName))
+            if (string.IsNullOrWhiteSpace(controllerName) && parameter==0)
             {
                 return controller.RedirectToAction(actionName);
 
             }
-            else
+            else if(!string.IsNullOrWhiteSpace(controllerName) && parameter == 0)
             {
                 return controller.RedirectToAction(actionName, controllerName);
             }
+            else if (!string.IsNullOrWhiteSpace(controllerName) && parameter == 1)
+            {
+                return controller.RedirectToAction(actionName, controllerName, new { ClassId = parameter });
+            }
+            else
+            {
+                return controller.RedirectToAction(actionName, new { ClassId = parameter });
+            }
         }
+
+
+
+
+
+
+
         //örneğin getbyıd
         public static IActionResult ResponseView<T>(this Controller contoller, IResponse<T> response)
         {

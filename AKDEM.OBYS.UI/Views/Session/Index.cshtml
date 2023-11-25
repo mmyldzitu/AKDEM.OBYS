@@ -19,18 +19,33 @@
         @foreach (var item in Model)
         {
         <tr>
-            <td>@item.Definition</td>
 
 
-            <td>@(item.Status? "Aktif":"Pasif")</td>
+
+            @{
+                if (item.Status)
+                {
+                    <td bgcolor="Cadetblue">@item.Definition</td>
+                    <td class="text-bg-success p-3">Aktif</td>
+
+                }
+                else
+                {   <td bgcolor="DimGrey">@item.Definition</td>
+                    <td class="text-bg-danger p-3">Pasif</td>
+                }
+            }
+
+
+
             @if (item.Status)
             {
-                <td><a asp-action="ChangeStatus" asp-controller="Session" asp-route-id="@item.Id" class="btn btn-danger">Pasifleştir</a></td>
+
+                <td><a asp-action="ChangeStatus" asp-controller="Session" asp-route-id="@item.Id" class="btn btn-outline-danger">Pasifleştir</a></td>
                 <td>---</td>
             }
             else
             {
-                <td><a asp-action="ChangeStatus" asp-controller="Session" asp-route-id="@item.Id" class="btn btn-primary">Aktifleştir</a></td>
+                <td><a asp-action="ChangeStatus" asp-controller="Session" asp-route-id="@item.Id" class="btn btn-outline-success">Aktifleştir</a></td>
                 <td>Döneme dair Ekleme/Silme/Güncelleme İşlemleri YAPILAMAZ!</td>
 
 

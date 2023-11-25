@@ -1,7 +1,11 @@
 ﻿using AKDEM.OBYS.Business.Services;
+using AKDEM.OBYS.Common.Enums;
 using AKDEM.OBYS.Dto.AppSessionDtos;
+using AKDEM.OBYS.Dto.SessionType;
 using AKDEM.OBYS.UI.Extensions;
+using AKDEM.OBYS.UI.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,7 +24,7 @@ namespace AKDEM.OBYS.UI.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var response = await _appSessionService.GetAllAsync();
+            var response = await _appSessionService.GetOrderingAsync();
             
             return View(response.Data);
         }
@@ -31,11 +35,28 @@ namespace AKDEM.OBYS.UI.Controllers
         }
         public IActionResult CreateSession()
         {
-            return View(new AppSessionCreateDto());
+            var items = Enum.GetValues(typeof(SessionType));
+            var list = new List<SessionTypeListDto>();
+            foreach (int item in items)
+            {
+                list.Add(new SessionTypeListDto
+                {
+                    Id = item,
+                    Definition = Enum.GetName(typeof(SessionType), item)
+                });
+
+            }
+            ViewBag.sessions = new SelectList(list, "Id", "Definition");
+            return View(new AppSessionCreateModel());
         }
         [HttpPost]
-        public async Task<IActionResult> CreateSession(AppSessionCreateDto dto)
+        public async Task<IActionResult> CreateSession(AppSessionCreateModel model)
         {
+            model.Definition = $"{model.year1}-{model.year2}/{ Enum.GetName(typeof(SessionType), model.SessionType)}";
+            
+            AppSessionCreateDto dto = new AppSessionCreateDto();
+            dto.Definition = model.Definition;
+            dto.Status = model.Status;
             var response=await _appSessionService.CreateAsync(dto);
             return this.ResponseRedirectAction(response, "Index");
         }

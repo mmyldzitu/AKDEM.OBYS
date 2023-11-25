@@ -1,14 +1,24 @@
 ﻿@model AppBranchCreateModel
 @{
     Layout = "_Layout";
+    var myclass = "0";
 }
+@{      if (Model.ClassId == 1)
+    {
+        myclass = "Hazırlık";
+    }
+    else
+    {
+        myclass = (Model.ClassId - 1).ToString();
+    }
+ }
 <div class="container-fluid">
     <form asp-action="CreateBranch" asp-controller="Branch" method="post">
         <input asp-for="ClassId" type="hidden" />
 
         <div class="mb-3">
             <label>Şube İsmi :</label>
-            <input asp-for="Class" type="text" />
+            <input asp-for="Class" type="text" style="text-align:center" class="font-weight-bold" readonly value="@myclass" />
             <label>/</label>
             <input asp-for="Branch" type="text" />
 

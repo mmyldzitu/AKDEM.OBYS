@@ -48,6 +48,7 @@ namespace AKDEM.OBYS.UI.Controllers
 
         }
 
+        
         public IActionResult CreateBranch(int id)
         {
 
@@ -64,7 +65,7 @@ namespace AKDEM.OBYS.UI.Controllers
                 ViewBag.classId = model.ClassId;
                 var dto = _mapper.Map<AppBranchCreateDto>(model);
                 var createResponse = await _appBranchService.CreateAsync(dto);
-                return this.ResponseRedirectAction(createResponse, "Index");
+                return this.ResponseRedirectAction(createResponse, "ReturnRelatedBranches", parameter:model.ClassId);
             }
             foreach (var error in result.Errors)
             {
@@ -72,6 +73,14 @@ namespace AKDEM.OBYS.UI.Controllers
             }
 
             return View(model);
+        }
+
+        public async Task<IActionResult> ReturnRelatedBranches(int ClassId)
+        {
+            ViewBag.id = ClassId;
+            var branches = await _appBranchService.GetClasses(ClassId);
+            
+            return View(branches);
         }
         [HttpGet]
         public async Task<IActionResult> GetBranches(int ClassId)
@@ -85,7 +94,7 @@ namespace AKDEM.OBYS.UI.Controllers
             var branches = await _appBranchService.GetClasses(ClassId);
             foreach(var item in branches)
             {
-                Console.WriteLine(item.AppClass.Definition);
+               
             }
             return Json(branches);
         }

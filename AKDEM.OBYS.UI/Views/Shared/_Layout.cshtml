@@ -17,23 +17,24 @@
             <div class="p-4 pt-5">
                 <a href="#" class="img logo rounded-circle mb-5" style="background-image: url(images/logo.jpg);"></a>
                 <ul class="list-unstyled components mb-5">
+                    <li>
+                        <a asp-action="Index" asp-controller="Session">Dönemler</a>
+                    </li>
                     <li class="active">
-                        <a href="#homeSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Kullanıcılar</a>
+                        <a href="#homeSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Yönetim</a>
                         <ul class="collapse list-unstyled" id="homeSubmenu">
                             <li>
-                                <a href="#">Öğretmenler</a>
+                                <a asp-action="GetTeachers" asp-controller="User">Öğretmenler</a>
                             </li>
                             <li>
-                                <a href="#">Öğrenciler</a>
+                                <a asp-action="GetStudents" asp-controller="User">Öğrenciler</a>
                             </li>
                             <li>
-                                <a href="#">Home 3</a>
+                                <a asp-action="Index" asp-controller="Branch">Sınıflar</a>
                             </li>
                         </ul>
                     </li>
-                    <li>
-                        <a href="#">Dönemler</a>
-                    </li>
+
                     <li>
                         <a href="#pageSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Pages</a>
                         <ul class="collapse list-unstyled" id="pageSubmenu">

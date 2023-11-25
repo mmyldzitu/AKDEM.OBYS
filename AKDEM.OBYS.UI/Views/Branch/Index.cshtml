@@ -3,11 +3,13 @@
     Layout = "_Layout";
 }
 
+
 <div class="mb-3">
 
     <label>Sınıf :</label>
+    
 
-    <select id="classes" asp-for="AppClass.ClassId" onchange="setInputDisplay()" asp-items="@ViewBag.classes" class="form form-control-sm">
+    <select id="classes" asp-for="ClassId" onchange="setInputDisplay()" asp-items="@ViewBag.classes" class="form form-control-sm">
         <option value="0">Bir Sınıf Seçiniz</option>
     </select>
 
@@ -31,7 +33,7 @@
     </table>
 </div>
     <div id="create-div"class="mb-3" style="display:none">
-        <a  asp-action="CreateBranch" asp-controller="Branch" asp-route-id="AppClass.ClassId" class="btn btn-primary">Yeni Sınıf Ekle</a>
+        <a href="javascript:void(0);" id="sendValue" class="btn btn-primary">Yeni Sınıf Ekle</a>
     </div>
 
 
@@ -41,6 +43,26 @@
 @section script {
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <script>
+
+
+        // Select elementini seç
+        var selectElement = document.getElementById("classes");
+
+        // A etiketini seç
+        var sendValueLink = document.getElementById("sendValue");
+
+        // A etiketinin click olayını dinle
+        sendValueLink.addEventListener("click", function () {
+            // Seçili değeri al
+            var selectedValue = selectElement.value;
+
+            // Hedef sayfa URL'sine parametre ekleyerek git
+            window.location.href = "/Branch/CreateBranch?id=" + selectedValue;
+        });
+
+
+
+
         $(document).ready(function () {
             // Birinci selectbox'ın değişimini takip et
             $('#classes').change(function () {

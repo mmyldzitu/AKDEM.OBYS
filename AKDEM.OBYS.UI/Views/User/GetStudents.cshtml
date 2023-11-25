@@ -34,21 +34,51 @@
             @foreach (var item in Model)
             {
                 count = count + 1;
-                <tr>
-                    <td>@count</td>
-                    <td>@item.FirstName</td>
-                    <td>@item.SecondName</td>
-                    <td>@item.Email</td>
-                    <td>@item.PhoneNumber</td>
-                    <td><img src="@item.ImagePath" height="150" width="150" /></td>
-                    <td>@item.AppBranch.AppClass.Definition</td>
-                    <td>@item.AppBranch.Definition</td>
-                    
-                    
+            <tr>
+                <td>@count</td>
+                <td>@item.FirstName</td>
+                <td>@item.SecondName</td>
+                <td>@item.Email</td>
+                <td>@item.PhoneNumber</td>
+                <td><img src="@item.ImagePath" height="150" width="150" /></td>
+                @{
+                    if (@item.AppBranch.AppClass.Definition == "Hazirlik")
+                    {
+                        <td>Hazırlık</td>
+                    }
+                    else if (@item.AppBranch.AppClass.Definition == "Bir")
+                    {
+                        <td>1</td>
+                    }
+                    else if (@item.AppBranch.AppClass.Definition == "İki")
+                    {
+                        <td>2</td>
+                    }
+                    else if (@item.AppBranch.AppClass.Definition == "Uç")
+                    {
+                        <td>3</td>
+                    }
+                    else if (@item.AppBranch.AppClass.Definition == "Dort")
+                    {
+                        <td>4</td>
+                    }
+                    else
+                    {
+                        <td>Mezun</td>
+
+                    }
+
+                }
+                
+
+
+                <td>@item.AppBranch.Definition</td>
 
 
 
-                </tr>
+
+
+            </tr>
             }
         </tbody>
 

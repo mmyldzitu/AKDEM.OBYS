@@ -9,6 +9,7 @@ namespace AKDEM.OBYS.UI.Models
     public class AppBranchListModel
     {
         public AppBranchListDto AppBranch { get; set; }
-        public List<AppBranchListDto> AppBranches { get; set; }
+        public AppBranchCreateModel BranchCreateModel { get; set; }
+
     }
 }

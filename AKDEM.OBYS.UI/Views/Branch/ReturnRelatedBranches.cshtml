@@ -1,0 +1,44 @@
+﻿@model List<AppBranchListDto>
+@{
+    Layout = "_Layout";
+}
+
+
+<div class="mb-3">
+
+  
+</div>
+
+<div class="mb-3"  >
+    <table class="mt-3 table table-sm table-hover">
+        <thead>
+            <tr>
+                <th>Şube</th>
+                <th>Sınıf</th>
+                <th>Mevcut</th>
+                <th>İşlem</th>
+            </tr>
+        </thead>
+        <tbody id="table-div">
+        </tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Definition</td>
+                <td>@item.AppClass.Definition</td>
+                <td></td>
+                <td></td>
+            </tr>
+        }
+
+
+    </table>
+</div>
+<div  class="mb-3" >
+    <a asp-action="CreateBranch" asp-controller="Branch" asp-route-id="@ViewBag.id" class="btn btn-primary">Yeni Sınıf Ekle</a>
+</div>
+
+
+
+
+

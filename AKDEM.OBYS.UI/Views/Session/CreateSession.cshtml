@@ -1,19 +1,25 @@
-﻿@model AppSessionCreateDto
+﻿@model AppSessionCreateModel
 @{
     Layout = "_Layout";
 }
 <div class="container-fluid">
     <form asp-action="CreateSession" asp-controller="Session" method="post">
-        <div class="mb-3">
-            <label>Dönem İsmi :</label>
-            <input asp-for="Definition" type="text" class="form-control" />
-        </div>
+
+        <label>Dönem İsmi :</label>
+        <input asp-for="year1" type="text" style="text-align:center" class="font-weight-bold" />
+        <label>-</label>
+        <input asp-for="year2" type="text" style="text-align:center" class="font-weight-bold" />
+        <label>/</label>
+        <select asp-for="SessionType" asp-items="@ViewBag.sessions" class="form form-control-sm">
+            <option value="0">Bir Dönem Seçiniz</option>
+        </select>
+
         <div class="mb-3">
             <label class="form-check-label">Aktif :</label>
             <input asp-for="Status" type="checkbox" class="form-check-label" />
         </div>
 
-        
+
         <div class="mb-3">
             <button class="btn btn-primary" type="submit">Oluştur</button>
         </div>
