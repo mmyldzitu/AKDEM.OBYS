@@ -19,14 +19,17 @@ namespace AKDEM.OBYS.UI.Controllers
     public class BranchController : Controller
     {
         private readonly IAppBranchService _appBranchService;
+        private readonly IAppStudentService _appStudentService;
+        
         private readonly IValidator<AppBranchCreateModel> _branchCreateModelValidator;
         private readonly IMapper _mapper;
 
-        public BranchController(IAppBranchService appBranchService, IValidator<AppBranchCreateModel> branchCreateModelValidator, IMapper mapper)
+        public BranchController(IAppBranchService appBranchService, IValidator<AppBranchCreateModel> branchCreateModelValidator, IMapper mapper, IAppStudentService appStudentService)
         {
             _appBranchService = appBranchService;
             _branchCreateModelValidator = branchCreateModelValidator;
             _mapper = mapper;
+            _appStudentService = appStudentService;
         }
 
         public IActionResult Index()
@@ -97,6 +100,11 @@ namespace AKDEM.OBYS.UI.Controllers
                
             }
             return Json(branches);
+        }
+        public async Task<IActionResult> BranchDetails(int id)
+        {
+            var response = await _appStudentService.GetStudentsWithBranchAsync(id);
+            return View(response);
         }
 
     }

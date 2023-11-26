@@ -86,8 +86,13 @@
                 // Yeni verileri tabloya ekle
                 $.each(data, function (index, item) {
                     var row = $('<tr>');
-                    row.append($('<td>').text(item.definition));
+                    var firstColumn = $('<td>');
+                    var branchId = item.id;
+                    var link1 = $('<a>').text(item.definition).attr('href', '/Branch/BranchDetails?id=' + branchId);
+                    firstColumn.append(link1);
+                    row.append(firstColumn);
                     row.append($('<td>').text(item.appClass.definition));
+                    
                     
 
                     table.append(row);

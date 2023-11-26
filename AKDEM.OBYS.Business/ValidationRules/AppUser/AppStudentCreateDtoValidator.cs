@@ -12,7 +12,12 @@ namespace AKDEM.OBYS.Business.ValidationRules.AppUser
     {
         public AppStudentCreateDtoValidator()
         {
-
+            RuleFor(x => x.FirstName).MaximumLength(200).NotEmpty().WithMessage("Lütfen İsim Giriniz");
+            RuleFor(x => x.SecondName).MaximumLength(200).NotEmpty().WithMessage("Lütfen Soyisim Giriniz");
+            RuleFor(x => x.Email).NotEmpty().WithMessage("Lütfen Mail Adresi Giriniz");
+            RuleFor(x => x.PhoneNumber).NotEmpty().WithMessage("Lütfen Telefon Numarası Giriniz");
+            RuleFor(x => x.ClassId).NotEmpty().WithMessage("Lütfen Sınıf Seçiminizi Yapınız");
+            RuleFor(x => x.BranchId).NotEmpty().WithMessage("Lütfen Şube Seçiminizi Yapınız");
         }
     }
 }

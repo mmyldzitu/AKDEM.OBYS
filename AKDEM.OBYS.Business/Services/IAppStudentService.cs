@@ -10,13 +10,15 @@ using System.Threading.Tasks;
 
 namespace AKDEM.OBYS.Business.Services
 {
-   public  interface IAppUserService:IGenericService<AppTeacherCreateDto,AppTeacherUpdateDto,AppTeacherListDto,AppUser>
+    public interface IAppStudentService : IGenericService<AppStudentCreateDto, AppStudentUpdateDto, AppStudentListDto, AppUser>
     {
-        Task<IResponse<AppTeacherCreateDto>> CreateTeacherWithRoleAsync(AppTeacherCreateDto dto, int roleId);
-        Task<IResponse<List<AppTeacherListDto>>> GetAllTeacherAsync(int roleId);
-
+        
         Task<List<AppStudentListDto>> GetAllStudentAsync(RoleType type);
+
         Task<IResponse<AppStudentUpdateDto>> CreateStudentWithRoleAsync(AppStudentUpdateDto dto, int roleId);
+        Task<List<AppStudentListDto>> GetStudentsWithBranchAsync(int id);
+
+
 
     }
 }

@@ -1,0 +1,104 @@
+﻿
+@model AppStudentUpdateModel
+@{
+    Layout = "_Layout";
+}
+<div class="container-fluid">
+    <form asp-action="UpdateStudent" asp-controller="User" method="post" enctype="multipart/form-data">
+        <input asp-for="Id" type="hidden" />
+        <input asp-for="ImagePath2" type="hidden" />
+        <input asp-for="Password" type="hidden" />
+
+
+        <div class="mb-3">
+            <label>İsim :</label>
+            <input asp-for="FirstName" type="text" class="form-control" />
+        </div>
+        <div class="mb-3">
+            <label>Soyisim :</label>
+            <input asp-for="SecondName" type="text" class="form-control" />
+        </div>
+        <div class="mb-3">
+            <label class="form-check-label">Mail Adresi :</label>
+            <input asp-for="Email" type="email" class="form-control" />
+        </div>
+        <div class="mb-3">
+            <label>Telefon Numarası :</label>
+            <input asp-for="PhoneNumber" type="tel" class="form-control" />
+        </div>
+        <div class="mb-3">
+            <label>Görsel :</label>
+            <div class="mb-2">
+                <img src="@Model.ImagePath2" height="150" width="150" />
+
+            </div>
+            <input type="file" asp-for="ImagePath" class="form-control" />
+            <br />
+            <div class="mb-3">
+
+                <label>Sınıf :</label>
+                <select id="classes" onchange="setInputDisplay()" asp-for="ClassId" asp-items="ViewBag.classes">
+                    <option value="">-- Sınıf Seçin --</option>
+                </select>
+
+            </div>
+            <br />
+
+
+
+
+            <div class="mb-3" style="display:block" id="branchDiv">
+
+                <label>Şube :</label>
+
+                <select id="branches" asp-for="BranchId" asp-items="ViewBag.branches">
+                    <option value="">-- Şube Seçin --</option>
+                </select>
+            </div>
+
+
+
+            <br />
+
+
+        </div>
+
+
+        <div class="mb-3">
+            <button class="btn btn-primary" type="submit">Güncelle</button>
+        </div>
+        <div class="mb-3 text-bg-danger" asp-validation-summary="All">
+
+        </div>
+    </form>
+</div>
+
+@section script {
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#classes').change(function () {
+                var sinifId = $(this).val();
+
+                // AJAX kullanarak seçilen sınıfa ait şubeleri getir
+                $.get('/User/GetBranches', { classId: sinifId }, function (data) {
+                    // Şubeleri güncelle
+                    $('#branches').empty();
+                    $('#branches').append($('<option>', {
+                        value: '',
+                        text: '-- Şube Seçin --'
+                    }));
+                    $.each(data, function (index, item) {
+                        $('#branches').append($('<option>', {
+                            value: item.value,
+                            text: item.text
+                        }));
+                    });
+                });
+            });
+        });
+
+        
+
+    </script>
+}

@@ -50,7 +50,7 @@
                     {
                         <td>1</td>
                     }
-                    else if (@item.AppBranch.AppClass.Definition == "İki")
+                    else if (@item.AppBranch.AppClass.Definition == "Iki")
                     {
                         <td>2</td>
                     }
@@ -69,10 +69,12 @@
                     }
 
                 }
-                
+
 
 
                 <td>@item.AppBranch.Definition</td>
+                <td><a class="btn btn-primary" asp-action="UpdateStudent" asp-controller="User" asp-route-id="@item.Id">Güncelle</a></td>
+                <td><a class="btn btn-danger" asp-action="RemoveStudent" asp-controller="User" asp-route-id="@item.Id">Sil</a></td>
 
 
 
