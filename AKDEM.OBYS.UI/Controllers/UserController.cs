@@ -195,7 +195,7 @@ namespace AKDEM.OBYS.UI.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateStudent(AppStudentCreateModel model)
         {
-            AppStudentUpdateDto dto = new();
+            AppStudentCreateDto dto = new();
             if (model.ImagePath != null)
             {
                 var fileName = Guid.NewGuid().ToString();

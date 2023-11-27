@@ -76,27 +76,44 @@
 @section script {
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <script>
-        $(document).ready(function () {
+        $(document).ready(function() {
+            var sinifId = $("#classes").val();
+
+            // AJAX kullanarak seçilen sınıfa ait şubeleri getir
+            $.get('/User/GetBranches', { classId: sinifId }, function (data) {
+                alert(sinifId);
+                updateBox(data);
+            
             $('#classes').change(function () {
                 var sinifId = $(this).val();
 
                 // AJAX kullanarak seçilen sınıfa ait şubeleri getir
                 $.get('/User/GetBranches', { classId: sinifId }, function (data) {
                     // Şubeleri güncelle
-                    $('#branches').empty();
-                    $('#branches').append($('<option>', {
-                        value: '',
-                        text: '-- Şube Seçin --'
-                    }));
-                    $.each(data, function (index, item) {
-                        $('#branches').append($('<option>', {
-                            value: item.value,
-                            text: item.text
-                        }));
-                    });
+                    updateBox(data);
                 });
             });
+            });
         });
+                    function updateBox(data) {
+                        $('#branches').empty();
+                        $('#branches').append($('<option>', {
+                            value: '',
+                            text: '-- Şube Seçin --'
+                        }));
+                        $.each(data, function (index, item) {
+                            $('#branches').append($('<option>', {
+                                value: item.value,
+                                text: item.text
+                            }));
+                        });
+                    }
+                  
+
+
+               
+
+         
 
         
 

@@ -88,18 +88,52 @@ namespace AKDEM.OBYS.UI.Controllers
         [HttpGet]
         public async Task<IActionResult> GetBranches(int ClassId)
         {
+            var list = new List<AppBranchListWithCountModel>();
+
             if (ClassId == 6)
             {
-                var allbranches = await _appBranchService.GetList();
-                return Json(allbranches);
-            }
+                var branches = await _appBranchService.GetList();
 
-            var branches = await _appBranchService.GetClasses(ClassId);
-            foreach(var item in branches)
-            {
-               
+
+                foreach (var item in branches)
+                {
+                    list.Add(new AppBranchListWithCountModel
+                    {
+                        Definition=item.Definition,
+                        ClassId = item.ClassId,
+                        Id = item.Id,
+                        AppClass = item.AppClass,
+                        BranchStokes = (await _appStudentService.GetStudentsWithBranchAsync(item.Id)).Count()
+
+
+                    });
+
+
+
+
+                }
+                return Json(list);
             }
-            return Json(branches);
+            else
+            {
+                var branches = await _appBranchService.GetClasses(ClassId);
+                foreach (var item in branches)
+                {
+                    list.Add(new AppBranchListWithCountModel
+                    {
+                        Definition = item.Definition,
+                        ClassId = item.ClassId,
+                        Id = item.Id,
+                        AppClass = item.AppClass,
+                        BranchStokes = (await _appStudentService.GetStudentsWithBranchAsync(item.Id)).Count()
+
+
+                    });
+                    
+                }
+                return Json(list);
+            }
+         
         }
         public async Task<IActionResult> BranchDetails(int id)
         {

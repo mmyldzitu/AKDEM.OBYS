@@ -39,5 +39,6 @@ namespace AKDEM.OBYS.Business.Managers
             return _mapper.Map<List<AppBranchListDto>>(list);
         }
         
+        
     }
 }

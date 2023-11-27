@@ -43,7 +43,44 @@
 @section script {
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <script>
+        $(document).ready(function(){
+            
 
+            var sinifId = $('#classes').val();
+            if (sinifId !=0) {
+                
+                setInputDisplay();
+            }
+
+
+
+            // AJAX kullanarak ilgili sınıfa ait şube ayrıntılarını getir
+            $.get('/Branch/GetBranches', { classId: sinifId }, function (data) {
+                // Şube ayrıntılarını güncelle
+                
+                updateTable(data);
+                
+
+
+            });
+
+        
+            // Birinci selectbox'ın değişimini takip et
+            $('#classes').change(function () {
+                
+
+                // Seçilen değeri al
+                var sinifId = $(this).val();
+
+
+                // AJAX kullanarak ilgili sınıfa ait şube ayrıntılarını getir
+                $.get('/Branch/GetBranches', { classId: sinifId }, function (data) {
+                    // Şube ayrıntılarını güncelle
+                    updateTable(data);
+                });
+            });
+
+        });
 
         // Select elementini seç
         var selectElement = document.getElementById("classes");
@@ -63,20 +100,7 @@
 
 
 
-        $(document).ready(function () {
-            // Birinci selectbox'ın değişimini takip et
-            $('#classes').change(function () {
-                // Seçilen değeri al
-                var sinifId = $(this).val();
-                
-
-                // AJAX kullanarak ilgili sınıfa ait şube ayrıntılarını getir
-                $.get('/Branch/GetBranches', { classId: sinifId }, function (data) {
-                    // Şube ayrıntılarını güncelle
-                    updateTable(data);
-                });
-            });
-
+       
             function updateTable(data) {
                 // Tabloyu güncelleme mantığını burada gerçekleştir
                 // Örnek olarak, tabloyu temizle ve yeni verileri ekleme
@@ -92,14 +116,16 @@
                     firstColumn.append(link1);
                     row.append(firstColumn);
                     row.append($('<td>').text(item.appClass.definition));
+                    row.append($('<td>').text(item.branchStokes));
                     
                     
 
                     table.append(row);
                 });
             }
+        
             
-        });
+        
         
         function setInputDisplay() {
             

@@ -14,7 +14,7 @@ namespace AKDEM.OBYS.Business.Mappings
         public AppStudentProfile()
         {
             CreateMap<AppStudentUpdateDto, AppUser>().ReverseMap();
-            CreateMap<AppStudentUpdateDto, AppUser>().ReverseMap();
+            CreateMap<AppStudentCreateDto, AppUser>().ReverseMap();
             CreateMap<AppStudentListDto, AppUser>().ReverseMap();
         }
     }

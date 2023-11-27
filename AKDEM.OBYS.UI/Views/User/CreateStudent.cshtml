@@ -70,39 +70,61 @@
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <script>
         $(document).ready(function () {
-            $('#classes').change(function () {
-                var sinifId = $(this).val();
+            var sinifId = $('#classes').val();
+            
+            if (sinifId != 0) {
 
-                // AJAX kullanarak seçilen sınıfa ait şubeleri getir
-                $.get('/User/GetBranches', { classId: sinifId }, function (data) {
-                    // Şubeleri güncelle
-                    $('#branches').empty();
-                    $('#branches').append($('<option>', {
-                        value: '',
-                        text: '-- Şube Seçin --'
-                    }));
-                    $.each(data, function (index, item) {
-                        $('#branches').append($('<option>', {
-                            value: item.value,
-                            text: item.text
-                        }));
+                setInputDisplay();
+            }
+            // AJAX kullanarak seçilen sınıfa ait şubeleri getir
+            $.get('/User/GetBranches', { classId: sinifId }, function (data) {
+
+                // Şubeleri güncelle
+                updateBox(data);
+                
+            
+
+                $('#classes').change(function () {
+                    var sinifId = $(this).val();
+                    
+                    // AJAX kullanarak seçilen sınıfa ait şubeleri getir
+                    $.get('/User/GetBranches', { classId: sinifId }, function (data) {
+                        // Şubeleri güncelle
+                        updateBox(data);
+
+
                     });
                 });
             });
+            
         });
+        function updateBox(data) {
+                $('#branches').empty();
+                $('#branches').append($('<option>', {
+                    value: '',
+                    text: '-- Şube Seçin --'
+                }));
+                $.each(data, function (index, item) {
+                    $('#branches').append($('<option>', {
+                        value: item.value,
+                        text: item.text
+                    }));
+                });
+            }
 
         /*setInputDisplay()*/
         function setInputDisplay() {
-            var selectElement = document.getElementById("classes");
-            
-            selectedDiv = document.getElementById("branchDiv");
-            selectedDiv.style.display = "block";
+                var selectElement = document.getElementById("classes");
 
-   
-        }
+                selectedDiv = document.getElementById("branchDiv");
+                selectedDiv.style.display = "block";
 
+
+            }
+        
     </script>
 }
+
 
 
 

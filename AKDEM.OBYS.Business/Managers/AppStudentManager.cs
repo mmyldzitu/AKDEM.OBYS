@@ -20,7 +20,7 @@ namespace AKDEM.OBYS.Business.Managers
     {
         private readonly IMapper _mapper;
         private readonly IValidator<AppStudentCreateDto> _createDtoValidator;
-        private readonly IValidator<AppStudentUpdateDto> _createStudentDtoValidator;
+        private readonly IValidator<AppStudentUpdateDto> _updateDtoValidator;
         private readonly IUow _uow;
 
         public AppStudentManager(IMapper mapper, IValidator<AppStudentCreateDto> createDtoValidator, IValidator<AppStudentUpdateDto> updateDtoValidator, IUow uow, IValidator<AppStudentUpdateDto> createStudentDtoValidator) : base(mapper, createDtoValidator, updateDtoValidator, uow)
@@ -28,7 +28,7 @@ namespace AKDEM.OBYS.Business.Managers
             _mapper = mapper;
             _createDtoValidator = createDtoValidator;
             _uow = uow;
-            _createStudentDtoValidator = createStudentDtoValidator;
+            _updateDtoValidator = createStudentDtoValidator;
         }
         
        
@@ -39,9 +39,9 @@ namespace AKDEM.OBYS.Business.Managers
             var list = await query.Include(x => x.AppBranch).ThenInclude(x => x.AppClass).Where(x => x.AppUserRoles.Any(x => x.RoleId == (int)type)).ToListAsync();
             return _mapper.Map<List<AppStudentListDto>>(list);
         }
-        public async Task<IResponse<AppStudentUpdateDto>> CreateStudentWithRoleAsync(AppStudentUpdateDto dto, int roleId)
+        public async Task<IResponse<AppStudentCreateDto>> CreateStudentWithRoleAsync(AppStudentCreateDto dto, int roleId)
         {
-            var validationResult = _createStudentDtoValidator.Validate(dto);
+            var validationResult = _createDtoValidator.Validate(dto);
             if (validationResult.IsValid)
             {
                 var user = _mapper.Map<AppUser>(dto);
@@ -52,10 +52,10 @@ namespace AKDEM.OBYS.Business.Managers
                     RoleId = roleId
                 });
                 await _uow.SaveChangesAsync();
-                return new Response<AppStudentUpdateDto>(ResponseType.Success, dto);
+                return new Response<AppStudentCreateDto>(ResponseType.Success, dto);
 
             }
-            return new Response<AppStudentUpdateDto>(dto, validationResult.ConvertToCustomValidationError());
+            return new Response<AppStudentCreateDto>(dto, validationResult.ConvertToCustomValidationError());
         }
         public async Task<List<AppStudentListDto>> GetStudentsWithBranchAsync(int id)
         {

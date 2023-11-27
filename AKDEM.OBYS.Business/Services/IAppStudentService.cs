@@ -15,7 +15,7 @@ namespace AKDEM.OBYS.Business.Services
         
         Task<List<AppStudentListDto>> GetAllStudentAsync(RoleType type);
 
-        Task<IResponse<AppStudentUpdateDto>> CreateStudentWithRoleAsync(AppStudentUpdateDto dto, int roleId);
+        Task<IResponse<AppStudentCreateDto>> CreateStudentWithRoleAsync(AppStudentCreateDto dto, int roleId);
         Task<List<AppStudentListDto>> GetStudentsWithBranchAsync(int id);
 
 
