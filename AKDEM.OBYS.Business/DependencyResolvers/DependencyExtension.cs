@@ -45,8 +45,10 @@ namespace AKDEM.OBYS.Business.DependencyResolvers
             services.AddScoped<IAppUserService, AppUserManager>();
             services.AddScoped<IAppStudentService, AppStudentManager>();
             services.AddScoped<IAppBranchService, AppBranchManager>();
+            services.AddScoped<IAppLessonService, AppLessonManager>();
 
             services.AddTransient<IValidator<AppLessonCreateDto>, AppLessonCreateDtoValidator>();
+            services.AddTransient<IValidator<AppLessonUpdateDto>, AppLessonUpdateDtoValidator>();
             services.AddTransient<IValidator<AppSessionCreateDto>, AppSessionCreateDtoValidator>();
             services.AddTransient<IValidator<AppSessionUpdateDto>, AppSessionUpdateDtoValidator>();
 

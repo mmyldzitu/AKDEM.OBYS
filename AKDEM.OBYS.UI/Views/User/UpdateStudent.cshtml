@@ -81,7 +81,7 @@
 
             // AJAX kullanarak seçilen sınıfa ait şubeleri getir
             $.get('/User/GetBranches', { classId: sinifId }, function (data) {
-                alert(sinifId);
+                
                 updateBox(data);
             
             $('#classes').change(function () {
@@ -93,6 +93,10 @@
                     updateBox(data);
                 });
             });
+
+
+
+
             });
         });
                     function updateBox(data) {

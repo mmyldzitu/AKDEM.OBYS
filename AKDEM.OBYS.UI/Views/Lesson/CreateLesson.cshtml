@@ -1,0 +1,25 @@
+﻿@model AppLessonCreateDto
+@{
+    Layout = "_Layout";
+}
+<div class="container-fluid">
+    <form asp-action="CreateLesson" asp-controller="Lesson" method="post" enctype="multipart/form-data">
+
+        <label>Ders İsmi :</label>
+        <input asp-for="Definition" type="text" class="form-control"  />
+        <br />
+        <label>Dersin Öğretmeni :</label>
+        
+        <select asp-for="UserId" asp-items="@ViewBag.teachers" class="form form-control-sm">
+            <option value="0">Bir Öğretmen Seçiniz</option>
+        </select>
+
+       
+        <div class="mb-3">
+            <button class="btn btn-primary" type="submit">Oluştur</button>
+        </div>
+        <div class="mb-3 text-bg-danger" asp-validation-summary="All">
+
+        </div>
+    </form>
+</div>
