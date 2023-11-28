@@ -60,6 +60,11 @@ namespace AKDEM.OBYS.UI.Controllers
             var response=await _appSessionService.CreateAsync(dto);
             return this.ResponseRedirectAction(response, "Index");
         }
+        public IActionResult SessionDetails(int id)
+        {
+            ViewBag.id = id;
+            return View();
+        }
        
     }
 }

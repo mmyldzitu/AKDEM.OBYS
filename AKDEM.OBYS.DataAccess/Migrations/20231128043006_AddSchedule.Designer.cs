@@ -4,14 +4,16 @@ using AKDEM.OBYS.DataAccess.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace AKDEM.OBYS.DataAccess.Migrations
 {
     [DbContext(typeof(AkdemContext))]
-    partial class AkdemContextModelSnapshot : ModelSnapshot
+    [Migration("20231128043006_AddSchedule")]
+    partial class AddSchedule
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -33,9 +35,6 @@ namespace AKDEM.OBYS.DataAccess.Migrations
                         .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
-
-                    b.Property<int>("ScheduleId")
-                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -120,8 +119,7 @@ namespace AKDEM.OBYS.DataAccess.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("BranchId")
-                        .IsUnique();
+                    b.HasIndex("BranchId");
 
                     b.HasIndex("SessionId");
 
@@ -370,8 +368,8 @@ namespace AKDEM.OBYS.DataAccess.Migrations
             modelBuilder.Entity("AKDEM.OBYS.Entities.AppSchedule", b =>
                 {
                     b.HasOne("AKDEM.OBYS.Entities.AppBranch", "AppBranch")
-                        .WithOne("AppSchedule")
-                        .HasForeignKey("AKDEM.OBYS.Entities.AppSchedule", "BranchId")
+                        .WithMany("AppSchedules")
+                        .HasForeignKey("BranchId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -488,7 +486,7 @@ namespace AKDEM.OBYS.DataAccess.Migrations
 
             modelBuilder.Entity("AKDEM.OBYS.Entities.AppBranch", b =>
                 {
-                    b.Navigation("AppSchedule");
+                    b.Navigation("AppSchedules");
 
                     b.Navigation("AppUsers");
                 });

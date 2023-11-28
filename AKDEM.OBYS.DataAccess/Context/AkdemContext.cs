@@ -27,6 +27,8 @@ namespace AKDEM.OBYS.DataAccess.Context
             modelBuilder.ApplyConfiguration(new AppUserSessionConfiguration());
             modelBuilder.ApplyConfiguration(new AppUserSessionLessonConfiguration());
             modelBuilder.ApplyConfiguration(new AppWarningConfiguration());
+            modelBuilder.ApplyConfiguration(new AppScheduleConfiguration());
+            modelBuilder.ApplyConfiguration(new AppScheduleDetailConfiguration());
         }
         public DbSet<AppBranch> AppBranches { get; set; }
         public DbSet<AppClass> AppClasses { get; set; }
@@ -38,6 +40,8 @@ namespace AKDEM.OBYS.DataAccess.Context
         public DbSet<AppUserSession> AppUserSessions { get; set; }
         public DbSet<AppUserSessionLesson> AppUserSessionLessons { get; set; }
         public DbSet<AppWarning> AppWarnings { get; set; }
+        public DbSet<AppSchedule> AppSchedules { get; set; }
+        public DbSet<AppScheduleDetail> AppScheduleDetails { get; set; }
         
     }
 }

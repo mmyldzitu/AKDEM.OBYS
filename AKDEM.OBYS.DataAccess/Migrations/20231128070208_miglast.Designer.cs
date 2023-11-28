@@ -4,14 +4,16 @@ using AKDEM.OBYS.DataAccess.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace AKDEM.OBYS.DataAccess.Migrations
 {
     [DbContext(typeof(AkdemContext))]
-    partial class AkdemContextModelSnapshot : ModelSnapshot
+    [Migration("20231128070208_miglast")]
+    partial class miglast
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

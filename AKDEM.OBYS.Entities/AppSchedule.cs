@@ -6,12 +6,13 @@ using System.Threading.Tasks;
 
 namespace AKDEM.OBYS.Entities
 {
-   public class AppLesson:BaseEntity
+    public class AppSchedule:BaseEntity
     {
         public string Definition { get; set; }
-        public int UserId { get; set; }
-        public AppUser AppUser { get; set; }
-        public List<AppUserSessionLesson> AppUserSessionLessons { get; set; }
+        public int SessionId { get; set; }
+        public AppSession AppSession { get; set; }
+        public int BranchId { get; set; }
+        public AppBranch AppBranch { get; set; }
         public List<AppScheduleDetail> AppScheduleDetails { get; set; }
     }
 }
