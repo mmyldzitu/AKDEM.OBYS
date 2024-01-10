@@ -1,5 +1,6 @@
 ﻿using AKDEM.OBYS.Dto.AppBranchDtos;
 using AKDEM.OBYS.Dto.AppClassDtos;
+using AKDEM.OBYS.Dto.AppUserSessionDtos;
 using AKDEM.OBYS.Dto.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -19,10 +20,12 @@ namespace AKDEM.OBYS.Dto.AppUserDtos
         public bool Status { get; set; }
         public string ImagePath { get; set; }
         public int ClassId { get; set; }
-
+        public int SıraNo { get; set; }
+        public double TotalAverage { get; set; }
         public AppClassListDto AppClass { get; set; }
         public int BranchId { get; set; }
-
+        public double TotalWarningCount { get; set; }
+        public List<AppUserSessionListDto> AppUserSessions { get; set; }
         public AppBranchListDto AppBranch { get; set; }
     }
 }

@@ -11,5 +11,6 @@ namespace AKDEM.OBYS.Dto.AppBranchDtos
     {
         public string Definition { get; set; }
         public int ClassId { get; set; }
+        public bool Status { get; set; } = true;
     }
 }

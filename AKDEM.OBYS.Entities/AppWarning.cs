@@ -8,11 +8,11 @@ namespace AKDEM.OBYS.Entities
 {
     public class AppWarning:BaseEntity
     {
-        public int WarningCount { get; set; }
+        public double WarningCount { get; set; }
         public DateTime WarningTime { get; set; }
         public string WarningReason { get; set; }
 
-        public int UserId { get; set; }
-        public AppUser AppUser { get; set; }
+        public int UserSessionId { get; set; }
+        public AppUserSession AppUserSession { get; set; }
     }
 }

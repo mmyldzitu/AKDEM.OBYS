@@ -19,7 +19,7 @@ namespace AKDEM.OBYS.DataAccess.Configurations
                 x.UserSessionId
             }).IsUnique();
             builder.HasOne(x => x.AppUserSession).WithMany(x => x.AppUserSessionLessons).HasForeignKey(x => x.UserSessionId).OnDelete(DeleteBehavior.ClientSetNull);
-            builder.HasOne(x => x.AppLesson).WithMany(x => x.AppUserSessionLessons).HasForeignKey(x => x.UserSessionId).OnDelete(DeleteBehavior.ClientSetNull);
+            builder.HasOne(x => x.AppLesson).WithMany(x => x.AppUserSessionLessons).HasForeignKey(x => x.LessonId).OnDelete(DeleteBehavior.ClientSetNull);
         }
     }
 }

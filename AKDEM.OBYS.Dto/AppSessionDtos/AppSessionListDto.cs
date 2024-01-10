@@ -12,5 +12,6 @@ namespace AKDEM.OBYS.Dto.AppSessionDtos
         public int Id { get; set; }
         public string Definition { get; set; }
         public bool Status { get; set; }
+        public bool Status2 { get; set; }
     }
 }

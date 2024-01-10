@@ -9,5 +9,11 @@ namespace AKDEM.OBYS.Dto.AppWarningDtos
 {
     public class AppWarningCreateDto : IDto
     {
+        public double WarningCount { get; set; } = 0;
+        public DateTime WarningTime { get; set; }
+        public string WarningReason { get; set; }
+
+        public int UserSessionId { get; set; }
+        
     }
 }

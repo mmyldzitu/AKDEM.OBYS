@@ -1,0 +1,23 @@
+﻿
+@{
+    Layout = "_Layout";
+}
+
+@{if (User.Identity.IsAuthenticated &&User.IsInRole("Student")){
+
+        <h2> AKDEM ÖĞRENCİ PANELİ</h2>
+    }
+    else if (User.Identity.IsAuthenticated && User.IsInRole("Teacher")){
+                <h2>AKDEM ÖĞRETMEN PANELİ</h2>
+            }
+            else if(User.Identity.IsAuthenticated && User.IsInRole("Admin"))
+            {
+                <h2>AKDEM YÖNETİCİ PANELİ</h2>
+            }
+            else { <h2>AKDEM'E HOŞGELDİNİZ DEVAM ETMEK İÇİN LÜTFEN GİRİŞ YAPINIZ</h2>
+            <hr />
+            <a class="btn btn-success" asp-action="SignIn" asp-controller="Account" >Giriş Yap</a>
+            
+            }
+} 
+

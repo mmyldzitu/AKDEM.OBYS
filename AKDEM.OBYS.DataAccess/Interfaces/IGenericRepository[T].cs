@@ -16,7 +16,7 @@ namespace AKDEM.OBYS.DataAccess.Interfaces
         Task<List<T>> GetAllAsync<TKey>(Expression<Func<T, TKey>> selector, OrderByType type = OrderByType.DESC);
         Task<List<T>> GetAllAsync<TKey>(Expression<Func<T, TKey>> selector, Expression<Func<T, bool>> filter, OrderByType type = OrderByType.DESC);
         Task<T> FindAsync(object id);
-        Task<T> FindByFilterAsync(Expression<Func<T, bool>> filter, bool asNoTracking = false);
+        Task<T> FindByFilterAsync(Expression<Func<T, bool>> filter, bool asNoTracking = true);
         IQueryable<T> GetQuery();
         void Remove(T entity);
         Task CreateAsync(T entity);

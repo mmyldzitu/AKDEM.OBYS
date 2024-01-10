@@ -10,5 +10,27 @@ namespace AKDEM.OBYS.Business.Services
 {
     public interface IAppWarningService : IGenericService<AppWarningCreateDto, AppWarningUpdateDto, AppWarningListDto, AppWarning>
     {
+        Task RemoveWarningByUserId(int userId);
+        Task CreateWarningByDtoandString(AppWarningCreateDto dto, string name, int userId, int userSessionId);
+        Task  RemoveWarningByString(string lessonName, int userId, int usersessionId);
+        Task<double> SessionWarningCountByUserSessionId(int userSessionId);
+        Task<double> TotalWarningCountByUserId(int userId,int sessionId);
+        Task<double> TotalWarningCountByUserIdGeneral(int userId);
+        Task<List<AppWarningListDto>> AppWarningByUserSessionId(int userSessionId);
+        Task RemoveWarningById(int id, int userId, int userSessionId);
+        Task ChangeStudentStatusBecasuseOfWarning(int userId, double sessionWarningCount, double totalWarningCount, int userSessionId);
+        Task<double> ReturnSwc(int userSessionId);
+        Task<double> ReturnTwc(int userId);
+        Task<int> FindWarningCountByString(string lessonName, int userSessionId);
+        Task RemoveWarningByUserIdandSessionId(int userId, int sessionId,int userSessionId);
+        Task SaveChangesAboutWarning(int userId, double sessionWarningCount, double totalWarningCount, int userSessionId);
+        Task RemoveWarningBySessionId(int sessionId);
+        Task<List<AppWarningListDto>> AppWarningBySessionId(int SessionId);
+        Task<double> ReturnTwcGeneral(int userId);
+        Task<List<AppWarningListDto>> AppWarningByUserId(int userId);
+
+
+
+
     }
 }

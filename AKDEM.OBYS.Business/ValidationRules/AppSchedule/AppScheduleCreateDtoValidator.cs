@@ -12,6 +12,8 @@ namespace AKDEM.OBYS.Business.ValidationRules.AppSchedule
     {
         public AppScheduleCreateDtoValidator()
         {
+            RuleFor(x => x.Definition).NotEmpty().WithMessage("Ders İsmi Boş Geçilemez");
+            RuleFor(x => x.SessionBranchId).NotEmpty().WithMessage("Lütfen Bir Sınıf Seçiniz");
 
         }
     }

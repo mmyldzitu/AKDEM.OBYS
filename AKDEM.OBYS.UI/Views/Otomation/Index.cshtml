@@ -1,0 +1,26 @@
+﻿@model AppOtomationBranchListModel
+@{
+    Layout = "_Layout";
+}
+
+
+<div class="mb-3">
+    <form asp-action="BranchDetails" asp-controller="Otomation" method="post" enctype="multipart/form-data">
+        <input type="hidden" asp-for="SessionId" value="@ViewBag.sessionId" />
+        <label>Sınıf :</label>
+
+
+        <select id="classes" asp-for="BranchId" asp-items="@ViewBag.branches" class="form form-control-sm">
+            <option value="0">Bir Sınıf Seçiniz</option>
+        </select>
+        <div class="mb-3">
+            <button class="btn btn-primary" type="submit">Devam</button>
+        </div>
+
+
+
+        <div class="mb-3 text-bg-danger" asp-validation-summary="All">
+
+        </div>
+    </form>
+</div>

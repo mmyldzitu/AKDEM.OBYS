@@ -12,6 +12,7 @@ namespace AKDEM.OBYS.UI.Models
         public string Class { get; set; }
         public string Branch { get; set; }
         public int ClassId { get; set; }
-        
+        public bool Status { get; set; } = true;
+
     }
 }

@@ -4,29 +4,74 @@
     int count = 0;
 }
 <div class="container-fluid">
-    <div class="text-end">
-        <h1>ÖĞRENCİLER</h1>
+    <div class="text-right">
+        <a id="pdfButton" class="btn btn-success" asp-action="GenerateAndDownloadPdf" asp-controller="User" asp-route-myFileName="@ViewBag.header2" asp-route-classType="@ViewBag.classType">PDF</a>
     </div>
-    <div class="text-end my5-3 p-1">
-        <a asp-action="CreateStudent" asp-controller="User" class="mt-2 btn btn-success ">Yeni Öğrenci  Ekle</a>
+    <div class="text-end">
+        <h1> @ViewBag.header</h1>
+    </div>
+    <div id="branchButtons" class="text-right">
+        <a asp-action="GetStudents" asp-controller="User" asp-route-classType="@((int)ClassType.Tamamı)">Tüm Öğrenciler</a>|
+
+        <a asp-action="GetStudents" asp-controller="User" asp-route-classType="@((int)ClassType.Hazırlık)">Hazırlık</a>|
+        <a asp-action="GetStudents" asp-controller="User" asp-route-classType="@((int)ClassType.Bir)">Birinci Sınıf</a>|
+        <a asp-action="GetStudents" asp-controller="User" asp-route-classType="@((int)ClassType.iki)">İkinci Sınıf</a>|
+        <a asp-action="GetStudents" asp-controller="User" asp-route-classType="@((int)ClassType.Üç)">Üçüncü Sınıf</a>|
+        <a asp-action="GetStudents" asp-controller="User" asp-route-classType="@((int)ClassType.Dört)">Dördüncü Sınıf</a>|
+        <a asp-action="GetStudents" asp-controller="User" asp-route-classType="@((int)ClassType.Mezun)">Mezunlar</a>|
+        <a asp-action="GetStudents" asp-controller="User" asp-route-classType="@((int)ClassType.Pasif)">Pasif Öğrenciler</a>
 
     </div>
+
+    @{
+        if (ViewBag.classId != 6 && ViewBag.classId != 8)
+        {
+            <div class="col-md-2 align-items-center">
+                <a id="newStudent" asp-action="CreateStudent" asp-controller="User" asp-route-classId="@ViewBag.classId" class="mt-2 btn btn-success ">Yeni Öğrenci  Ekle</a>
+
+            </div>
+
+        }
+    }
+
+
+
     <table class="mt-3 table table-sm table-hover table-striped">
         <thead>
             <tr>
                 <th>#</th>
                 <th>İsim</th>
-                <th>Soyisim</th>
+                <th>Sıra No</th>
+                <th>Durum</th>
                 <th>Email</th>
                 <th>Telefon Numarası</th>
                 <th>Görsel</th>
                 <th>Sınıf</th>
-                <th>Şube</th>
+                @{if (ViewBag.classType == ClassType.Mezun)
+                    {
+
+                        <th>Mezuniyet Dönemi</th>
+
+                    }
+
+                    else if (ViewBag.classType == ClassType.Pasif)
+                    {
+                        <th>Ayrılık Dönemi</th>
+
+                    }
+
+
+                    else
+                    {
+                        <th>Şube</th>
 
 
 
-                <th>Güncelle</th>
-                <th>Sil</th>
+                        <th>Güncelle</th>
+                        <th>Sil</th>
+                    }
+                }
+
 
             </tr>
         </thead>
@@ -36,45 +81,37 @@
                 count = count + 1;
             <tr>
                 <td>@count</td>
-                <td>@item.FirstName</td>
-                <td>@item.SecondName</td>
+                <td> <a asp-action="UserDetails" asp-controller="Branch" asp-route-userId="@item.Id"> <span style="font-weight: bold; color: darkblue; text-decoration: underline">@item.FirstName @item.SecondName</span> </a></td>
+                <td>@item.SıraNo</td>
+                <td>@(item.Status==true ? "Aktif":"Pasif")</td>
                 <td>@item.Email</td>
                 <td>@item.PhoneNumber</td>
                 <td><img src="@item.ImagePath" height="150" width="150" /></td>
-                @{
-                    if (@item.AppBranch.AppClass.Definition == "Hazirlik")
+                <td>@item.AppBranch.AppClass.Definition</td>
+                @{if (ViewBag.classType == ClassType.Mezun)
                     {
-                        <td>Hazırlık</td>
+                        string[] parcalar = item.AppBranch.Definition.Split(new char[] { '/' });
+                        string date = parcalar[1] + "/" + parcalar[2];
+
+                        <td>@date</td>
+
                     }
-                    else if (@item.AppBranch.AppClass.Definition == "Bir")
+                    else if (ViewBag.classType == ClassType.Pasif)
                     {
-                        <td>1</td>
-                    }
-                    else if (@item.AppBranch.AppClass.Definition == "Iki")
-                    {
-                        <td>2</td>
-                    }
-                    else if (@item.AppBranch.AppClass.Definition == "Uç")
-                    {
-                        <td>3</td>
-                    }
-                    else if (@item.AppBranch.AppClass.Definition == "Dort")
-                    {
-                        <td>4</td>
+                        <td><getPassiveStudentInfo user-id="@item.Id"></getPassiveStudentInfo></td>
+
                     }
                     else
                     {
-                        <td>Mezun</td>
-
+                        <td>@item.AppBranch.Definition</td>
+                        <td><a class="btn btn-primary" asp-action="UpdateStudent" asp-controller="User" asp-route-id="@item.Id">Güncelle</a></td>
+                        <td><a class="btn btn-danger" asp-action="RemoveStudent" asp-controller="User" asp-route-id="@item.Id" asp-route-classId="@item.ClassId">Sil</a></td>
                     }
+
+
 
                 }
 
-
-
-                <td>@item.AppBranch.Definition</td>
-                <td><a class="btn btn-primary" asp-action="UpdateStudent" asp-controller="User" asp-route-id="@item.Id">Güncelle</a></td>
-                <td><a class="btn btn-danger" asp-action="RemoveStudent" asp-controller="User" asp-route-id="@item.Id">Sil</a></td>
 
 
 

@@ -29,6 +29,23 @@ namespace AKDEM.OBYS.Business.Managers
             var mappedList= _mapper.Map<List<AppLessonListDto>>(lessons);
             return mappedList;
         }
-        
+        public async Task<string> GetLessonNameByLessonId(int lessonId)
+        {
+            var entity = await _uow.GetRepositry<AppLesson>().FindByFilterAsync(x => x.Id == lessonId);
+            return entity.Definition;
+        }
+        public async Task<List<AppLessonListDto>> TeacherActiveLessons(int sessionId, int userId)
+        {
+            var query = _uow.GetRepositry<AppLesson>().GetQuery();
+            var entities = await query.Include(x => x.AppUser).Where(x => x.AppUser.Id == userId && x.AppUserSessionLessons.Any(x => x.AppUserSession.SessionId == sessionId)).ToListAsync();
+            if (entities.Count != 0)
+            {
+                var mappedList = _mapper.Map<List<AppLessonListDto>>(entities);
+                return mappedList;
+            }
+            return new List<AppLessonListDto>();
+        }
+
+
     }
 }

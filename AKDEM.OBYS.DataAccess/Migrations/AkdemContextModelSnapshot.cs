@@ -34,8 +34,8 @@ namespace AKDEM.OBYS.DataAccess.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
-                    b.Property<int>("ScheduleId")
-                        .HasColumnType("int");
+                    b.Property<bool>("Status")
+                        .HasColumnType("bit");
 
                     b.HasKey("Id");
 
@@ -107,23 +107,17 @@ namespace AKDEM.OBYS.DataAccess.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int>("BranchId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Definition")
                         .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
-                    b.Property<int>("SessionId")
+                    b.Property<int>("SessionBranchId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("BranchId")
-                        .IsUnique();
-
-                    b.HasIndex("SessionId");
+                    b.HasIndex("SessionBranchId");
 
                     b.ToTable("AppSchedules");
                 });
@@ -179,6 +173,29 @@ namespace AKDEM.OBYS.DataAccess.Migrations
                     b.ToTable("AppSessions");
                 });
 
+            modelBuilder.Entity("AKDEM.OBYS.Entities.AppSessionBranch", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("BranchId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SessionId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BranchId");
+
+                    b.HasIndex("SessionId", "BranchId")
+                        .IsUnique();
+
+                    b.ToTable("AppSessionBranches");
+                });
+
             modelBuilder.Entity("AKDEM.OBYS.Entities.AppUser", b =>
                 {
                     b.Property<int>("Id")
@@ -227,6 +244,9 @@ namespace AKDEM.OBYS.DataAccess.Migrations
                     b.Property<double>("TotalAverage")
                         .HasColumnType("float");
 
+                    b.Property<double>("TotalWarningCount")
+                        .HasColumnType("float");
+
                     b.HasKey("Id");
 
                     b.HasIndex("BranchId");
@@ -269,16 +289,27 @@ namespace AKDEM.OBYS.DataAccess.Migrations
                     b.Property<double>("Average")
                         .HasColumnType("float");
 
+                    b.Property<int>("BranchId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ClassId")
+                        .HasColumnType("int");
+
                     b.Property<int>("SessionId")
                         .HasColumnType("int");
 
-                    b.Property<int>("SessionWarningCount")
-                        .HasColumnType("int");
+                    b.Property<double>("SessionWarningCount")
+                        .HasColumnType("float");
+
+                    b.Property<bool>("Status")
+                        .HasColumnType("bit");
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("BranchId");
 
                     b.HasIndex("SessionId");
 
@@ -324,11 +355,11 @@ namespace AKDEM.OBYS.DataAccess.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int>("UserId")
+                    b.Property<int>("UserSessionId")
                         .HasColumnType("int");
 
-                    b.Property<int>("WarningCount")
-                        .HasColumnType("int");
+                    b.Property<double>("WarningCount")
+                        .HasColumnType("float");
 
                     b.Property<string>("WarningReason")
                         .HasColumnType("nvarchar(max)");
@@ -340,7 +371,7 @@ namespace AKDEM.OBYS.DataAccess.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("UserSessionId");
 
                     b.ToTable("AppWarnings");
                 });
@@ -369,21 +400,13 @@ namespace AKDEM.OBYS.DataAccess.Migrations
 
             modelBuilder.Entity("AKDEM.OBYS.Entities.AppSchedule", b =>
                 {
-                    b.HasOne("AKDEM.OBYS.Entities.AppBranch", "AppBranch")
-                        .WithOne("AppSchedule")
-                        .HasForeignKey("AKDEM.OBYS.Entities.AppSchedule", "BranchId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("AKDEM.OBYS.Entities.AppSession", "AppSession")
+                    b.HasOne("AKDEM.OBYS.Entities.AppSessionBranch", "AppSessionBranch")
                         .WithMany("AppSchedules")
-                        .HasForeignKey("SessionId")
+                        .HasForeignKey("SessionBranchId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("AppBranch");
-
-                    b.Navigation("AppSession");
+                    b.Navigation("AppSessionBranch");
                 });
 
             modelBuilder.Entity("AKDEM.OBYS.Entities.AppScheduleDetail", b =>
@@ -403,6 +426,25 @@ namespace AKDEM.OBYS.DataAccess.Migrations
                     b.Navigation("AppLesson");
 
                     b.Navigation("AppSchedule");
+                });
+
+            modelBuilder.Entity("AKDEM.OBYS.Entities.AppSessionBranch", b =>
+                {
+                    b.HasOne("AKDEM.OBYS.Entities.AppBranch", "AppBranch")
+                        .WithMany("AppSessionBranches")
+                        .HasForeignKey("BranchId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("AKDEM.OBYS.Entities.AppSession", "AppSession")
+                        .WithMany("AppSessionBranches")
+                        .HasForeignKey("SessionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("AppBranch");
+
+                    b.Navigation("AppSession");
                 });
 
             modelBuilder.Entity("AKDEM.OBYS.Entities.AppUser", b =>
@@ -441,6 +483,12 @@ namespace AKDEM.OBYS.DataAccess.Migrations
 
             modelBuilder.Entity("AKDEM.OBYS.Entities.AppUserSession", b =>
                 {
+                    b.HasOne("AKDEM.OBYS.Entities.AppBranch", "AppBranch")
+                        .WithMany("AppUserSessions")
+                        .HasForeignKey("BranchId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("AKDEM.OBYS.Entities.AppSession", "AppSession")
                         .WithMany("AppUserSessions")
                         .HasForeignKey("SessionId")
@@ -453,6 +501,8 @@ namespace AKDEM.OBYS.DataAccess.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.Navigation("AppBranch");
+
                     b.Navigation("AppSession");
 
                     b.Navigation("AppUser");
@@ -462,7 +512,7 @@ namespace AKDEM.OBYS.DataAccess.Migrations
                 {
                     b.HasOne("AKDEM.OBYS.Entities.AppLesson", "AppLesson")
                         .WithMany("AppUserSessionLessons")
-                        .HasForeignKey("UserSessionId")
+                        .HasForeignKey("LessonId")
                         .IsRequired();
 
                     b.HasOne("AKDEM.OBYS.Entities.AppUserSession", "AppUserSession")
@@ -477,20 +527,22 @@ namespace AKDEM.OBYS.DataAccess.Migrations
 
             modelBuilder.Entity("AKDEM.OBYS.Entities.AppWarning", b =>
                 {
-                    b.HasOne("AKDEM.OBYS.Entities.AppUser", "AppUser")
+                    b.HasOne("AKDEM.OBYS.Entities.AppUserSession", "AppUserSession")
                         .WithMany("AppWarnings")
-                        .HasForeignKey("UserId")
+                        .HasForeignKey("UserSessionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("AppUser");
+                    b.Navigation("AppUserSession");
                 });
 
             modelBuilder.Entity("AKDEM.OBYS.Entities.AppBranch", b =>
                 {
-                    b.Navigation("AppSchedule");
+                    b.Navigation("AppSessionBranches");
 
                     b.Navigation("AppUsers");
+
+                    b.Navigation("AppUserSessions");
                 });
 
             modelBuilder.Entity("AKDEM.OBYS.Entities.AppClass", b =>
@@ -519,9 +571,14 @@ namespace AKDEM.OBYS.DataAccess.Migrations
 
             modelBuilder.Entity("AKDEM.OBYS.Entities.AppSession", b =>
                 {
-                    b.Navigation("AppSchedules");
+                    b.Navigation("AppSessionBranches");
 
                     b.Navigation("AppUserSessions");
+                });
+
+            modelBuilder.Entity("AKDEM.OBYS.Entities.AppSessionBranch", b =>
+                {
+                    b.Navigation("AppSchedules");
                 });
 
             modelBuilder.Entity("AKDEM.OBYS.Entities.AppUser", b =>
@@ -531,13 +588,13 @@ namespace AKDEM.OBYS.DataAccess.Migrations
                     b.Navigation("AppUserRoles");
 
                     b.Navigation("AppUserSessions");
-
-                    b.Navigation("AppWarnings");
                 });
 
             modelBuilder.Entity("AKDEM.OBYS.Entities.AppUserSession", b =>
                 {
                     b.Navigation("AppUserSessionLessons");
+
+                    b.Navigation("AppWarnings");
                 });
 #pragma warning restore 612, 618
         }

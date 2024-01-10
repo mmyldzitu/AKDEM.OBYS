@@ -11,23 +11,28 @@
 
 
         <div class="mb-3">
-            <label>İsim :</label>
+            <label><strong>İsim:</strong></label>
             <input asp-for="FirstName" type="text" class="form-control" />
         </div>
         <div class="mb-3">
-            <label>Soyisim :</label>
+            <label><strong>Soyisim:</strong></label>
             <input asp-for="SecondName" type="text" class="form-control" />
         </div>
         <div class="mb-3">
-            <label class="form-check-label">Mail Adresi :</label>
+            <label><strong>Sıra No:</strong></label>
+            <label asp-for="SıraNo">@Model.SıraNo</label>
+            
+        </div>
+        <div class="mb-3">
+            <label class="form-check-label"><strong>Mail Adresi:</strong></label>
             <input asp-for="Email" type="email" class="form-control" />
         </div>
         <div class="mb-3">
-            <label>Telefon Numarası :</label>
+            <label><strong>Telefon Numarası:</strong></label>
             <input asp-for="PhoneNumber" type="tel" class="form-control" />
         </div>
         <div class="mb-3">
-            <label>Görsel :</label>
+            <label><strong>Görsel:</strong></label>
             <div class="mb-2">
                 <img src="@Model.ImagePath2" height="150" width="150" />
 
@@ -36,10 +41,11 @@
             <br />
             <div class="mb-3">
 
-                <label>Sınıf :</label>
-                <select id="classes" onchange="setInputDisplay()" asp-for="ClassId" asp-items="ViewBag.classes">
-                    <option value="">-- Sınıf Seçin --</option>
-                </select>
+                <label><strong>Sınıf:</strong></label>
+                <label asp-for="ClassId" >@(Model.ClassId==0 ? "Hazırlık" :$"{Model.ClassId - 1}. Sınıf" ) </label>
+                <input type="hidden" asp-for="ClassId" readonly class="form-control" />
+
+
 
             </div>
             <br />
@@ -49,7 +55,7 @@
 
             <div class="mb-3" style="display:block" id="branchDiv">
 
-                <label>Şube :</label>
+                <label><strong>Şube:</strong></label>
 
                 <select id="branches" asp-for="BranchId" asp-items="ViewBag.branches">
                     <option value="">-- Şube Seçin --</option>
@@ -73,7 +79,7 @@
     </form>
 </div>
 
-@section script {
+@*@section script {
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <script>
         $(document).ready(function() {
@@ -122,4 +128,4 @@
         
 
     </script>
-}
+}*@

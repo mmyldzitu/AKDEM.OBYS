@@ -20,6 +20,7 @@ namespace AKDEM.OBYS.DataAccess.Configurations
             }).IsUnique();
             builder.HasOne(x => x.AppUser).WithMany(x => x.AppUserSessions).HasForeignKey(x => x.UserId);
             builder.HasOne(x => x.AppSession).WithMany(x => x.AppUserSessions).HasForeignKey(x => x.SessionId);
+            builder.HasOne(x => x.AppBranch).WithMany(x => x.AppUserSessions).HasForeignKey(x => x.BranchId);
         }
     }
 }

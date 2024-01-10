@@ -1,0 +1,25 @@
+﻿@model List<AppSessionListDto>
+@{
+    Layout = "_Layout";
+}
+<div class="container-fluid">
+
+    <div class="text-end">
+        <h2>KARNELER VE TRANSKRİPT</h2>
+    </div>
+    <br />
+    <div class="mb-3">
+        <a class="btn btn-dark" asp-action="Transcrypt" asp-controller="Branch" asp-route-userId="@ViewBag.userId" >TRANSKRİPT</a>
+        </div>
+    <br />
+    @foreach (var item in Model)
+    {
+        <div class="mb-3">
+            <a asp-action="SessionDetailsForUser" asp-controller="Branch" asp-route-sessionId="@item.Id" asp-route-userId="@ViewBag.userId" class="btn btn-outline-dark">@item.Definition</a>
+        </div>
+        <br />
+    }
+
+
+
+</div>

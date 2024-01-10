@@ -9,6 +9,12 @@ namespace AKDEM.OBYS.Dto.AppScheduleDetailDto
 {
     public class AppScheduleDetailCreateDto : IDto
     {
+        public string Day { get; set; }
+        public string Hours { get; set; }
+        public int LessonId { get; set; }
+        
+        public int ApScheduleId { get; set; }
+        
 
     }
 }

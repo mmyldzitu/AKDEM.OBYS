@@ -1,0 +1,63 @@
+﻿@model AppScheduleCreateModel
+@{
+    Layout = "_Layout";
+}
+<div class="container-fluid">
+    <div class="text-left">
+        <a class="btn btn-danger" asp-action="SessionDetails" asp-controller="Session" asp-route-id="@ViewBag.sessionId">Döneme Dön</a>
+    </div>
+    <hr />
+    <h1 id="headertext">Program Oluştur</h1>
+    <form asp-action="CreateSchedule" asp-controller="Schedule" method="post" enctype="multipart/form-data">
+        <input type="hidden" asp-for="SessionId" value="@ViewBag.sessionId" />
+
+        <div id="divekle" class="mt-3">
+            <label>Program İsmi :</label>
+            <input id="inputDefinition" asp-for="Definition" type="text" class="form-control font-weight-bold" />
+        </div>
+
+        <div id="divclasses" class="mt-3">
+            <label>Sınıf :</label>
+            <select asp-for="BranchId" asp-items="@ViewBag.branches" class="form form-control-sm">
+                <option value="0">Bir Sınıf Seçiniz</option>
+            </select>
+        </div>
+
+
+        <div id="btnekle" class="mt-3">
+            <button class="btn btn-primary" type="submit">Kaydet</button>
+        </div>
+        <br />
+        <div id="btncreate" style="display:none" class="mb-3">
+            <a class="btn btn-outline-info" asp-action="CreateScheduleDetail" asp-controller="ScheduleDetail" asp-route-sessionBranchId="@ViewBag.sessionBranchId">Çizelge Oluştur</a>
+        </div>
+        <div class="mb-3 text-bg-danger" asp-validation-summary="All">
+
+        </div>
+    </form>
+
+</div>
+
+@section script{ 
+<script>
+    var btnsave = document.getElementById("btnekle");
+    var btncreate = document.getElementById("btncreate");
+
+        if (@ViewBag.message==1) {
+            
+            @*alert("@ViewBag.alert");*@
+            document.getElementById("inputDefinition").value = "";
+            btnekle.style.display = "none";
+            btncreate.style.display = "block";
+
+            divclasses.style.display = "none";
+            divekle.style.display = "none";
+            document.getElementById("headertext").innerHTML = "Çizelge";
+
+    }
+
+
+</script>
+
+
+}

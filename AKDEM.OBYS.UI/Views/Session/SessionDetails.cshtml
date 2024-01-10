@@ -3,7 +3,100 @@
     Layout = "_Layout";
 }
 <div class="container-fluid">
-    <div class="mb-3">
-        <a asp-action="Index" asp-controller="Schedule" asp-route-id="@ViewBag.id" class="btn btn-success">DERS PROGRAMLARI</a>
+
+    <div class="mt-2">
+        <h1>  DÖNEME DAİR İŞLEMLER (@ViewBag.sessionName)</h1>
     </div>
+    <hr />
+    <table class="mt-3 table table-sm table-hover">
+        <thead>
+            <tr>
+                <th>İşlem</th>
+                <th>Açıklama</th>
+
+
+            </tr>
+        </thead>
+        <tbody>
+
+            <tr>
+                <td bgcolor="Cadetblue"><a asp-action="Index" asp-controller="Schedule" asp-route-id="@ViewBag.id">DERS PROGRAMLARI</a></td>
+                <td><strong>DÖNEME DAİR DERS PROGRAMI İŞLEMLERİ</strong></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td bgcolor="Cadetblue"><a asp-action="Index" asp-controller="Otomation" asp-route-sessionId="@ViewBag.id">ÖĞRENCİ/OTOMASYON İŞLEMLERİ</a></td>
+                <td><strong>DÖNEME DAİR ÖĞRENCİ İŞLEMLERİ/KARNELER</strong></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td bgcolor="Cadetblue"><a asp-action="Index" asp-controller="Warning" asp-route-sessionId="@ViewBag.id">İHTAR İŞLEMLERİ/ BAŞARISIZ DURUMA DÜŞEN ÖĞRENCİLER</a></td>
+                <td><strong>BAŞARISIZLIK NEDENLERİ/ DURUMLAR</strong></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td></td>
+            </tr>
+
+            @{ if (ViewBag.sessionStatus2)
+                {
+                    
+                    <tr>
+                        <td bgcolor="Cadetblue"> <a asp-action="MissingNotes" asp-controller="Session" asp-route-sessionId="@ViewBag.id"> HENÜZ GİRİLMEMİŞ NOTLAR</a></td>
+                        <td><strong>DÖNEM SONLANDIRMADAN ÖNCE NOT KONTROLLERİ</strong></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td bgcolor="Cadetblue"><a asp-action="SessionEnding" asp-controller="Session" asp-route-sessionId="@ViewBag.id">DÖNEM SONU</a></td>
+                        <td><strong>YENİ DÖNEME GEÇEBİLMEK VE SÜRECİN İŞLEMESİ İÇİN DÖNEM SONLANDIRMA</strong></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                    </tr>
+
+
+
+                } }
+            <tr>
+                <td bgcolor="Cadetblue"><a asp-action="RemoveSession" asp-controller="Session" asp-route-sessionId="@ViewBag.id">DÖNEMi SİL</a></td>
+                <td><strong>DÖNEM SİLME (VERİ KAYINA NEDEN OLACAĞINDAN DOLAYI TAVSİYE EDİLMEZ)</strong></td>
+            </tr>
+            @{if (ViewBag.sessionValue == 1)
+
+                {
+                    <tr>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td bgcolor="Cadetblue"><a asp-action="GraduatedStudents" asp-controller="Session" asp-route-sessionId="@ViewBag.id">DÖNEM MEZUNLARI</a></td>
+                        <td><strong>BU DÖNEM MEZUN OLAN ÖĞRENCİLER</strong></td>
+                    </tr>
+                }
+            }
+
+            <tr>
+                <td></td>
+                <td></td>
+            </tr>
+
+
+
+
+        </tbody>
+
+    </table>
+
 </div>
+
+

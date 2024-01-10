@@ -1,4 +1,12 @@
-﻿<!doctype html>
+﻿@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor HttpContextAccessor
+@using System.Security.Claims
+
+@using AKDEM.OBYS.Business.Services
+@inject IAppSessionService SessionService
+@inject IAppStudentService StudentService
+@inject IAppUserService UserService
+<!doctype html>
 <html lang="tr">
 <head>
     <title>Sidebar 01</title>
@@ -6,57 +14,110 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
     <link href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700,800,900" rel="stylesheet">
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="/css/style.css">
+    @RenderSection("style", false)
+
 </head>
 <body>
-
     <div class="wrapper d-flex align-items-stretch">
-        <nav id="sidebar">
+
+        @{if (User.Identity.IsAuthenticated)
+            {
+                var userId = HttpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+                int convertedUserId = Convert.ToInt32(userId);
+                var ImageUrl = await StudentService.ReturnUserImg(convertedUserId);
+                var sesionId = await SessionService.GetActiveSessionId();
+                var userName = await UserService.GetUserNameById(convertedUserId);
+
+<nav id="sidebar">
             <div class="p-4 pt-5">
-                <a href="#" class="img logo rounded-circle mb-5" style="background-image: url(images/logo.jpg);"></a>
+                <a href="#" class="img logo rounded-circle mb-5" style="background-image: url(@ImageUrl);"></a>
+                <div class="text-center">
+                    <span class="mx-auto" style="font-weight:bold"> <em>@userName</em> </span>
+                </div>
+                <br />
                 <ul class="list-unstyled components mb-5">
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <li>
+                            <a asp-action="Index" asp-controller="Session">Dönemler</a>
+                        </li>
+                        <li>
+                            <a asp-action="GetTeachers" asp-controller="User">Öğretmenler</a>
+                        </li>
+                        <li>
+                            <a asp-action="GetStudents" asp-controller="User" asp-route-classType="@((int)ClassType.Tamamı)">Öğrenciler</a>
+                        </li>
+                        <li>
+                            <a asp-action="GetBranches" asp-controller="Branch" asp-route-classType="@((int)ClassType.Tamamı)">Sınıflar</a>
+                        </li>
+                        <li>
+                            <a asp-action="Index" asp-controller="Lesson">Dersler</a>
+                        </li>
+                    }
+
+                    else if (User.IsInRole("Teacher"))
+                    {
+
+
+
+                        <li>
+                            <a asp-action="Index" asp-controller="Teacher" asp-route-sessionId="@(sesionId)">Program</a>
+                        </li>
+                        <li>
+                            <a asp-action="TeacherLessons" asp-controller="Teacher" asp-route-sessionId="@(sesionId)" asp-route-userId="@userId">Derslerim</a>
+                        </li>
+                        <li>
+                            <a asp-action="TeacherExSessions" asp-controller="Teacher" asp-route-userId="@userId">Geçmiş Dönemlerim</a>
+                        </li>
+
+                    }
+
+                    else if (User.IsInRole("Student"))
+                    {
+                        <li>
+                            <a asp-action="Index" asp-controller="Student" asp-route-sessionId="@(sesionId)">Program</a>
+                        </li>
+                        <li>
+                            <a asp-action="StudentDetailsStudent" asp-controller="Student" asp-route-userId="@userId" asp-route-sessionId="@sesionId">Dönem Özeti(Karne)</a>
+                        </li>
+                        <li>
+                            <a asp-action="StudentExSessions" asp-controller="Student" asp-route-userId="@userId">Geçmiş Dönemlerim</a>
+                        </li>
+                        <li>
+                            <a asp-action="StudentAllWarningDetails" asp-controller="Student" asp-route-userId="@userId">İhtarlarım</a>
+                        </li>
+                        <li>
+                            <a asp-action="StudentTranscrypt" asp-controller="Student" asp-route-userId="@userId">Transkript</a>
+                        </li>
+
+
+                    }
+
+                    @*<li class="active">
+            <a href="#homeSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Yönetim</a>
+            <ul class="collapse list-unstyled" id="homeSubmenu">
+                <li>
+                    <a asp-action="GetTeachers" asp-controller="User">Öğretmenler</a>
+                </li>
+                <li>
+                    <a asp-action="GetStudents" asp-controller="User" asp-route-classType="@((int)ClassType.Tamamı)">Öğrenciler</a>
+                </li>
+                <li>
+                    <a asp-action="GetBranches" asp-controller="Branch" asp-route-classType="@((int)ClassType.Tamamı)">Sınıflar</a>
+                </li>
+
+            </ul>
+        </li>*@
+
                     <li>
-                        <a asp-action="Index" asp-controller="Session">Dönemler</a>
-                    </li>
-                    <li class="active">
-                        <a href="#homeSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Yönetim</a>
-                        <ul class="collapse list-unstyled" id="homeSubmenu">
-                            <li>
-                                <a asp-action="GetTeachers" asp-controller="User">Öğretmenler</a>
-                            </li>
-                            <li>
-                                <a asp-action="GetStudents" asp-controller="User">Öğrenciler</a>
-                            </li>
-                            <li>
-                                <a asp-action="Index" asp-controller="Branch">Sınıflar</a>
-                            </li>
-                            <li>
-                                <a asp-action="Index" asp-controller="Lesson">Dersler</a>
-                            </li>
-                        </ul>
+                        <a asp-action="UpdateMe" asp-controller="Account">Bilgilerimi Düzenle</a>
                     </li>
 
                     <li>
-                        <a href="#pageSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Pages</a>
-                        <ul class="collapse list-unstyled" id="pageSubmenu">
-                            <li>
-                                <a href="#">Page 1</a>
-                            </li>
-                            <li>
-                                <a href="#">Page 2</a>
-                            </li>
-                            <li>
-                                <a href="#">Page 3</a>
-                            </li>
-                        </ul>
-                    </li>
-                    <li>
-                        <a href="#">Portfolio</a>
-                    </li>
-                    <li>
-                        <a href="#">Contact</a>
+                        <a asp-action="LogOut" asp-controller="Account">Çıkış Yap</a>
                     </li>
                 </ul>
 
@@ -70,35 +131,34 @@
                 </div>
 
             </div>
-        </nav>
+</nav> } }
+
+
 
         <!-- Page Content  -->
         <div id="content" class="p-4 p-md-5">
             <nav class="navbar navbar-expand-lg navbar-light bg-light">
                 <div class="container-fluid">
 
-                    <button type="button" id="sidebarCollapse" class="btn btn-primary">
-                        <i class="fa fa-bars"></i>
-                        <span class="sr-only">Toggle Menu</span>
-                    </button>
-                    <button class="btn btn-dark d-inline-block d-lg-none ml-auto" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                        <i class="fa fa-bars"></i>
-                    </button>
+                    @*<button type="button" id="sidebarCollapse" class="btn btn-primary">
+                            <i class="fa fa-bars"></i>
+                            <span class="sr-only">Toggle Menu</span>
+                        </button>*@
+                    @*<button class="btn btn-dark d-inline-block d-lg-none ml-auto" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                            <i class="fa fa-bars"></i>
+                        </button>*@
 
                     <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                        <img src="/images/akdem.jpg">
                         <ul class="nav navbar-nav ml-auto">
+
                             <li class="nav-item active">
-                                <a class="nav-link" href="#">Home</a>
+                                <a class="nav-link" href="https://www.aksaray.edu.tr">AKSARAY ÜNİVERSİTESİ</a>
                             </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="#">About</a>
+                            <li class="nav-item active">
+                                <a class="nav-link" href="https://iif.aksaray.edu.tr">FAKÜLTEMİZ</a>
                             </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="#">Portfolio</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="#">Contact</a>
-                            </li>
+
                         </ul>
                     </div>
                 </div>
@@ -110,7 +170,6 @@
         </div>
 
     </div>
-
     <script src="/js/jquery.min.js"></script>
     <script src="/js/popper.js"></script>
     <script src="/js/bootstrap.min.js"></script>

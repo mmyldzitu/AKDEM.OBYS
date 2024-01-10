@@ -1,0 +1,61 @@
+﻿
+@{
+    Layout = "_Layout";
+}
+<div class="container-fluid">
+
+    <div class="mt-2">
+        @{ if (ViewBag.sessionStatus2 == true)
+            {
+                <h1> (@ViewBag.sessionName) DÖNEMİNE DAİR İŞLEMLER  <span style="font-weight: bold; color: cadetblue;">(AKTİF)</span> </h1>
+
+
+            }
+            else if (ViewBag.sessionStatus == false)
+            {
+                <h1> (@ViewBag.sessionName) DÖNEMİNE DAİR İŞLEMLER  <span style="font-weight: bold; color: red;">(PASİF)</span> </h1>
+
+            }
+            else
+            {
+                <h1> (@ViewBag.sessionName) DÖNEMİNE DAİR İŞLEMLER  <span style="font-weight: bold; color: lightblue;">(DÜZENLENEBİLİR)</span> </h1>
+
+            }
+
+        }
+    </div>
+    <hr />
+    <table class="mt-3 table table-sm table-hover">
+        <thead>
+            <tr>
+                <th>İşlem</th>
+                <th>Açıklama</th>
+
+
+            </tr>
+        </thead>
+        <tbody>
+
+            <tr>
+                <td bgcolor="Cadetblue"><a asp-action="Index" asp-controller="Student" asp-route-sessionId="@ViewBag.sessionId">PROGRAMIM</a></td>
+                <td>  <strong>@ViewBag.sessionName</strong> DÖNEMİNE AİT GEÇMİŞ POGRAMINIZ </td>
+            </tr>
+            <tr>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td bgcolor="Cadetblue"><a asp-action="StudentDetailsStudent" asp-controller="Student" asp-route-sessionId="@ViewBag.sessionId" asp-route-userId="@ViewBag.userId">DÖNEM ÖZETİM</a></td>
+                <td>  <strong>@ViewBag.sessionName</strong> DÖNEMİNE AİT GEÇMİŞ DÖNEM ÖZETİNİZ </td>
+            </tr>
+
+
+
+
+        </tbody>
+
+    </table>
+
+</div>
+
+

@@ -17,7 +17,17 @@ namespace AKDEM.OBYS.Business.Services
 
         Task<IResponse<AppStudentCreateDto>> CreateStudentWithRoleAsync(AppStudentCreateDto dto, int roleId);
         Task<List<AppStudentListDto>> GetStudentsWithBranchAsync(int id);
-
+        
+        Task<AppStudentListDto> GetStudentById(int id);
+        Task ChangeStudentStatusBecasuseOfWarning(int userId, double sessionWarningCount, double totalWarningCount);
+        Task<List<AppStudentListDto>> GetPassiveStudents(int sessionId);
+        Task CreateStudentOrChangeStatusProcessForUserSessionandUSerSessionLessons(int userId);
+        Task<List<AppStudentListDto>> GetStudentsWithBranchAndSessionAsync(int branchId,int sessionId);
+        Task<List<AppStudentListDto>> GetStudentsByClassId(RoleType type, int classId);
+        Task ChangeStudentBranch(int studentId, int branchId,int classId);
+        Task<List<AppStudentListDto>> GraduatedStudenstBySessionId(int sessionId);
+        Task<List<AppStudentListDto>> GetStudentsWithBranchAndSessionAndLessonAsync(int branchId, int sessionId, int lessonId);
+        Task<string> ReturnUserImg(int userId);
 
 
     }

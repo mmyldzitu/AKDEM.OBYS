@@ -38,11 +38,11 @@ namespace AKDEM.OBYS.UI.Extensions
             }
             else if (!string.IsNullOrWhiteSpace(controllerName) && parameter == 1)
             {
-                return controller.RedirectToAction(actionName, controllerName, new { ClassId = parameter });
+                return controller.RedirectToAction(actionName, controllerName, new { classType = parameter });
             }
             else
             {
-                return controller.RedirectToAction(actionName, new { ClassId = parameter });
+                return controller.RedirectToAction(actionName, new { classType = parameter });
             }
         }
 

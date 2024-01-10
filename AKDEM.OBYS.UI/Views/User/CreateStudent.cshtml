@@ -3,7 +3,8 @@
     Layout = "_Layout";
 }
 <div class="container-fluid">
-    <form asp-action="CreateStudent" asp-controller="User" method="post" enctype="multipart/form-data">
+    <form asp-action="CreateStudent" asp-controller="User" asp-route-classId="@ViewBag.classId" method="post" enctype="multipart/form-data">
+        
 
         <div class="mb-3">
             <label>İsim :</label>
@@ -14,6 +15,10 @@
             <input asp-for="SecondName" type="text" class="form-control" />
         </div>
         <div class="mb-3">
+            <label>Sıra No :</label>
+            <input asp-for="SıraNo" type="text" class="form-control" />
+        </div>
+        <div class="mb-3">
             <label class="form-check-label">Mail Adresi :</label>
             <input asp-for="Email" type="email" class="form-control" />
         </div>
@@ -21,6 +26,7 @@
             <label>Telefon Numarası :</label>
             <input asp-for="PhoneNumber" type="tel" class="form-control" />
         </div>
+
         <div class="mb-3">
             <label>Görsel :</label>
             <input type="file" asp-for="ImagePath" class="form-control" />

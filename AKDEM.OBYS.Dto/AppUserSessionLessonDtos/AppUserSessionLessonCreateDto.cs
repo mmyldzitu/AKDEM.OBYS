@@ -9,5 +9,11 @@ namespace AKDEM.OBYS.Dto.AppUserSessionLessonDtos
 {
     public class AppUserSessionLessonCreateDto : IDto
     {
+        public int LessonId { get; set; }
+        
+        public int UserSessionId { get; set; }
+
+        public int Not { get; set; } = -1;
+        public int Devamsızlık { get; set; } = -1;
     }
 }

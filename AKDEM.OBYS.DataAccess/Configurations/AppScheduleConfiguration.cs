@@ -14,8 +14,8 @@ namespace AKDEM.OBYS.DataAccess.Configurations
         public void Configure(EntityTypeBuilder<AppSchedule> builder)
         {
             builder.Property(x => x.Definition).HasMaxLength(200).IsRequired();
-            builder.HasOne(x => x.AppBranch).WithOne(x => x.AppSchedule).HasForeignKey<AppSchedule>(x => x.BranchId);
-            builder.HasOne(x => x.AppSession).WithMany(x => x.AppSchedules).HasForeignKey(x => x.SessionId);
+
+            builder.HasOne(x => x.AppSessionBranch).WithMany(x => x.AppSchedules).HasForeignKey(x => x.SessionBranchId);
         }
     }
 }

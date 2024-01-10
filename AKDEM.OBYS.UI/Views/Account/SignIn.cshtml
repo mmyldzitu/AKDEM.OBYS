@@ -1,0 +1,39 @@
+﻿
+@model AppUserLoginDto
+@{
+    Layout = "_Layout";
+}
+<div class="mt-4">
+    <h2>AKDEM GİRİŞ PANELİ</h2>
+    <hr />
+    <form method="post" asp-action="SignIn" asp-controller="Account" class="p-4 w-75 mx-aouto">
+
+
+        <div class="mb-3">
+            <label>Mail Adresiniz :</label>
+            <input type="text" asp-for="Email" class="form-control" />
+
+        </div>
+
+
+        <div class="mb-3">
+            <label>Şifreniz :</label>
+            <input type="password" asp-for="Password" class="form-control" />
+
+        </div>
+
+
+        <div class="mb-3 text-lg-end">
+
+            <button type="submit" class="btn btn-primary">Giriş Yap</button>
+
+        </div>
+        <div class="text-danger text-lg-start" asp-validation-summary="All">
+
+
+
+        </div>
+
+
+    </form>
+</div>

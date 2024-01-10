@@ -9,6 +9,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="PuppeteerSharp" Version="13.0.2" />
   </ItemGroup>
 
   <ItemGroup>
@@ -18,6 +19,7 @@
   <ItemGroup>
     <Folder Include="wwwroot\images\studentImages\" />
     <Folder Include="wwwroot\images\teacherImages\" />
+    <Folder Include="wwwroot\pdf\" />
   </ItemGroup>
 
 </Project>

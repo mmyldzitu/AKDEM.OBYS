@@ -1,0 +1,128 @@
+﻿@model AppClassListWithCountModel
+@{
+    Layout = "_Layout";
+    int count = 0;
+}
+
+
+<div class=container-fluid>
+    <div class="text-right">
+        <a id="pdfButton" class="btn btn-success" asp-action="GenerateAndDownloadPdf2" asp-controller="Branch" asp-route-myFileName="@ViewBag.header2" asp-route-classType="@ViewBag.classType">PDF</a>
+    </div>
+    <div class="text-end">
+        <h1> @ViewBag.header</h1>
+    </div>
+
+
+    <div id="branchButtons" class="text-right">
+        <a asp-action="GetBranches" asp-controller="Branch" asp-route-classType="@((int)ClassType.Tamamı)">Tüm Sınıflar</a>|
+
+        <a asp-action="GetBranches" asp-controller="Branch" asp-route-classType="@((int)ClassType.Hazırlık)">Hazırlık</a>|
+        <a asp-action="GetBranches" asp-controller="Branch" asp-route-classType="@((int)ClassType.Bir)">Birinci Sınıf</a>|
+        <a asp-action="GetBranches" asp-controller="Branch" asp-route-classType="@((int)ClassType.iki)">İkinci Sınıf</a>|
+        <a asp-action="GetBranches" asp-controller="Branch" asp-route-classType="@((int)ClassType.Üç)">Üçüncü Sınıf</a>|
+        <a asp-action="GetBranches" asp-controller="Branch" asp-route-classType="@((int)ClassType.Dört)">Dördüncü Sınıf</a>|
+
+
+    </div>
+
+    @{ if (ViewBag.classType != (int)ClassType.Tamamı)
+
+        {
+            <div>
+                <a id="newClass" class="btn btn-success" asp-action="CreateBranch" asp-controller="Branch" asp-route-id="@ViewBag.classType">Yeni Sınıf</a>
+            </div>
+
+            <table class="mt-3 table table-sm table-hover">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Şube</th>
+                        <th>Sınıf</th>
+                        <th>Mevcut</th>
+                        <th>İşlem</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.BranchListWithCountModels)
+                    {
+                        count = count + 1;
+                        <tr>
+                            <td>@count</td>
+                            <td> <a asp-action="BranchDetails" asp-controller="Branch" asp-route-id="@item.Id"><span style="font-weight: bold; color: darkblue; text-decoration: underline">@item.Definition</span></a>
+                            </td>
+                            <td>@item.AppClass.Definition</td>
+                            <td>@item.BranchStokes</td>
+                            <td><a asp-action="RemoveBranch" asp-controller="Branch" asp-route-branchId="@item.Id" class="btn btn-danger">Sil</a></td>
+
+                        </tr>
+
+                    }
+                    <tr>
+                        <td><strong>--></strong></td>
+                        <td><strong>GENEL</strong></td>
+                        <td><strong>@Model.AppClass.Definition</strong></td>
+                        <td><strong>@Model.ClassStokes</strong></td>
+
+                    </tr>
+
+
+                </tbody>
+
+
+            </table>
+
+        }
+
+        else
+        {
+
+
+            <table class="mt-3 table table-sm table-hover">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Şube</th>
+                        <th>Sınıf</th>
+                        <th>Mevcut</th>
+                        <th>İşlem</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.BranchListWithCountModels)
+                    {
+                        count = count + 1;
+                        <tr>
+                            <td>@count</td>
+                            <td>
+                                <a asp-action="BranchDetails" asp-controller="Branch" asp-route-id="@item.Id"><span style="font-weight: bold; color: darkblue; text-decoration: underline">@item.Definition</span></a>
+                            </td>
+                            <td>@item.AppClass.Definition</td>
+                            <td>@item.BranchStokes</td>
+                            <td><a asp-action="RemoveBranch" asp-controller="Branch" asp-route-branchId="@item.Id" class="btn btn-danger">Sil</a></td>
+
+                        </tr>
+
+                    }
+                    <tr>
+                        <td><strong>--></strong></td>
+                        <td><strong>GENEL</strong></td>
+                        <td><strong></strong></td>
+                        <td><strong>@ViewBag.totalStock</strong></td>
+
+                    </tr>
+
+
+                </tbody>
+
+
+            </table>
+
+
+        }
+
+    }
+
+</div>
+
+

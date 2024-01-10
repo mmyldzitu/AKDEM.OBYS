@@ -1,27 +1,33 @@
 ﻿using AKDEM.OBYS.Business.Managers;
 using AKDEM.OBYS.Business.Mappings;
 using AKDEM.OBYS.Business.Services;
+using AKDEM.OBYS.Business.ValidationRules.AppAccount;
 using AKDEM.OBYS.Business.ValidationRules.AppBranch;
 using AKDEM.OBYS.Business.ValidationRules.AppLesson;
 using AKDEM.OBYS.Business.ValidationRules.AppSchedule;
 using AKDEM.OBYS.Business.ValidationRules.AppScheduleDetail;
 using AKDEM.OBYS.Business.ValidationRules.AppSession;
+using AKDEM.OBYS.Business.ValidationRules.AppSessionBranch;
 using AKDEM.OBYS.Business.ValidationRules.AppUser;
 using AKDEM.OBYS.Business.ValidationRules.AppUserSession;
 using AKDEM.OBYS.Business.ValidationRules.AppUserSessionLesson;
 using AKDEM.OBYS.Business.ValidationRules.AppWarning;
 using AKDEM.OBYS.DataAccess.Context;
 using AKDEM.OBYS.DataAccess.UnitOfWork;
+using AKDEM.OBYS.Dto.AppAccountDtos;
 using AKDEM.OBYS.Dto.AppBranchDtos;
 using AKDEM.OBYS.Dto.AppLessonDtos;
 using AKDEM.OBYS.Dto.AppScheduleDetailDto;
 using AKDEM.OBYS.Dto.AppScheduleDtos;
+using AKDEM.OBYS.Dto.AppSessionBranchDtos;
 using AKDEM.OBYS.Dto.AppSessionDtos;
 using AKDEM.OBYS.Dto.AppUserDtos;
 using AKDEM.OBYS.Dto.AppUserSessionDtos;
 using AKDEM.OBYS.Dto.AppUserSessionLessonDtos;
 using AKDEM.OBYS.Dto.AppWarningDtos;
 using AutoMapper;
+using DinkToPdf;
+using DinkToPdf.Contracts;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -43,11 +49,11 @@ namespace AKDEM.OBYS.Business.DependencyResolvers
                 opt.UseSqlServer(configuration.GetConnectionString("Local"));
 
                 //mapping profilleri buraya
-                 
+
             }
                 );
 
-           
+
 
 
             services.AddScoped<IUow, Uow>();
@@ -59,6 +65,10 @@ namespace AKDEM.OBYS.Business.DependencyResolvers
             services.AddScoped<IAppScheduleService, AppScheduleManager>();
             services.AddScoped<IAppScheduleDetailService, AppScheduleDetailManager>();
             services.AddScoped<IAppUserSessionLessonService, AppUserSessionLessonManager>();
+            services.AddScoped<IAppUserSessionService, AppUserSessionManager>();
+            services.AddScoped<IAppWarningService, AppWarningManager>();
+            services.AddScoped<IAppSessionBranchService, AppSessionBranchManager>();
+
 
             services.AddTransient<IValidator<AppLessonCreateDto>, AppLessonCreateDtoValidator>();
             services.AddTransient<IValidator<AppLessonUpdateDto>, AppLessonUpdateDtoValidator>();
@@ -87,6 +97,12 @@ namespace AKDEM.OBYS.Business.DependencyResolvers
             services.AddTransient<IValidator<AppWarningCreateDto>, AppWarningCreateDtoValidator>();
             services.AddTransient<IValidator<AppWarningUpdateDto>, AppWarningUpdateDtoValidator>();
 
+            services.AddTransient<IValidator<AppSessionBranchUpdateDto>, AppSessionBranchUpdateDtoValidator>();
+            services.AddTransient<IValidator<AppSessionBranchCreateDto>, AppSessionBranchCreateDtoValidator>();
+
+            services.AddTransient<IValidator<AppUserLoginDto>, AppUserLoginDtoValidator>();
+
+            services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));
 
 
 

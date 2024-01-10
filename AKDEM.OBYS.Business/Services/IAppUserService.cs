@@ -1,5 +1,7 @@
 ﻿using AKDEM.OBYS.Common;
 using AKDEM.OBYS.Common.Enums;
+using AKDEM.OBYS.Dto.AppAccountDtos;
+using AKDEM.OBYS.Dto.AppRoleDtos;
 using AKDEM.OBYS.Dto.AppUserDtos;
 using AKDEM.OBYS.Entities;
 using System;
@@ -15,8 +17,14 @@ namespace AKDEM.OBYS.Business.Services
         Task<IResponse<AppTeacherCreateDto>> CreateTeacherWithRoleAsync(AppTeacherCreateDto dto, int roleId);
         Task<IResponse<List<AppTeacherListDto>>> GetAllTeacherAsync(int roleId);
 
-        Task<List<AppStudentListDto>> GetAllStudentAsync(RoleType type);
+        Task<List<AppStudentListDto>> GetAllStudentAsync(RoleType type, ClassType classType);
         Task<IResponse<AppStudentUpdateDto>> CreateStudentWithRoleAsync(AppStudentUpdateDto dto, int roleId);
+        Task<int> GetUserIdByNameSecondNameandEmail(string name, string secondName, string mail);
+        Task<IResponse<AppTeacherListDto>> CheckUserAsync(AppUserLoginDto dto);
+        Task<IResponse<List<AppRoleListDto>>> GetRolesByUserIdAsync(int userId);
+        Task<string> GetUserNameById(int userId);
+
+
 
     }
 }

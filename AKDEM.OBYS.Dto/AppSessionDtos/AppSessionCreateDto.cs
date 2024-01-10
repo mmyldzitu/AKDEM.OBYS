@@ -10,7 +10,8 @@ namespace AKDEM.OBYS.Dto.AppSessionDtos
    public class AppSessionCreateDto:IDto
     {
         public string Definition { get; set; }
-        public bool Status { get; set; } = false;
+        public bool Status { get; set; } = true;
+        public bool Status2 { get; set; } = true;
 
 
     }

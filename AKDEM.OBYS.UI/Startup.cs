@@ -5,6 +5,7 @@ using AKDEM.OBYS.UI.Models;
 using AKDEM.OBYS.UI.ValidationRules;
 using AutoMapper;
 using FluentValidation;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -38,6 +39,21 @@ namespace AKDEM.OBYS.UI
             services.AddTransient<IValidator<AppStudentCreateModel>, AppStudentCreateModelValidator>();
             
             services.AddTransient<IValidator<AppStudentUpdateModel>, AppStudentUpdateModelValidator>();
+            services.AddHttpContextAccessor();
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(opt => {
+        opt.Cookie.Name = "AkdemCookie";
+        opt.Cookie.HttpOnly = true;
+        opt.Cookie.SameSite = SameSiteMode.Strict;
+        opt.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+        opt.ExpireTimeSpan = TimeSpan.FromDays(20);
+        opt.LoginPath = new PathString("/Account/SignIn");
+        opt.LogoutPath = new PathString("/Account/LogOut");
+        opt.AccessDeniedPath = new PathString("/Account/AccessDeniedPath");
+
+
+    });
+            
             services.AddControllersWithViews();
 
             var profiles = ProfileHelper.GetProfiles();
@@ -57,12 +73,15 @@ namespace AKDEM.OBYS.UI
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
             app.UseStaticFiles();
             app.UseRouting();
+            app.UseAuthentication();
+            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {

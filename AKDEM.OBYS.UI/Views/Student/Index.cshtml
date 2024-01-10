@@ -1,0 +1,111 @@
+﻿
+@{
+    Layout = "_Layout";
+}
+@section style{
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th, td {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+        }
+    </style>
+
+}
+<div class="text-right">
+    <a id="pdfButton" class="btn btn-success" asp-action="GenerateAndDownloadPdf" asp-controller="Student" asp-route-myFileName="@ViewBag.name2" asp-route-sessionId="@ViewBag.sessionId" asp-route-userId="@ViewBag.userId">PDF</a>
+</div>
+<h2>@ViewBag.name</h2>
+
+
+
+<br />
+<table id="dersProgramiTable">
+    <thead>
+        <tr>
+            <th>Saat</th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+
+
+
+@section script{
+
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+    <script>
+
+
+        var gunler = ["Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma","Cumartesi","Pazar"];
+
+        var baslikSatiri = $("<tr>").append("<th>Saat</th>");
+        gunler.forEach(function (gun) {
+            baslikSatiri.append("<th>" + gun + "</th>");
+        });
+        $("#dersProgramiTable thead tr").remove();
+        $("#dersProgramiTable thead").append(baslikSatiri);
+
+
+
+
+
+        $.get('/ScheduleDetail/GetScheduleDetailandHours', { scheduleId: @ViewBag.scheduleId }, function (data) {
+                // Şube ayrıntılarını güncelle
+
+                updateTable(data);
+            });
+
+
+
+
+        function updateTable(data) {
+            // Tabloyu temizle
+            $("#dersProgramiTable tbody").empty();
+
+
+            // Saat aralıkları üzerinde döngü
+            $.each(data.scheduleHours, function (index, saat) {
+                var satir = $("<tr>").append("<td>" + saat + "</td>");
+                console.log(saat);
+
+                // Günler üzerinde döngü
+                gunler.forEach(function (gun) {
+                    // İlgili gün ve saatteki dersi bul
+                    var ders = data.appScheduleDetails.find(x => x.day == gun && x.hours == saat);
+
+                    // Ders bilgisini al
+                    var dersBilgisi = ders ? ders.appLesson.definition : "";
+                    var saatBilgisi = ders ? `(\n${saat})` : "";
+
+
+
+                    satir.append("<td>" + dersBilgisi + saatBilgisi + "</td>");
+
+
+                });
+
+
+
+
+                // Satırı tabloya ekle
+                $("#dersProgramiTable tbody").append(satir);
+
+
+            });
+
+
+
+        }
+
+    </script>
+
+
+}

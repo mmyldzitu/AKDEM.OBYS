@@ -13,6 +13,8 @@ namespace AKDEM.OBYS.Common.Enums
         iki=3,
         Üç=4,
         Dört=5,
-        Tamamı=6
+        Mezun=6,
+        Tamamı=7,
+        Pasif=8
     }
 }

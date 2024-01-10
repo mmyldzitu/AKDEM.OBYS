@@ -12,6 +12,6 @@ namespace AKDEM.OBYS.Entities
         public bool Status { get; set; }
         public bool Status2 { get; set; }
         public List<AppUserSession> AppUserSessions { get; set; }
-        public List<AppSchedule> AppSchedules { get; set; }
+        public List<AppSessionBranch> AppSessionBranches { get; set; }
     }
 }

@@ -6,48 +6,81 @@
 <div class="mt-2">
     <h1>DÖNEMLER</h1>
 </div>
+<hr />
+@{if (ViewBag.status2Count == 0)
+    {
+        <div class="text-right">
+            <a asp-action="CreateSession" asp-controller="Session" class="mt-2 btn btn-success">Yeni Dönem Ekle</a>
+
+        </div>
+        <hr />
+    } }
+
+
 <table class="mt-3 table table-sm table-hover">
     <thead>
         <tr>
             <th>Dönem Adı</th>
             <th>Durumu</th>
-            <th>İşlem</th>
+
             <th>Not</th>
         </tr>
     </thead>
     <tbody>
         @foreach (var item in Model)
         {
-        <tr>
+            <tr>
 
 
 
-            @{
-                if (item.Status)
-                {
-                    <td bgcolor="Cadetblue"><a asp-action="SessionDetails" asp-controller="Session" asp-route-id="@item.Id">@item.Definition</a></td>
-                    <td class="text-bg-success p-3">Aktif</td>
+                @{
+                    if (item.Status2)
+                    {
+                        <td bgcolor="Cadetblue"><a asp-action="SessionDetails" asp-controller="Session" asp-route-id="@item.Id">@item.Definition</a></td>
+                        <td class="text-bg-success p-3">Aktif</td>
+
+                    }
+                    else if (item.Status == true && item.Status2 == false)
+                    {
+                        <td bgcolor="LightBlue"><a class="text-dark" asp-action="SessionDetails" asp-controller="Session" asp-route-id="@item.Id">@item.Definition</a></td>
+
+                        <td class="text-bg-danger p-3">Düzenlenebilir</td>
+                    }
+                    else
+                    {
+                        <td bgcolor="DimGrey"><a asp-action="SessionDetails" asp-controller="Session" asp-route-id="@item.Id">@item.Definition</a></td>
+                        <td class="text-bg-danger p-3">Geçmiş</td>
+                    }
+                }
+
+
+
+                @{
+                    if (!item.Status)
+                    {
+
+
+                        <td>Yalnızca Döneme Dair Veriler İncelenebilir</td>
+                    }
+                    else if (item.Status2 == false && item.Status == true)
+                    {
+
+                        <td>Döneme Dair Veriler İncelenebilir ve Düzeltilebilir. Yeni Ders Programı Oluşturalamaz!</td>
+                    }
+                    else
+                    {
+
+                        <td>Döneme Dair Veriler İncelenebilir. Yeni Program Oluşturulabilir.</td>
+
+                    }
 
                 }
-                else
-                {
-                    <td bgcolor="DimGrey">@item.Definition</td>
-                    <td class="text-bg-danger p-3">Pasif</td>
-                }
-            }
 
 
 
-            @if (!item.Status)
-            {
-
-                <td><a asp-action="ChangeStatus" asp-controller="Session" asp-route-id="@item.Id" class="btn btn-outline-success">Aktifleştir</a></td>
-                <td>Döneme dair Ekleme/Silme/Güncelleme İşlemleri YAPILAMAZ!</td>
-            }
-            
-        </tr>
+            </tr>
         }
     </tbody>
 
 </table>
-<a asp-action="CreateSession" asp-controller="Session" class="mt-2 btn btn-primary">Yeni Dönem Ekle</a>
+

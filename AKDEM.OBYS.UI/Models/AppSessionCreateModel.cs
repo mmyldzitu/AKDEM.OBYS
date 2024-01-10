@@ -14,6 +14,7 @@ namespace AKDEM.OBYS.UI.Models
         public string year2 { get; set; }
 
         public int SessionType { get; set; }
-        public bool Status { get; set; } = false;
+        public bool Status { get; set; } = true;
+        public bool Status2 { get; set; } = true;
     }
 }

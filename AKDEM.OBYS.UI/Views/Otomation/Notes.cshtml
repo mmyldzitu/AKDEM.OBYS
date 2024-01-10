@@ -1,0 +1,110 @@
+﻿@model List<AppUserSessionLessonUpdateDto>
+    @{
+        Layout = "_Layout";
+    }
+
+    @{ if (Model.Count != 0)
+        {
+            <input id="modelCount" type="hidden" value="@Model.Count" />
+            <div class="container-fluid">
+                <form asp-action="Notes" asp-controller="Otomation" method="post">
+
+                    @for (int i = 0; i < Model.Count; i++)
+                    {
+                        <input type="hidden" asp-for="@Model[i].Id" />
+                        <input type="hidden" asp-for="@Model[i].LessonId" />
+                        <input type="hidden" asp-for="@Model[i].AppLesson" />
+
+                        <input type="hidden" asp-for="@Model[i].UserSessionId" />
+
+                        <label class="font-italic font-weight-bold">@Model[i].AppLesson.Definition --> ( @Model[i].AppLesson.AppUser.FirstName @Model[i].AppLesson.AppUser.SecondName )</label>
+
+                        <div class="row">
+
+                            <div class="col-md-6">
+                                <label class="font-weight-bold">NOT</label>
+
+
+                                <input id="visibleInputNot_@i" value="" type="text" class="form-control" placeholder="GİRİLMEDİ" />
+                                <input id="hiddenInputNot_@i"  type="hidden" asp-for="@Model[i].Not" />
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="font-weight-bold">Devamsızlık</label>
+
+                                <input id="visibleInput_@i" value="" type="text" class="form-control" placeholder="GİRİLMEDİ" />
+                                <input id="hiddenInput_@i"  type="hidden" asp-for="@Model[i].Devamsızlık" />
+                            </div>
+
+
+
+                        </div>
+                        <hr />
+                    }
+                    <br />
+
+
+                    <div class="mb-3">
+                        <button class="btn btn-primary" type="submit">Kaydet</button>
+                    </div>
+                    <div class="mb-3 text-bg-danger" asp-validation-summary="All">
+
+                    </div>
+                </form>
+            </div>
+        }
+    }
+    @{else
+        {
+
+            <p class="font-weight-bold">ÖĞRENCİYE/SINIFA AİT BİR DERS PROGRAMI BİLGİSİ BULUNAMADI</p>
+        }
+    }
+
+    @section script{
+
+        <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+        <script>
+            $(document).ready(function () {
+                var modelCount = $('#modelCount').val();
+
+                for (var i = 0; i < modelCount; i++) {
+                    // Görünür input alanında bir değer girildiğinde
+                    $('#visibleInputNot_' + i).on('input', function () {
+                        var id = $(this).attr('id').split('_')[1];
+                        var enteredValue = $(this).val();
+
+                        // Gizli input alanına girilen değeri aktar
+                        $('#hiddenInputNot_' + id).val(enteredValue);
+                    });
+
+                    $('#visibleInput_' + i).on('input', function () {
+                        var id = $(this).attr('id').split('_')[1];
+                        var enteredValue = $(this).val();
+
+                        // Gizli input alanına girilen değeri aktar
+                        $('#hiddenInput_' + id).val(enteredValue);
+                    });
+
+                    // Sayfa yüklendiğinde, eğer Not değeri -1 ise "GİRİLMEDİ ALTERNATİF" yazısını görünür input alanına ekle
+                    var notValue = $('#hiddenInputNot_' + i).val();
+                    var devamValue = $('#hiddenInput_' + i).val();
+
+                    if (notValue == -1) {
+                        $('#visibleInputNot_' + i).attr('placeholder', 'GİRİLMEDİ');
+                    } else {
+                        $('#visibleInputNot_' + i).val(notValue);
+                    }
+
+                    if (devamValue == -1) {
+                        $('#visibleInput_' + i).attr('placeholder', 'GİRİLMEDİ');
+                    } else {
+                        $('#visibleInput_' + i).val(devamValue);
+                    }
+                }
+            });
+        </script>
+
+
+
+    }

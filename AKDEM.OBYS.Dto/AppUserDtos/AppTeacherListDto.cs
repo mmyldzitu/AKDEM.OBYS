@@ -1,4 +1,5 @@
-﻿using AKDEM.OBYS.Dto.Interfaces;
+﻿using AKDEM.OBYS.Dto.AppRoleDtos;
+using AKDEM.OBYS.Dto.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,5 +17,6 @@ namespace AKDEM.OBYS.Dto.AppUserDtos
         public string PhoneNumber { get; set; }
         public bool Status { get; set; }
         public string ImagePath { get; set; }
+        
     }
 }

@@ -11,5 +11,7 @@ namespace AKDEM.OBYS.Business.Services
     public interface IAppLessonService:IGenericService<AppLessonCreateDto,AppLessonUpdateDto,AppLessonListDto,AppLesson>
     {
         Task<List<AppLessonListDto>> GetLessonsByTeacher();
+        Task<string> GetLessonNameByLessonId(int lessonId);
+        Task<List<AppLessonListDto>> TeacherActiveLessons(int sessionId, int userId);
     }
 }

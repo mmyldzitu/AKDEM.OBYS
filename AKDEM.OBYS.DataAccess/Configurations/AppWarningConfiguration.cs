@@ -14,7 +14,7 @@ namespace AKDEM.OBYS.DataAccess.Configurations
         public void Configure(EntityTypeBuilder<AppWarning> builder)
         {
             builder.Property(x => x.WarningTime).HasDefaultValueSql("getdate()");
-            builder.HasOne(x => x.AppUser).WithMany(x => x.AppWarnings).HasForeignKey(x => x.UserId);
+            builder.HasOne(x => x.AppUserSession).WithMany(x => x.AppWarnings).HasForeignKey(x => x.UserSessionId);
         }
     }
 }

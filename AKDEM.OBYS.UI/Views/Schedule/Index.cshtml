@@ -1,0 +1,42 @@
+﻿@model List<AppScheduleListDto>
+@{
+    Layout = "_Layout";
+}
+
+<div class="mt-2">
+    <h1>DERS PROGRAMLARI</h1>
+</div>
+@{ if (ViewBag.sessionStatus2)
+    {
+        <div class="text-right">
+            <a asp-action="CreateSchedule" asp-controller="Schedule" asp-route-id="@ViewBag.sessionId" class="mt-2 btn btn-success">Yeni Program Ekle</a>
+        </div>
+
+    }
+}
+
+<br />
+<table class="mt-3 table table-sm table-hover">
+    <thead>
+        <tr>
+            <th>Dönem Adı</th>
+            <th>Sınıf </th>
+            <th>Program</th>
+
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.AppSessionBranch.AppSession.Definition</td>
+                <td>@item.AppSessionBranch.AppBranch.Definition</td>
+                <td><a asp-action="Index" asp-controller="ScheduleDetail" asp-route-id="@item.Id" class="btn btn-info">@item.Definition</a></td>
+
+            </tr>
+        }
+    </tbody>
+
+</table>
+
+
