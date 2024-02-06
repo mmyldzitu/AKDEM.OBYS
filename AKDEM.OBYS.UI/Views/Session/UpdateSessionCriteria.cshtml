@@ -1,0 +1,59 @@
+﻿@model AppSessionUpdateDto
+@{
+    Layout = "_Layout";
+}
+<h2>@ViewBag.sessionName DÖNEMİ KRİTERLERİ DÜZENLEME</h2>
+<hr />
+<br />
+<div class="container-fluid">
+    <form asp-action="UpdateSessionCriteria" asp-controller="Session" method="post">
+        <input type="hidden" asp-for="Definition"/>
+        <input type="hidden" asp-for="Status"/>
+        <input type="hidden" asp-for="Status2"/>
+        <input type="hidden" asp-for="Id"/>
+       
+
+      
+        
+        <div style="display: flex; flex-direction: row; align-items: center;">
+            <div style="flex: 1; margin-right: 10px;">
+                <label><strong>Ortalama Başarı Kriteri :</strong></label>
+                <br />
+                <input asp-for="MinAverageNote" style="text-align:center" placeholder="70" class="form form-control-sm" />
+            </div>
+            <div style="flex: 1; margin-right: 10px;">
+                <label><strong>Ders Başarı Kriteri :</strong></label>
+                <br />
+
+                <input asp-for="MinLessonNote" style="text-align:center" placeholder="50" class="form form-control-sm" />
+            </div>
+            <div style="flex: 1;margin-right: 10px;">
+                <label><strong>Max. Devamsızlık Hakkı :</strong></label>
+                <br />
+
+                <input asp-for="MinAbsenteeism" style="text-align:center" class="form form-control-sm" />
+            </div>
+            <div style="flex: 1;margin-right: 10px;">
+                <label><strong>AKDEM Başkanı :</strong></label>
+                <br />
+
+                <select asp-for="SessionPresident" asp-items="@ViewBag.teachers" class="form form-control-sm">
+                    <option value="0">Bir Öğretmen Seçiniz</option>
+                </select>
+            </div>
+        </div>
+
+        
+
+        <br />
+        <hr />
+
+        <br />
+        <div class="mb-3">
+            <button class="btn btn-primary" type="submit">Güncelle</button>
+        </div>
+        <div class="mb-3 text-bg-danger" asp-validation-summary="All">
+
+        </div>
+    </form>
+</div>

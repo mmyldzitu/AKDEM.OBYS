@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace AKDEM.OBYS.Dto.AppUserSessionLessonDtos
 {
-    public class AppUserSessionLessonCreateDto : IDto
+    public class AppUserSessionLessonCreateDto :IDto
     {
         public int LessonId { get; set; }
         

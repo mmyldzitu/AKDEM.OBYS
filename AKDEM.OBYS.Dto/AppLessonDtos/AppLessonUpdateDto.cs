@@ -7,10 +7,11 @@ using System.Threading.Tasks;
 
 namespace AKDEM.OBYS.Dto.AppLessonDtos
 {
-    public class AppLessonUpdateDto:IUpdateDto
+    public class AppLessonUpdateDto : IUpdateDto
     {
         public int Id { get; set; }
         public string Definition { get; set; }
+        public bool Status { get; set; } = true;
         public int UserId { get; set; }
     }
 }

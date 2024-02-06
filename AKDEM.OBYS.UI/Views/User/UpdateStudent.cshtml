@@ -4,10 +4,11 @@
     Layout = "_Layout";
 }
 <div class="container-fluid">
-    <form asp-action="UpdateStudent" asp-controller="User" method="post" enctype="multipart/form-data">
+    <form asp-action="UpdateStudent" asp-controller="User" method="post" onsubmit="return confirmAndSubmit()" enctype="multipart/form-data">
         <input asp-for="Id" type="hidden" />
         <input asp-for="ImagePath2" type="hidden" />
         <input asp-for="Password" type="hidden" />
+        <input asp-for="ExBranchId" type="hidden" />
 
 
         <div class="mb-3">
@@ -42,7 +43,7 @@
             <div class="mb-3">
 
                 <label><strong>Sınıf:</strong></label>
-                <label asp-for="ClassId" >@(Model.ClassId==0 ? "Hazırlık" :$"{Model.ClassId - 1}. Sınıf" ) </label>
+                <label asp-for="ClassId" >@(Model.ClassId==1 ? "Hazırlık" :$"{Model.ClassId - 1}. Sınıf" ) </label>
                 <input type="hidden" asp-for="ClassId" readonly class="form-control" />
 
 
@@ -57,9 +58,10 @@
 
                 <label><strong>Şube:</strong></label>
 
-                <select id="branches" asp-for="BranchId" asp-items="ViewBag.branches">
+                <select id="branches" asp-for="BranchId" asp-items="ViewBag.branches" >
                     <option value="">-- Şube Seçin --</option>
                 </select>
+                <input type="hidden" id="originalBranchValue" value="@Model.BranchId" />
             </div>
 
 
@@ -79,53 +81,20 @@
     </form>
 </div>
 
-@*@section script {
-    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+@section script {
     <script>
-        $(document).ready(function() {
-            var sinifId = $("#classes").val();
+        var originalBranchValue = document.getElementById('originalBranchValue').value;
 
-            // AJAX kullanarak seçilen sınıfa ait şubeleri getir
-            $.get('/User/GetBranches', { classId: sinifId }, function (data) {
-                
-                updateBox(data);
-            
-            $('#classes').change(function () {
-                var sinifId = $(this).val();
+        function confirmAndSubmit() {
+            var currentBranchValue = document.getElementById('branches').value;
 
-                // AJAX kullanarak seçilen sınıfa ait şubeleri getir
-                $.get('/User/GetBranches', { classId: sinifId }, function (data) {
-                    // Şubeleri güncelle
-                    updateBox(data);
-                });
-            });
+            // Eğer şube değeri değişmemişse, direkt olarak formu submit et
+            if (originalBranchValue === currentBranchValue) {
+                return true;
+            }
 
-
-
-
-            });
-        });
-                    function updateBox(data) {
-                        $('#branches').empty();
-                        $('#branches').append($('<option>', {
-                            value: '',
-                            text: '-- Şube Seçin --'
-                        }));
-                        $.each(data, function (index, item) {
-                            $('#branches').append($('<option>', {
-                                value: item.value,
-                                text: item.text
-                            }));
-                        });
-                    }
-                  
-
-
-               
-
-         
-
-        
-
+            // Şube değeri değişmişse, onay kutusunu göster
+            return confirm('Öğrencinin şubesini değiştirmek geçmiş dönemlere ait verileri etkilemez fakat aktif dönem içerisinde öğrenciye ait Not, Devamsızlık, Ders Programı bilgilerinin silinmesine neden olabilir. Değişiklikleri kaydetmek istediğinize emin misiniz?');
+        }
     </script>
-}*@
+}

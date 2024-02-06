@@ -4,7 +4,7 @@
     int count = 0;
 }
 <div class="container-fluid">
-    <div class="text-left">
+    <div id="turnToSession"class="text-left">
         <a class="btn btn-danger" asp-action="SessionDetails" asp-controller="Session" asp-route-id="@ViewBag.sessionId">Döneme Dön</a>
     </div>
     <div class="text-right">
@@ -31,8 +31,11 @@
                 <th>Sınıf Sıralaması(Genel)</th>
 
                 <th>Sınıf Sıralaması(Dönem)</th>
-                <th>Dönem İhtarları</th>
-                <th>Toplam İhtarlar</th>
+                <th>Dönem Ders İhtarları</th>
+                <th>Dönem Başarı İhtarları</th>
+                <th>Dönem Devamsızlık İhtarları</th>
+
+                <th>Toplam Başarı İhtarları</th>
                 <th>Ayrıntılar</th>
                 @{if (ViewBag.sessionStatus)
                     {
@@ -82,9 +85,9 @@
 
                         }
                     }
-
+                    <td>@item.SessionLessonWarningCount</td>
                     <td>@item.SessionWarningCount</td>
-
+                    <td>@item.SessionAbsentWarningCount</td>
                     <td>@item.WarningCount</td>
 
 

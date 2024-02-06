@@ -23,6 +23,7 @@ namespace AKDEM.OBYS.UI.Models
 
 
         public int BranchId { get; set; }
+        public int ExBranchId { get; set; }
         public int ClassId { get; set; }
         public List<SelectListItem> Classes { get; set; }
         public List<SelectListItem> Branches { get; set; }

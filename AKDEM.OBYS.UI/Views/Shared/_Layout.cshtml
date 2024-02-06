@@ -67,6 +67,9 @@
                             <a asp-action="Index" asp-controller="Teacher" asp-route-sessionId="@(sesionId)">Program</a>
                         </li>
                         <li>
+                            <a asp-action="SessionCriterias" asp-controller="Teacher" asp-route-sessionId="@(sesionId)">Dönem Yönetmeliği</a>
+                        </li>
+                        <li>
                             <a asp-action="TeacherLessons" asp-controller="Teacher" asp-route-sessionId="@(sesionId)" asp-route-userId="@userId">Derslerim</a>
                         </li>
                         <li>
@@ -79,6 +82,9 @@
                     {
                         <li>
                             <a asp-action="Index" asp-controller="Student" asp-route-sessionId="@(sesionId)">Program</a>
+                        </li>
+                        <li>
+                            <a asp-action="SessionCriterias" asp-controller="Student" asp-route-sessionId="@(sesionId)">Dönem Yönetmeliği</a>
                         </li>
                         <li>
                             <a asp-action="StudentDetailsStudent" asp-controller="Student" asp-route-userId="@userId" asp-route-sessionId="@sesionId">Dönem Özeti(Karne)</a>
@@ -113,7 +119,7 @@
         </li>*@
 
                     <li>
-                        <a asp-action="UpdateMe" asp-controller="Account">Bilgilerimi Düzenle</a>
+                        <a asp-action="UpdatePassword" asp-controller="Account" asp-route-userId="@userId">Şifre Güncelleme</a>
                     </li>
 
                     <li>

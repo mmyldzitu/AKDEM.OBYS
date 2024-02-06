@@ -2,10 +2,13 @@
 @{
     Layout = "_Layout";
 }
+<h2>DÖNEM OLUŞTURMA</h2>
+<hr />
+<br />
 <div class="container-fluid">
     <form asp-action="CreateSession" asp-controller="Session" method="post">
 
-        <label>Dönem İsmi :</label>
+        <label><strong>Dönem İsmi :</strong></label>
         <input asp-for="year1" type="text" style="text-align:center" class="font-weight-bold" />
         <label>-</label>
         <input asp-for="year2" type="text" style="text-align:center" class="font-weight-bold" />
@@ -18,8 +21,44 @@
             <label class="form-check-label">Aktif :</label>
             <input asp-for="Status" type="checkbox" class="form-check-label" />
         </div>*@
+        <br />
+        <br />
+        <hr />
+        <br />
+        <div style="display: flex; flex-direction: row; align-items: center;">
+            <div style="flex: 1; margin-right: 10px;">
+                <label><strong>Ortalama Başarı Kriteri :</strong></label>
+                <br />
+                <input asp-for="MinAverageNote" style="text-align:center" placeholder="70" class="form form-control-sm" />
+            </div>
+            <div style="flex: 1; margin-right: 10px;">
+                <label><strong>Ders Başarı Kriteri :</strong></label>
+                <br />
 
+                <input asp-for="MinLessonNote" style="text-align:center" placeholder="50" class="form form-control-sm" />
+            </div>
+            <div style="flex: 1;margin-right: 10px;">
+                <label><strong>Max. Devamsızlık Hakkı :</strong></label>
+                <br />
 
+                <input asp-for="MinAbsenteeism" style="text-align:center" class="form form-control-sm" />
+            </div>
+            <div style="flex: 1;margin-right: 10px;">
+                <label><strong>AKDEM Başkanı :</strong></label>
+                <br />
+
+                <select asp-for="SessionPresident" asp-items="@ViewBag.teachers" class="form form-control-sm">
+                    <option value="0">Bir Öğretmen Seçiniz</option>
+                </select>
+            </div>
+        </div>
+        <br />
+        <label>* Kutuların içindeki değerler varsayılan değerlerdir. Değiştirmediğiniz taktirde bu değerler kabul edilir.</label>
+
+        <br />
+        <hr />
+
+        <br />
         <div class="mb-3">
             <button class="btn btn-primary" type="submit">Oluştur</button>
         </div>

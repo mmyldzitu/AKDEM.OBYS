@@ -1,5 +1,7 @@
 ﻿using AKDEM.OBYS.Business.Services;
 using AKDEM.OBYS.Dto.AppAccountDtos;
+using AKDEM.OBYS.UI.Models;
+using FluentValidation;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
@@ -15,10 +17,12 @@ namespace AKDEM.OBYS.UI.Controllers
     {
         private readonly IAppUserService _appUserService;
         private readonly IAppSessionService _appSessionService;
-        public AccountController(IAppUserService appUserService, IAppSessionService appSessionService)
+        private readonly IValidator<UpdatePasswordModel> _updatePasswordModelValidator;
+        public AccountController(IAppUserService appUserService, IAppSessionService appSessionService, IValidator<UpdatePasswordModel> updatePasswordModelValidator)
         {
             _appUserService = appUserService;
             _appSessionService = appSessionService;
+            _updatePasswordModelValidator = updatePasswordModelValidator;
         }
 
         public IActionResult SignIn()
@@ -46,7 +50,12 @@ namespace AKDEM.OBYS.UI.Controllers
                 claims.Add(new Claim(ClaimTypes.NameIdentifier, result.Data.Id.ToString()));
                 var claimsIdentity = new ClaimsIdentity(
                     claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                var authProperties = new AuthenticationProperties
+                {
 
+                    IsPersistent = true,
+
+                };
 
 
                 await HttpContext.SignInAsync(
@@ -84,5 +93,26 @@ namespace AKDEM.OBYS.UI.Controllers
     CookieAuthenticationDefaults.AuthenticationScheme);
             return RedirectToAction("Index", "Home");
         }
+        public IActionResult UpdatePassword(int userId)
+        {
+            
+            return View(new UpdatePasswordModel { UserId=userId});
+        }
+        [HttpPost]
+        public async Task<IActionResult> UpdatePassword(UpdatePasswordModel model)
+        {
+            var result = await _updatePasswordModelValidator.ValidateAsync(model);
+            if (result.IsValid)
+            {
+                await _appUserService.UserPasswordUpdate(model.UserId, model.NewPassword);
+                return RedirectToAction("LogOut", "Account");
+            }
+            foreach(var error in result.Errors)
+            {
+                ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
+            }
+            return View(model);
+        }
+        
     }
 }

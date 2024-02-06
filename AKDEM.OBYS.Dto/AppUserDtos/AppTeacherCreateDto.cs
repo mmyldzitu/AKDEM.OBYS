@@ -7,10 +7,11 @@ using System.Threading.Tasks;
 
 namespace AKDEM.OBYS.Dto.AppUserDtos
 {
-    public class AppTeacherCreateDto:IDto
+    public class AppTeacherCreateDto : IDto
     {
         public string FirstName { get; set; }
         public string SecondName { get; set; }
+        public string DepartReason { get; set; } = "";
         public string Email { get; set; }
         public string Password { get; set; } = "12345";
         public string PhoneNumber { get; set; }

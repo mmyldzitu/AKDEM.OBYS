@@ -25,6 +25,9 @@ namespace AKDEM.OBYS.Business.Services
         Task<AppBranchListDto> FindBranchByNameAndStatus(string name);
         Task<string> FindClassNameByClassId(int classId);
         Task CreateBranchWhichNotExist(AppBranchCreateDto dto);
+        Task<bool> IfBranchAlreadyExists(string definition);
+        Task RemoveEmptyBranches();
+        Task<int> ReturnClassTypeOfUser(int userId);
     }
     
 }

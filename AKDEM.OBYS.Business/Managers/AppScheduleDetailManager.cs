@@ -56,10 +56,22 @@ namespace AKDEM.OBYS.Business.Managers
             }
             return new List<AppScheduleDetailListDto>();
         }
-        public async Task<List<AppScheduleDetailListDto>> GetScheduleDetailsByScheduleIdDistinct(int scheduldeId)
+
+        public async Task<List<AppScheduleDetailListDto>> GetScheduleDetailsByScheduleIdForTeacher(int scheduldeId,int userId)
         {
             var query = _uow.GetRepositry<AppScheduleDetail>().GetQuery();
-            var entities = await query.Include(x => x.AppLesson).ThenInclude(x => x.AppUser).Where(x => x.ApScheduleId == scheduldeId).ToListAsync();
+            var entities = await query.Include(x => x.AppLesson).ThenInclude(x => x.AppUser).Where(x => x.ApScheduleId == scheduldeId && x.AppLesson.AppUser.Id==userId).ToListAsync();
+            if (entities.Count != 0)
+            {
+                var mappedList = _mapper.Map<List<AppScheduleDetailListDto>>(entities);
+                return mappedList;
+            }
+            return new List<AppScheduleDetailListDto>();
+        }
+        public async Task<List<AppScheduleDetailListDto>> GetScheduleDetailsByScheduleIdDistinct(int scheduldeId, int userId)
+        {
+            var query = _uow.GetRepositry<AppScheduleDetail>().GetQuery();
+            var entities = await query.Include(x => x.AppLesson).ThenInclude(x => x.AppUser).Where(x => x.ApScheduleId == scheduldeId && x.AppLesson.AppUser.Id==userId).ToListAsync();
             if (entities.Count != 0)
             {
                 var distinctEntities = entities

@@ -37,9 +37,10 @@ namespace AKDEM.OBYS.UI.Controllers
         private readonly IAppScheduleDetailService _appScheduleDetailService;
         private readonly IAppWarningService _appWarningService;
         private readonly IWebHostEnvironment _webHostEnvironment;
+        private readonly IAppGraduatedService _appGraduatedService;
 
 
-        public UserController(IAppUserService appUserService, IMapper mapper, IValidator<AppTeacherUpdateModel> teacherUpdateModelValidator, IAppBranchService appBranchService, IAppStudentService appStudentService, IAppSessionService appSessionService, IAppUserSessionService appUserSessionService, IAppUserSessionLessonService appUserSessionLessonService, IAppScheduleDetailService appScheduleDetailService, IAppWarningService appWarningService, IWebHostEnvironment webHostEnvironment)
+        public UserController(IAppUserService appUserService, IMapper mapper, IValidator<AppTeacherUpdateModel> teacherUpdateModelValidator, IAppBranchService appBranchService, IAppStudentService appStudentService, IAppSessionService appSessionService, IAppUserSessionService appUserSessionService, IAppUserSessionLessonService appUserSessionLessonService, IAppScheduleDetailService appScheduleDetailService, IAppWarningService appWarningService, IWebHostEnvironment webHostEnvironment, IAppGraduatedService appGraduatedService)
         {
             _appUserService = appUserService;
             _mapper = mapper;
@@ -52,12 +53,21 @@ namespace AKDEM.OBYS.UI.Controllers
             _appScheduleDetailService = appScheduleDetailService;
             _appWarningService = appWarningService;
             _webHostEnvironment = webHostEnvironment;
+            _appGraduatedService = appGraduatedService;
         }
 
-        public async Task<IActionResult> GetTeachers()
+        public async Task<IActionResult> GetTeachers(bool status=true)
         {
-            var response = await _appUserService.GetAllTeacherAsync((int)RoleType.Teacher);
-
+            var response = await _appUserService.GetAllTeacherAsync((int)RoleType.Teacher,status);
+            if (status)
+            {
+                ViewBag.header = "Aktif";
+            }
+            else
+            {
+                ViewBag.header = "Pasif";
+            }
+            ViewBag.status = status;
             return View(response.Data);
         }
         public IActionResult CreateTeacher()
@@ -87,7 +97,9 @@ namespace AKDEM.OBYS.UI.Controllers
             newdto.Status = model.Status;
             newdto.PhoneNumber = model.PhoneNumber;
             newdto.Email = model.Email;
+            newdto.DepartReason = model.DepartReason;
             newdto.Password = model.Email;
+            
 
             var response = await _appUserService.CreateTeacherWithRoleAsync(newdto, (int)RoleType.Teacher);
             if (response.ResponseType == ResponseType.ValidationError)
@@ -119,6 +131,7 @@ namespace AKDEM.OBYS.UI.Controllers
             model.Status = response.Data.Status;
             model.Email = response.Data.Email;
             model.Password = response.Data.Password;
+            model.DepartReason = response.Data.DepartReason;
 
 
             return View(model);
@@ -152,6 +165,7 @@ namespace AKDEM.OBYS.UI.Controllers
             newdto.Status = model.Status;
             newdto.PhoneNumber = model.PhoneNumber;
             newdto.Email = model.Email;
+            newdto.DepartReason = model.DepartReason;
 
             var response = await _appUserService.UpdateAsync(newdto);
             if (response.ResponseType == ResponseType.ValidationError)
@@ -165,10 +179,11 @@ namespace AKDEM.OBYS.UI.Controllers
             return RedirectToAction("GetTeachers");
 
         }
-        public async Task<IActionResult> RemoveTeacher(int id)
+        public async Task<IActionResult> RemoveTeacher(int id,bool status)
         {
-            var response = await _appUserService.RemoveAsync(id);
-            return this.ResponseRedirectAction(response, "GetTeachers");
+            await _appUserService.ChangeTeacherStatus(id);
+            return RedirectToAction("GetTeachers", new { status = status });
+            
         }
 
 
@@ -282,6 +297,7 @@ namespace AKDEM.OBYS.UI.Controllers
             dto.BranchId = model.BranchId;
             dto.ClassId = model.ClassId;
             dto.Status = model.Status;
+            dto.DepartReason = "";
             var response = await _appStudentService.CreateStudentWithRoleAsync(dto, (int)RoleType.Student);
             if (response.ResponseType == ResponseType.ValidationError)
             {
@@ -358,17 +374,18 @@ namespace AKDEM.OBYS.UI.Controllers
             model.Password = response.Data.Password;
             model.ClassId = response.Data.ClassId;
             model.BranchId = response.Data.BranchId;
-            //var list = new List<AppClassListDto>();
-            //var items = Enum.GetValues(typeof(ClassType));
-            //foreach (int item in items)
-            //{
-            //    list.Add(new AppClassListDto
-            //    {
-            //        ClassId = item,
-            //        Definition = Enum.GetName(typeof(ClassType), item)
-            //    });
-            //}
-            //ViewBag.classes = new SelectList(list, "ClassId", "Definition");
+            model.ExBranchId = model.BranchId;
+            var list = new List<AppClassListDto>();
+            var items = Enum.GetValues(typeof(ClassType));
+            foreach (int item in items)
+            {
+                list.Add(new AppClassListDto
+                {
+                    ClassId = item,
+                    Definition = Enum.GetName(typeof(ClassType), item)
+                });
+            }
+            ViewBag.classes = new SelectList(list, "ClassId", "Definition");
 
 
             var list2 = new List<AppBranchListDto>();
@@ -456,7 +473,15 @@ namespace AKDEM.OBYS.UI.Controllers
 
 
             }
-            return RedirectToAction("GetStudents");
+            if (model.ExBranchId != model.BranchId)
+            {
+                int activeStatusId = await _appSessionService.GetActiveSessionId();
+                await _appStudentService.ControlUserSessionWhenUpdating(model.Id, activeStatusId);
+                await _appStudentService.CreateStudentOrChangeStatusProcessForUserSessionandUSerSessionLessons(model.Id);
+
+
+            }
+            return RedirectToAction("GetStudents", new { classType = model.ClassId });
 
         }
         public async Task<IActionResult> RemoveStudent(int id, int classId=1)
@@ -467,6 +492,7 @@ namespace AKDEM.OBYS.UI.Controllers
             await _appUserSessionLessonService.RemoveUserSessionLessonsByUserSessionListAsync(userSessionIdList);
             await _appUserSessionService.RemoveUserSessionByUserId(id);
             await _appWarningService.RemoveWarningByUserId(id);
+            await _appGraduatedService.RemoveCertificateByUserId(id);
             var response = await _appStudentService.RemoveAsync(id);
 
             return RedirectToAction("GetStudents", new { classType = classId });
@@ -524,7 +550,87 @@ namespace AKDEM.OBYS.UI.Controllers
                                                                 }
 
                                 // Seçilecek kolon başlıkları
-                                const selectedColumns = ['#', ' İsim','Sıra No','Durum','Email', 'Telefon Numarası', 'Görsel', 'Sınıf', 'Şube'];
+                                const selectedColumns = ['#', 'İsim','Sıra No','Durum','Email', 'Telefon Numarası', 'Görsel', 'Sınıf', 'Şube','Mezuniyet Dönemi','Ayrılık Dönemi'];
+
+                                // Diğer elementleri gizle (isteğe bağlı)
+                                document.querySelectorAll('th, td').forEach(element => {
+                                    const columnIndex = element.cellIndex;
+                                    const columnHeader = document.querySelector('th:nth-child(' + (columnIndex + 1) + ')');
+
+                                    if (columnHeader && !selectedColumns.includes(columnHeader.innerText.trim())) {
+                                        element.style.display = 'none';
+                                    }
+                                });
+                            }");
+
+
+                    // Razor sayfasının HTML içeriğini alın
+                    var htmlContent = await page.GetContentAsync();
+
+                    // HTML içeriğini PDF'ye çevir
+                    var pdfBuffer = await page.PdfDataAsync();
+                    var wwwrootPath = _webHostEnvironment.WebRootPath;
+                    var pdfPath = Path.Combine(wwwrootPath, "pdf", $"{myFileName}.pdf");
+
+                    // PDF'yi kaydedin
+                    System.IO.File.WriteAllBytes(pdfPath, pdfBuffer);
+
+                }
+            }
+        }
+
+        public async Task<IActionResult> GenerateAndDownloadPdfTeacher(string myFileName, bool status)
+        {
+            // PDF oluştur
+            await GeneratePdfAsyncTeacher(myFileName, status);
+
+            // PDF dosyasının geçici konumunu belirtin
+            var pdfPath = $"wwwroot/pdf/{myFileName}.pdf";
+
+            // PDF dosyasının varlığını kontrol et
+            if (System.IO.File.Exists(pdfPath))
+            {
+                // PDF dosyasını kullanıcıya indirme
+                var fileBytes = System.IO.File.ReadAllBytes(pdfPath);
+                var fileName = $"{myFileName}.pdf";
+
+                // PDF dosyasını indir
+                return File(fileBytes, "application/pdf", fileName);
+            }
+            else
+            {
+                // Hata durumunu ele alabilirsiniz
+                return NotFound("PDF dosyası bulunamadı.");
+            }
+        }
+
+        private async Task GeneratePdfAsyncTeacher(string myFileName, bool status)
+        {
+            await new BrowserFetcher().DownloadAsync();
+            using (var browser = await Puppeteer.LaunchAsync(new LaunchOptions { Headless = true }))
+            {
+                using (var page = await browser.NewPageAsync())
+                {
+                    // Razor sayfasının URL'sini belirtin
+                    var razorPageUrl = Url.Action("GetTeachers", "User", new { status = status }, Request.Scheme);
+                    await page.GoToAsync(razorPageUrl);
+                    await page.EvaluateFunctionAsync(@"() => {
+                                // PDF Oluştur butonunu gizle
+                                const pdfButton = document.getElementById('pdfButton');
+                                if (pdfButton) {
+                                    pdfButton.style.display = 'none';
+                                }
+                                const hbutton = document.getElementById('branchButtons');
+                                                                if (hbutton) {
+                                                                    hbutton.style.display = 'none';
+                                                                }
+                                const newStudentbutton = document.getElementById('newStudent');
+                                                                if (newStudentbutton) {
+                                                                    newStudentbutton.style.display = 'none';
+                                                                }
+
+                                // Seçilecek kolon başlıkları
+                                const selectedColumns = ['#', 'Ünvan', ' İsim','Soyisim','Email', 'Telefon Numarası', 'Görsel'];
 
                                 // Diğer elementleri gizle (isteğe bağlı)
                                 document.querySelectorAll('th, td').forEach(element => {

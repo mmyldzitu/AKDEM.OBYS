@@ -13,6 +13,7 @@ namespace AKDEM.OBYS.Dto.AppLessonDtos
         public int Id { get; set; }
         public string Definition { get; set; }
         public int UserId { get; set; }
+        public bool Status { get; set; }
         public AppTeacherListDto AppUser { get; set; }
     }
 }

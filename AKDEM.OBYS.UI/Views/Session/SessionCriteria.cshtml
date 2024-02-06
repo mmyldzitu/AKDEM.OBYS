@@ -1,0 +1,41 @@
+﻿@model AppSessionListDto
+@{
+    Layout = "_Layout";
+}
+
+<div class="container-fluid">
+    <div class="text-right">
+        <a id="pdfButton" class="btn btn-success" asp-action="GenerateAndDownloadPdfStudentSessionCriteria" asp-controller="Session" asp-route-myFileName="@($"{ViewBag.sessionName2}_Dönem_Yönetmeliği")" asp-route-sessionId="@ViewBag.sessionId">PDF</a>
+    </div>
+    <h2>@ViewBag.sessionName DÖNEMİ YÖNETMELİĞİ</h2>
+    <hr />
+
+
+    <ul class="list-group">
+
+        <li class="list-group-item">Dönem ortalaması <strong>@Model.MinAverageNote</strong> altında olan öğrenciler <strong>DÖNEM BAŞARISIZLIĞI İHTARI</strong> alırlar</li>
+        <li class="list-group-item">Dönem İçerisinde herhangi bir dersten <strong>@Model.MinLessonNote</strong> altında not alan öğrenciler <strong>DERS BAŞARISIZLIĞI İHTARI</strong> alırlar</li>
+        <li class="list-group-item">Dönem İçerisinde iki veya daha fazla dersten <strong>DERS BAŞARISIZLIĞI İHTARI</strong> alan   öğrenciler <strong>DÖNEM BAŞARISIZLIĞI İHTARI</strong> alırlar</li>
+        <li class="list-group-item">Dönem İçerisinde herhangi bir derste <strong>@Model.MinAbsenteeism</strong> günden fazla devamsızlık yapan öğrenciler <strong>DEVAMSIZLIK İHTARI </strong>alırlar
+        <li class="list-group-item">Üstüste 2 dönem boyunca <strong>DÖNEM BAŞARISIZLIĞI İHTARI</strong> alan öğrenciler veya toplamda 3 dönem <strong> DÖNEM BAŞARISIZLIĞI İHTARI</strong> alan öğrenciler programdan uzaklaştırılır.
+        <li class="list-group-item">Bir dönem içerisinde 2 veya daha fazla dersten <strong>DEVAMSIZLIK İHTARI</strong> alan öğrenciler programdan uzaklaştırılır.
+
+
+
+    </ul>
+    <br />
+    <div class="text-right">
+        <label><strong>AKDEM BAŞKANI :</strong></label>
+        <span>@Model.Sessionpresident</span>
+    </div>
+    @{ if (Model.Status2)
+        {
+
+            <div id="editbutton" class="text-left">
+                <a id="createButton" class="btn btn-success" asp-action="UpdateSessionCriteria" asp-controller="Session" asp-route-sessionId="@ViewBag.sessionId">DÜZENLE</a>
+            </div>
+        }
+    }
+</div>
+
+

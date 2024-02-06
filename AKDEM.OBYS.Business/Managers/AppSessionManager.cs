@@ -18,10 +18,14 @@ namespace AKDEM.OBYS.Business.Managers
     {
         private readonly IUow _uow;
         private readonly IMapper _mapper;
-        public AppSessionManager(IMapper mapper, IValidator<AppSessionCreateDto> createDtoValidator,IValidator<AppSessionUpdateDto> updateDtoValidator, IUow uow):base(mapper,createDtoValidator,updateDtoValidator,uow)
+        private readonly IAppUserSessionService _appUserSessionService;
+
+
+        public AppSessionManager(IMapper mapper, IValidator<AppSessionCreateDto> createDtoValidator, IValidator<AppSessionUpdateDto> updateDtoValidator, IUow uow/* IAppUserSessionService appUserSessionService, IAppWarningService appWarningService*/, IAppUserSessionService appUserSessionService) : base(mapper, createDtoValidator, updateDtoValidator, uow)
         {
             _uow = uow;
             _mapper = mapper;
+            _appUserSessionService = appUserSessionService;
         }
         public async Task<int> GetActiveSessionId()
         {
@@ -32,6 +36,32 @@ namespace AKDEM.OBYS.Business.Managers
                 return entity.Id;
             }
             return 0;
+        }
+        public async Task<bool> IfLessonAlreadyExists(string definition, int userId)
+        {
+            var query = _uow.GetRepositry<AppLesson>().GetQuery();
+            var lessons = await query.Where(x => x.Definition == definition).ToListAsync();
+            if (lessons.Count != 0)
+            {
+                foreach (var lesson in lessons)
+                {
+                    if (lesson.UserId == userId)
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+        public async Task<string> ReturnPresidentName(int sessionId)
+        {
+            var query = _uow.GetRepositry<AppSession>().GetQuery();
+            var session = await query.Where(x => x.Id == sessionId).SingleOrDefaultAsync();
+            if (session != null)
+            {
+                return session.SessionPresident;
+            }
+            return "";
         }
         public async Task SetStatusAsync(int sessionId)
         {
@@ -48,6 +78,69 @@ namespace AKDEM.OBYS.Business.Managers
             }
             await _uow.SaveChangesAsync();
         }
+        public async Task<double> MinLessonNoteOfSession(int sessionId)
+        {
+            var query = _uow.GetRepositry<AppSession>().GetQuery();
+            var entity = await query.Where(x => x.Id == sessionId).SingleOrDefaultAsync();
+            if (entity != null)
+            {
+                return entity.MinLessonNote;
+            }
+            return 0;
+        }
+        public async Task<double> MinAverageNoteOfSession(int sessionId)
+        {
+            var query = _uow.GetRepositry<AppSession>().GetQuery();
+            var entity = await query.Where(x => x.Id == sessionId).SingleOrDefaultAsync();
+            if (entity != null)
+            {
+                return entity.MinAverageNote;
+            }
+            return 0;
+        }
+        public async Task<int> MinAbsenteismOfSession(int sessionId)
+        {
+            var query = _uow.GetRepositry<AppSession>().GetQuery();
+            var entity = await query.Where(x => x.Id == sessionId).SingleOrDefaultAsync();
+            if (entity != null)
+            {
+                return entity.MinAbsenteeism;
+            }
+            return 0;
+        }
+        public async Task RemoveUserSessionsBecauseOfBeingPassive(int sessionId,int userId)
+        {
+            var control = await GetStatus2FromSessionId(sessionId);
+            if (!control)
+            {
+                int activeSessionId = await GetActiveSessionId();
+                await _appUserSessionService.RemoveUserSessionsAndLessons(activeSessionId, userId);
+            }
+        }
+
+        public async Task<int> PreviousSessionOfUser(int userSessionId,int sessionId)
+        {
+            
+            var sessionName = await ReturnSessionName(sessionId);
+            int userId = await _appUserSessionService.GetUserIdByUserSessionId(userSessionId);
+            string[] parcalar = sessionName.Split(new char[] { '/' });
+            string exsessionName = "";
+            string yearName = parcalar[0];
+            
+            if (sessionName.Contains("Bahar"))
+            {
+                exsessionName = yearName + "/" + "Güz";
+            }
+            else if (sessionName.Contains("Yaz"))
+            {
+                exsessionName = yearName + "/" + "Bahar";
+            }
+            int exsessionId = await GetSeesionIdBySessionDefinition(exsessionName);
+            int exUserSessionId = await _appUserSessionService.UserSessionIdByUserIdAndSessionId(userId, exsessionId);
+
+            return exUserSessionId;
+        }
+
         public async Task SetStatusAllexceptThis(int sessionId_2,int sessionId=-1)
         {
             var query = _uow.GetRepositry<AppSession>().GetQuery();
@@ -219,6 +312,54 @@ namespace AKDEM.OBYS.Business.Managers
                 return mappedList;
             }
             return new List<AppSessionListDto>();
+        }
+        public async Task<bool> IsThereSession(string sessionName)
+        {
+            var query = _uow.GetRepositry<AppSession>().GetQuery();
+            var session = await query.Where(x => x.Definition == sessionName).SingleOrDefaultAsync();
+            if (session == null)
+            {
+                return true;
+            }
+            else { return false; }
+        }
+        public async Task<AppSessionListDto> SessionCriterias (int sessionId)
+        {
+            var query = _uow.GetRepositry<AppSession>().GetQuery();
+            var session = await query.Where(x => x.Id == sessionId).SingleOrDefaultAsync();
+            if (session != null)
+            {
+                var mappedSession = _mapper.Map<AppSessionListDto>(session);
+                return mappedSession;
+            }
+            return new AppSessionListDto();
+        }
+        public async Task<AppSessionUpdateDto> UpdateSessionCriterias(int sessionId)
+        {
+            var query = _uow.GetRepositry<AppSession>().GetQuery();
+            var session = await query.Where(x => x.Id == sessionId).SingleOrDefaultAsync();
+            if (session != null)
+            {
+                var mappedSession = _mapper.Map<AppSessionUpdateDto>(session);
+                return mappedSession;
+            }
+            return new AppSessionUpdateDto();
+        }
+        public async Task UpdateSessionCriteriasPost(AppSessionUpdateDto dto)
+        {
+            var query = _uow.GetRepositry<AppSession>().GetQuery();
+            var session = await query.Where(x => x.Id == dto.Id).SingleOrDefaultAsync();
+            if (session != null)
+            {
+                session.Status = dto.Status;
+                session.Status2 = dto.Status2;
+                session.Definition = dto.Definition;
+                session.MinAbsenteeism = dto.MinAbsenteeism;
+                session.MinAverageNote = dto.MinAverageNote;
+                session.MinLessonNote = dto.MinLessonNote;
+                session.SessionPresident = dto.SessionPresident;
+            }
+            await _uow.SaveChangesAsync();
         }
     }
 }

@@ -7,6 +7,7 @@ using AKDEM.OBYS.UI.Extensions;
 using AKDEM.OBYS.UI.Models;
 using DinkToPdf;
 using DinkToPdf.Contracts;
+using FluentValidation;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -29,26 +30,41 @@ namespace AKDEM.OBYS.UI.Controllers
         private readonly IAppLessonService _appLessonService;
         private readonly IAppUserService _appUserService;
         private readonly IWebHostEnvironment _webHostEnvironment;
+        private readonly IValidator<AppLessonCreateDto> _appLessonCreateDtoValidator;
+        private readonly IValidator<AppLessonUpdateDto> _appLessonUpdateDtoValidator;
 
 
-        public LessonController(IAppLessonService appLessonService, IAppUserService appUserService, IConverter converter, IWebHostEnvironment webHostEnvironment)
+        public LessonController(IAppLessonService appLessonService, IAppUserService appUserService, IConverter converter, IWebHostEnvironment webHostEnvironment, IValidator<AppLessonCreateDto> appLessonCreateDtoValidator, IValidator<AppLessonUpdateDto> appLessonUpdateDtoValidator)
         {
             _appLessonService = appLessonService;
             _appUserService = appUserService;
             _webHostEnvironment = webHostEnvironment;
+            _appLessonCreateDtoValidator = appLessonCreateDtoValidator;
+            _appLessonUpdateDtoValidator = appLessonUpdateDtoValidator;
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(bool status = true)
         {
-            var response = await _appLessonService.GetLessonsByTeacher();
+            var response = await _appLessonService.GetLessonsByTeacher(status);
+            ViewBag.status = status;
+            if (status)
+            {
+                ViewBag.header = "Aktif";
+            }
+            else
+            {
+                ViewBag.header = "Pasif";
+            }
             return this.View(response);
 
+
+
         }
 
-        public async Task<IActionResult> GenerateAndDownloadPdf(string myFileName)
+        public async Task<IActionResult> GenerateAndDownloadPdf(string myFileName, bool status)
         {
             // PDF oluştur
-            await GeneratePdfAsync(myFileName);
+            await GeneratePdfAsync(myFileName, status);
 
             // PDF dosyasının geçici konumunu belirtin
             var pdfPath = $"wwwroot/pdf/{myFileName}.pdf";
@@ -70,7 +86,7 @@ namespace AKDEM.OBYS.UI.Controllers
             }
         }
 
-        private async Task GeneratePdfAsync(string myFileName)
+        private async Task GeneratePdfAsync(string myFileName, bool status)
         {
             await new BrowserFetcher().DownloadAsync();
             using (var browser = await Puppeteer.LaunchAsync(new LaunchOptions { Headless = true }))
@@ -78,7 +94,7 @@ namespace AKDEM.OBYS.UI.Controllers
                 using (var page = await browser.NewPageAsync())
                 {
                     // Razor sayfasının URL'sini belirtin
-                    var razorPageUrl = Url.Action("Index", "Lesson", null, Request.Scheme);
+                    var razorPageUrl = Url.Action("Index", "Lesson", new { status = status }, Request.Scheme);
                     await page.GoToAsync(razorPageUrl);
                     await page.EvaluateFunctionAsync(@"() => {
                          // PDF Oluştur butonunu gizle
@@ -86,6 +102,10 @@ namespace AKDEM.OBYS.UI.Controllers
                      if (pdfButton) {
                                   pdfButton.style.display = 'none';
                     }
+const hbutton = document.getElementById('branchButtons');
+                                                                if (hbutton) {
+                                                                    hbutton.style.display = 'none';
+                                                                }
 
                     // Yeni Ders Ekle butonunu gizle
                     const newLessonButton = document.getElementById('newLessonButton');
@@ -111,7 +131,7 @@ namespace AKDEM.OBYS.UI.Controllers
 
                     // PDF'yi kaydedin
                     System.IO.File.WriteAllBytes(pdfPath, pdfBuffer);
-                    
+
                 }
             }
         }
@@ -122,7 +142,7 @@ namespace AKDEM.OBYS.UI.Controllers
         {
             var list = new List<AppLessonListModel>();
 
-            var items = await _appUserService.GetAllTeacherAsync((int)RoleType.Teacher);
+            var items = await _appUserService.GetAllTeacherAsync((int)RoleType.Teacher, true);
 
             foreach (var item in items.Data)
             {
@@ -143,35 +163,25 @@ namespace AKDEM.OBYS.UI.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateLesson(AppLessonCreateDto dto)
         {
-            var response = await _appLessonService.CreateAsync(dto);
-            if (response.ResponseType == ResponseType.ValidationError)
+            var result = await _appLessonCreateDtoValidator.ValidateAsync(dto);
+            if (result.IsValid)
             {
-                foreach (var error in response.ValidationErrors)
+                await _appLessonService.AppLessonCreate(dto);
+                return RedirectToAction("Index");
+
+            }
+            else
+            {
+                foreach (var error in result.Errors)
                 {
                     ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
                 }
-
-                var list = new List<AppLessonListModel>();
-
-                var items = await _appUserService.GetAllTeacherAsync((int)RoleType.Teacher);
-                foreach (var item in items.Data)
-                {
-                    list.Add(new AppLessonListModel
-                    {
-                        Id = item.Id,
-                        TeacherName = $"{ item.FirstName} { item.SecondName}"
-
-
-
-                    });
-                }
-                ViewBag.teachers = new SelectList(list, "Id", "TeacherName");
                 return View(dto);
-
-
             }
 
-            return RedirectToAction("Index");
+
+
+
         }
         public async Task<IActionResult> UpdateLesson(int id)
         {
@@ -179,7 +189,7 @@ namespace AKDEM.OBYS.UI.Controllers
             var response = await _appLessonService.GetByIdAsync<AppLessonUpdateDto>(id);
             var list = new List<AppLessonListModel>();
 
-            var items = await _appUserService.GetAllTeacherAsync((int)RoleType.Teacher);
+            var items = await _appUserService.GetAllTeacherAsync((int)RoleType.Teacher, true);
 
             foreach (var item in items.Data)
             {
@@ -195,36 +205,47 @@ namespace AKDEM.OBYS.UI.Controllers
             ViewBag.teachers = new SelectList(list, "Id", "TeacherName");
             return this.View(response.Data);
         }
+        public async Task<IActionResult> RemoveLesson(int id, bool status)
+        {
+            await _appLessonService.ChangeLessonStatus(id);
+            return RedirectToAction("Index", new { status = status });
+        }
         [HttpPost]
         public async Task<IActionResult> UpdateLesson(AppLessonUpdateDto dto)
         {
-            var response = await _appLessonService.UpdateAsync(dto);
-            if (response.ResponseType == ResponseType.ValidationError)
+            var list = new List<AppLessonListModel>();
+
+            var items = await _appUserService.GetAllTeacherAsync((int)RoleType.Teacher, true);
+
+            foreach (var item in items.Data)
             {
-                foreach (var error in response.ValidationErrors)
+                list.Add(new AppLessonListModel
+                {
+                    Id = item.Id,
+                    TeacherName = $"{ item.FirstName} { item.SecondName}"
+
+
+
+                });
+            }
+            ViewBag.teachers = new SelectList(list, "Id", "TeacherName");
+            var result = await _appLessonUpdateDtoValidator.ValidateAsync(dto);
+            if (result.IsValid)
+            {
+                await _appLessonService.AppLessonUpdate(dto);
+                return RedirectToAction("Index");
+
+            }
+            else
+            {
+                foreach (var error in result.Errors)
                 {
                     ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
                 }
-                var list = new List<AppLessonListModel>();
-
-                var items = await _appUserService.GetAllTeacherAsync((int)RoleType.Teacher);
-
-                foreach (var item in items.Data)
-                {
-                    list.Add(new AppLessonListModel
-                    {
-                        Id = item.Id,
-                        TeacherName = $"{ item.FirstName} { item.SecondName}"
-
-
-
-                    });
-                }
-                ViewBag.teachers = new SelectList(list, "Id", "TeacherName");
-
                 return View(dto);
             }
-            return RedirectToAction("Index");
+
+
         }
 
 

@@ -15,13 +15,13 @@
 
 
     <div id="branchButtons" class="text-right">
-        <a asp-action="GetBranches" asp-controller="Branch" asp-route-classType="@((int)ClassType.Tamamı)">Tüm Sınıflar</a>|
+        <a style="color:navy; text-decoration:underline;" asp-action="GetBranches" asp-controller="Branch" asp-route-classType="@((int)ClassType.Tamamı)">Tüm Sınıflar</a>    |
 
-        <a asp-action="GetBranches" asp-controller="Branch" asp-route-classType="@((int)ClassType.Hazırlık)">Hazırlık</a>|
-        <a asp-action="GetBranches" asp-controller="Branch" asp-route-classType="@((int)ClassType.Bir)">Birinci Sınıf</a>|
-        <a asp-action="GetBranches" asp-controller="Branch" asp-route-classType="@((int)ClassType.iki)">İkinci Sınıf</a>|
-        <a asp-action="GetBranches" asp-controller="Branch" asp-route-classType="@((int)ClassType.Üç)">Üçüncü Sınıf</a>|
-        <a asp-action="GetBranches" asp-controller="Branch" asp-route-classType="@((int)ClassType.Dört)">Dördüncü Sınıf</a>|
+        <a style="color:navy; text-decoration:underline;" asp-action="GetBranches" asp-controller="Branch" asp-route-classType="@((int)ClassType.Hazırlık)">Hazırlık</a>    |
+        <a style="color:navy; text-decoration:underline;" asp-action="GetBranches" asp-controller="Branch" asp-route-classType="@((int)ClassType.Bir)">Birinci Sınıf</a>    |
+        <a style="color:navy; text-decoration:underline;"asp-action="GetBranches" asp-controller="Branch" asp-route-classType="@((int)ClassType.iki)">İkinci Sınıf</a>    |
+        <a style="color:navy; text-decoration:underline;" asp-action="GetBranches" asp-controller="Branch" asp-route-classType="@((int)ClassType.Üç)">Üçüncü Sınıf</a>    |
+        <a style="color:navy; text-decoration:underline;"asp-action="GetBranches" asp-controller="Branch" asp-route-classType="@((int)ClassType.Dört)">Dördüncü Sınıf</a>  |
 
 
     </div>
@@ -32,66 +32,92 @@
             <div>
                 <a id="newClass" class="btn btn-success" asp-action="CreateBranch" asp-controller="Branch" asp-route-id="@ViewBag.classType">Yeni Sınıf</a>
             </div>
-
-            <table class="mt-3 table table-sm table-hover">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Şube</th>
-                        <th>Sınıf</th>
-                        <th>Mevcut</th>
-                        <th>İşlem</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var item in Model.BranchListWithCountModels)
-                    {
-                        count = count + 1;
+            <br />
+            if (Model.BranchListWithCountModels.Count != 0)
+            {
+                <table class="mt-3 table table-sm table-hover">
+                    <thead>
                         <tr>
-                            <td>@count</td>
-                            <td> <a asp-action="BranchDetails" asp-controller="Branch" asp-route-id="@item.Id"><span style="font-weight: bold; color: darkblue; text-decoration: underline">@item.Definition</span></a>
-                            </td>
-                            <td>@item.AppClass.Definition</td>
-                            <td>@item.BranchStokes</td>
-                            <td><a asp-action="RemoveBranch" asp-controller="Branch" asp-route-branchId="@item.Id" class="btn btn-danger">Sil</a></td>
+                            <th>#</th>
+                            <th>Şube</th>
+                            <th>Sınıf</th>
+                            <th>Mevcut</th>
+                            <th>İşlem</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.BranchListWithCountModels)
+                        {
+                            count = count + 1;
+                            <tr>
+                                <td>@count</td>
+                                <td>
+                                    <a asp-action="BranchDetails" asp-controller="Branch" asp-route-id="@item.Id"><span style="font-weight: bold; color: darkblue; text-decoration: underline">@item.Definition</span></a>
+                                </td>
+                                <td>@item.AppClass.Definition</td>
+                                <td>@item.BranchStokes</td>
+                                @{if (item.BranchStokes == 0) { 
+                                                                <td><a asp-action="RemoveBranch" asp-controller="Branch" asp-route-branchId="@item.Id" asp-route-classType="@ViewBag.classType" class="btn btn-danger">Sil</a></td>
+                                    
+                                    }
+                        else
+                        {
+                            <td>Öğrenci Barındıran Sınıflar Silinemez</td>
+                        }
+                                    }
+                                
+
+                            </tr>
+
+                        }
+                        <tr>
+                            <td><strong>--></strong></td>
+                            <td><strong>GENEL</strong></td>
+                            <td><strong>@Model.AppClass.Definition</strong></td>
+                            <td><strong>@Model.ClassStokes</strong></td>
 
                         </tr>
 
-                    }
-                    <tr>
-                        <td><strong>--></strong></td>
-                        <td><strong>GENEL</strong></td>
-                        <td><strong>@Model.AppClass.Definition</strong></td>
-                        <td><strong>@Model.ClassStokes</strong></td>
 
-                    </tr>
+                    </tbody>
 
 
-                </tbody>
+                </table>
+                if (Model.BranchListWithCountModels.Count >= 2)
+                {
+                    <div>
+                        <a id="mergeBranches" class="btn btn-link" asp-action="MergeBranches" asp-controller="Branch" asp-route-classType="@ViewBag.classType">Sınıfları Birleştir</a>
+                    </div>
+                }
 
+            }
+            else
+            {
+                <h5>Görüntülenecek Sınıf Bulunamadı</h5>
+            }
 
-            </table>
 
         }
 
         else
         {
+            if (Model.BranchListWithCountModels.Count != 0)
+            {
 
-
-            <table class="mt-3 table table-sm table-hover">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Şube</th>
-                        <th>Sınıf</th>
-                        <th>Mevcut</th>
-                        <th>İşlem</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var item in Model.BranchListWithCountModels)
-                    {
-                        count = count + 1;
+                <table class="mt-3 table table-sm table-hover">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Şube</th>
+                            <th>Sınıf</th>
+                            <th>Mevcut</th>
+                            <th>İşlem</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.BranchListWithCountModels)
+                        {
+                            count = count + 1;
                         <tr>
                             <td>@count</td>
                             <td>
@@ -99,24 +125,41 @@
                             </td>
                             <td>@item.AppClass.Definition</td>
                             <td>@item.BranchStokes</td>
-                            <td><a asp-action="RemoveBranch" asp-controller="Branch" asp-route-branchId="@item.Id" class="btn btn-danger">Sil</a></td>
+                            @{if (item.BranchStokes == 0)
+                                {
+                                    <td><a asp-action="RemoveBranch" asp-controller="Branch" asp-route-branchId="@item.Id" asp-route-classType="@ViewBag.classType" class="btn btn-danger">Sil</a></td>
+
+                                }
+                                else
+                                {
+                                    <td>Öğrenci Barındıran Sınıflar Silinemez</td>
+                                }
+                            }
 
                         </tr>
 
-                    }
-                    <tr>
-                        <td><strong>--></strong></td>
-                        <td><strong>GENEL</strong></td>
-                        <td><strong></strong></td>
-                        <td><strong>@ViewBag.totalStock</strong></td>
+                        }
+                        <tr>
+                            <td><strong>--></strong></td>
+                            <td><strong>GENEL</strong></td>
+                            <td><strong></strong></td>
+                            <td><strong>@ViewBag.totalStock</strong></td>
 
-                    </tr>
-
-
-                </tbody>
+                        </tr>
 
 
-            </table>
+                    </tbody>
+
+
+                </table>
+
+            }
+            else
+            {
+                <h5>Görüntülenecek Sınıf Bulunamadı</h5>
+            }
+
+
 
 
         }

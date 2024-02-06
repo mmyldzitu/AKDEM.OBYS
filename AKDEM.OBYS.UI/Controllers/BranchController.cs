@@ -33,9 +33,11 @@ namespace AKDEM.OBYS.UI.Controllers
         private readonly IAppWarningService _appWarningService;
         private readonly IAppUserSessionLessonService _appUserSessionLessonService;
         private readonly IWebHostEnvironment _webHostEnvironment;
+        private readonly IValidator<MergeBranchModel> _mergeBranchModelValidator;
+        private readonly IAppGraduatedService _appGraduatedService;
 
 
-        public BranchController(IAppBranchService appBranchService, IValidator<AppBranchCreateModel> branchCreateModelValidator, IMapper mapper, IAppStudentService appStudentService, IAppSessionService appSessionService, IAppSessionBranchService appSessionBranchService, IAppUserSessionService appUserSessionService, IAppWarningService appWarningService, IAppUserSessionLessonService appUserSessionLessonService, IWebHostEnvironment webHostEnvironment)
+        public BranchController(IAppBranchService appBranchService, IValidator<AppBranchCreateModel> branchCreateModelValidator, IMapper mapper, IAppStudentService appStudentService, IAppSessionService appSessionService, IAppSessionBranchService appSessionBranchService, IAppUserSessionService appUserSessionService, IAppWarningService appWarningService, IAppUserSessionLessonService appUserSessionLessonService, IWebHostEnvironment webHostEnvironment, IValidator<MergeBranchModel> mergeBranchModelValidator, IAppGraduatedService appGraduatedService)
         {
             _appBranchService = appBranchService;
             _branchCreateModelValidator = branchCreateModelValidator;
@@ -47,6 +49,8 @@ namespace AKDEM.OBYS.UI.Controllers
             _appWarningService = appWarningService;
             _appUserSessionLessonService = appUserSessionLessonService;
             _webHostEnvironment = webHostEnvironment;
+            _mergeBranchModelValidator = mergeBranchModelValidator;
+            _appGraduatedService = appGraduatedService;
         }
 
         public IActionResult Index()
@@ -79,7 +83,7 @@ namespace AKDEM.OBYS.UI.Controllers
         public async Task<IActionResult> CreateBranch(AppBranchCreateModel model)
         {
             model.Definition = $"{model.Class}/{model.Branch}";
-            var result = _branchCreateModelValidator.Validate(model);
+            var result =await  _branchCreateModelValidator.ValidateAsync(model);
             var sessions = await _appSessionService.GetAllAsync();
             List<AppSessionBranchCreateDto> sessionBranchCreateDtos = new();
             if (result.IsValid)
@@ -265,9 +269,16 @@ namespace AKDEM.OBYS.UI.Controllers
             }
             return View(studentList);
         }
+        public async Task<IActionResult> Certificate(int userId)
+        {
+            
+            var list = await _appGraduatedService.CertificaofUser(userId);
+            return View(list);
+        }
         public async Task<IActionResult> UserDetails(int userId)
         {
             ViewBag.userId = userId;
+            ViewBag.userClassType = await _appBranchService.ReturnClassTypeOfUser(userId);
             var sessions = await _appSessionService.GetSessionsByUserId(userId);
             return View(sessions);
         }
@@ -275,9 +286,11 @@ namespace AKDEM.OBYS.UI.Controllers
         {
             await _appUserSessionService.TotalAverageAllUsers(sessionId);
             int userSessionId = await _appUserSessionService.UserSessionIdByUserIdAndSessionId(userId, sessionId);
-            double swc = await _appWarningService.SessionWarningCountByUserSessionId(userSessionId);
+            double slwc = await _appWarningService.SessionLessonWarningCountByUserSessionId(userSessionId);
+            double awc = await _appWarningService.AbsenteismWarningCountByUserSessionId(userSessionId);
+            double swc = await _appWarningService.SessionWarningCountByUserSessionId(userSessionId, slwc);
             double twc = await _appWarningService.TotalWarningCountByUserId(userId, sessionId);
-            await _appWarningService.ChangeStudentStatusBecasuseOfWarning(userId, swc, twc, userSessionId);
+            await _appWarningService.ChangeStudentStatusBecasuseOfWarning(userId, swc,awc, twc, userSessionId);
             //BURASI
             var branchId = await _appUserSessionService.GetBranchIdByUserSessionId(userSessionId);
             string sessionName= await _appSessionService.ReturnSessionName(sessionId);
@@ -303,6 +316,8 @@ namespace AKDEM.OBYS.UI.Controllers
                 SessionId = sessionId,
                 SessionWarningCount = await _appWarningService.ReturnSwc(userSessionId),
                 TotalAverage = await _appUserSessionService.ReturnTotalAverage(userId),
+                AbsenteismWarningCount = await _appWarningService.ReturnAwc(userSessionId),
+                LessonWarningCount= await _appWarningService.SessionLessonWarningCountByUserSessionId(userSessionId),
                 TotalWarningCount = await _appWarningService.ReturnTwc(userId)
             };
 
@@ -330,9 +345,11 @@ namespace AKDEM.OBYS.UI.Controllers
             {
 
                 var sessionId = await _appUserSessionService.GetSessionIdByUserSessionId(userSessionId);
-                double swc = await _appWarningService.SessionWarningCountByUserSessionId(userSessionId);
+                double slwc = await _appWarningService.SessionLessonWarningCountByUserSessionId(userSessionId);
+                double swc = await _appWarningService.SessionWarningCountByUserSessionId(userSessionId, slwc);
+                double awc = await _appWarningService.AbsenteismWarningCountByUserSessionId(userSessionId);
                 double twc = await _appWarningService.TotalWarningCountByUserId(userId, sessionId);
-                await _appWarningService.ChangeStudentStatusBecasuseOfWarning(userId, swc, twc, userSessionId);
+                await _appWarningService.ChangeStudentStatusBecasuseOfWarning(userId, swc, awc, twc, userSessionId);
                 await _appUserSessionService.TotalAverageAllUsers(sessionId);
                 //BURASI
                 int classId = await _appUserSessionService.GetClassIdByUserSessionId(userSessionId);
@@ -357,6 +374,8 @@ namespace AKDEM.OBYS.UI.Controllers
                     Average = await _appUserSessionService.ReturnSessionAverage(userSessionId),
                     SessionId = sessionId,
                     SessionWarningCount = await _appWarningService.ReturnSwc(userSessionId),
+                    AbsenteismWarningCount = await _appWarningService.ReturnAwc(userSessionId),
+                    LessonWarningCount= await _appWarningService.SessionLessonWarningCountByUserSessionId(userSessionId),
                     TotalAverage = await _appUserSessionService.ReturnTotalAverage(userId),
                     TotalWarningCount = await _appWarningService.ReturnTwc(userId)
                 };
@@ -678,6 +697,165 @@ namespace AKDEM.OBYS.UI.Controllers
                                     }
                                 });
                         }");
+
+
+                    // Razor sayfasının HTML içeriğini alın
+                    var htmlContent = await page.GetContentAsync();
+
+                    // HTML içeriğini PDF'ye çevir
+                    var pdfBuffer = await page.PdfDataAsync();
+                    var wwwrootPath = _webHostEnvironment.WebRootPath;
+                    var pdfPath = Path.Combine(wwwrootPath, "pdf", $"{myFileName}.pdf");
+
+                    // PDF'yi kaydedin
+                    System.IO.File.WriteAllBytes(pdfPath, pdfBuffer);
+
+                }
+            }
+        }
+
+        public async Task< IActionResult> MergeBranches(int classType)
+        {
+            var branches1 = await _appBranchService.GetClasses(classType);
+            var branches2 = await _appBranchService.GetClasses(classType);
+            ViewBag.classType = classType;
+
+            var list = new List<AppBranchListDto>();
+            var items = branches1;
+            foreach (var item in items)
+            {
+                list.Add(new AppBranchListDto
+                {
+                    Id = item.Id,
+                    Definition = item.Definition
+                });
+            }
+            ViewBag.firstBranch = new SelectList(list, "Id", "Definition");
+            var list2 = new List<AppBranchListDto>();
+            var items2 = branches2;
+            foreach (var item in items2)
+            {
+                list2.Add(new AppBranchListDto
+                {
+                    Id = item.Id,
+                    Definition = item.Definition
+                });
+            }
+            ViewBag.secondBranch = new SelectList(list2, "Id", "Definition");
+            return View();
+        }
+        public async Task<IActionResult> RemoveBranch(int branchId, int classType)
+        {
+            await _appBranchService.SessionEndingBranchStatus(branchId);
+            return RedirectToAction("GetBranches", new { classType = classType });
+        }
+        [HttpPost]
+        public async Task<IActionResult> MergeBranches(MergeBranchModel model)
+        {
+            var result = _mergeBranchModelValidator.Validate(model);
+            if (result.IsValid)
+            {
+                var firstBranchStudents = await _appStudentService.GetStudentsWithBranchAsync(model.FirstBranchId);
+                foreach (var student in firstBranchStudents)
+                {
+                    await _appStudentService.ChangeBranchForStudent(student.Id, model.SecondBranchId);
+                    int activeStatusId = await _appSessionService.GetActiveSessionId();
+                    await _appStudentService.ControlUserSessionWhenUpdating(student.Id, activeStatusId);
+                    await _appStudentService.CreateStudentOrChangeStatusProcessForUserSessionandUSerSessionLessons(student.Id);
+                    await _appBranchService.SessionEndingBranchStatus(model.FirstBranchId);
+                }
+                return RedirectToAction("GetBranches", new { ClassType = model.ClassType });
+            }
+            foreach(var error in result.Errors)
+            {
+                ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
+            }
+            var branches1 = await _appBranchService.GetClasses(model.ClassType);
+            var branches2 = await _appBranchService.GetClasses(model.ClassType);
+            
+
+            var list = new List<AppBranchListDto>();
+            var items = branches1;
+            foreach (var item in items)
+            {
+                list.Add(new AppBranchListDto
+                {
+                    Id = item.Id,
+                    Definition = item.Definition
+                });
+            }
+            ViewBag.classType = model.ClassType;
+
+            ViewBag.firstBranch = new SelectList(list, "Id", "Definition");
+            var list2 = new List<AppBranchListDto>();
+            var items2 = branches2;
+            foreach (var item in items2)
+            {
+                list2.Add(new AppBranchListDto
+                {
+                    Id = item.Id,
+                    Definition = item.Definition
+                });
+            }
+            ViewBag.secondBranch = new SelectList(list2, "Id", "Definition");
+            return View(model);
+            
+        }
+        public async Task<IActionResult> GenerateAndDownloadPdfCertificate(string myFileName, int userId)
+        {
+            // PDF oluştur
+            await GeneratePdfAsyncCertificate(myFileName, userId);
+
+            // PDF dosyasının geçici konumunu belirtin
+            var pdfPath = $"wwwroot/pdf/{myFileName}.pdf";
+
+            // PDF dosyasının varlığını kontrol et
+            if (System.IO.File.Exists(pdfPath))
+            {
+                // PDF dosyasını kullanıcıya indirme
+                var fileBytes = System.IO.File.ReadAllBytes(pdfPath);
+                var fileName = $"{myFileName}.pdf";
+
+                // PDF dosyasını indir
+                return File(fileBytes, "application/pdf", fileName);
+            }
+            else
+            {
+                // Hata durumunu ele alabilirsiniz
+                return NotFound("PDF dosyası bulunamadı.");
+            }
+        }
+
+        private async Task GeneratePdfAsyncCertificate(string myFileName, int userId)
+        {
+            await new BrowserFetcher().DownloadAsync();
+            using (var browser = await Puppeteer.LaunchAsync(new LaunchOptions { Headless = true }))
+            {
+                using (var page = await browser.NewPageAsync())
+                {
+                    // Razor sayfasının URL'sini belirtin
+                    var razorPageUrl = Url.Action("Certificate", "Branch", new { userId = userId }, Request.Scheme);
+                    await page.GoToAsync(razorPageUrl);
+                    await page.EvaluateFunctionAsync(@"() => {
+                                // PDF Oluştur butonunu gizle
+                                const pdfButton = document.getElementById('buttons');
+                                if (pdfButton) {
+                                    pdfButton.style.display = 'none';
+                                }
+                                
+
+                                
+
+                                // Diğer elementleri gizle (isteğe bağlı)
+                                document.querySelectorAll('th, td').forEach(element => {
+                                    const columnIndex = element.cellIndex;
+                                    const columnHeader = document.querySelector('th:nth-child(' + (columnIndex + 1) + ')');
+
+                                    if (columnHeader && !selectedColumns.includes(columnHeader.innerText.trim())) {
+                                        element.style.display = 'none';
+                                    }
+                                });
+                            }");
 
 
                     // Razor sayfasının HTML içeriğini alın

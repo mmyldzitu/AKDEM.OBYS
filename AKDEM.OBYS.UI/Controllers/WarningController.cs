@@ -1,4 +1,5 @@
 ﻿using AKDEM.OBYS.Business.Services;
+using AKDEM.OBYS.UI.Models;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using PuppeteerSharp;
@@ -60,8 +61,11 @@ namespace AKDEM.OBYS.UI.Controllers
             ViewBag.userName = await _appUserService.GetUserNameById(userId);
             int userSessionId = await _appUserSessionService.UserSessionIdByUserIdAndSessionId(userId, sessionId);
             ViewBag.userSessionId = userSessionId;
+            string departReason = await _appStudentService.ReturnDepartReasonOfStudent(userId);
+            var status = await _appStudentService.ReturnStatusOfStudent(userId);
+
             var warningList = await _appWarningService.AppWarningByUserSessionId(userSessionId);
-            return View(warningList);
+            return View(new StudentWarningsModel {AppWarnings=warningList,Status=status,DepartReason= departReason});
 
         }
         public async Task<IActionResult> RemoveWarning(int sessionId, int userId, int id)
@@ -273,11 +277,13 @@ const turntoSession = document.getElementById('turntoSession');
                                 if (pdfButton) {
                                     pdfButton.style.display = 'none';
                                 }
-
+        const listButton = document.getElementById('turntolist');
+                                if(listButton){
+                                           listButton.style.display='none'     };
                                 
 
                                 // Seçilecek kolon başlıkları
-                                const selectedColumns = ['#', 'İsim','Soyisim','Sınıf','Genel Ortalama','Toplam İhtar Sayısı'];
+                                const selectedColumns = ['#', 'İsim','Soyisim','Sınıf','Genel Ortalama','Sebep'];
 
                                 // Diğer elementleri gizle (isteğe bağlı)
                                 document.querySelectorAll('th, td').forEach(element => {
@@ -347,6 +353,9 @@ const turntoSession = document.getElementById('turntoSession');
                                 if (pdfButton) {
                                     pdfButton.style.display = 'none';
                                 }
+                const listButton = document.getElementById('turntolist');
+                                if(listButton){
+                                           listButton.style.display='none'     };
 
                                 
 

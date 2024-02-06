@@ -16,18 +16,18 @@
 
                 @{ if (ViewBag.sessionStatus2 == true)
                     {
-                        <h1>   (@ViewBag.sessionName) DÖNEMİ @ViewBag.branchName SINIFI <span style="font-weight: bold; color: cadetblue;">(AKTİF)</span> </h1>
+                        <h2>   (@ViewBag.sessionName) DÖNEMİ @ViewBag.branchName SINIFI @ViewBag.lessonName DERSİ <span style="font-weight: bold; color: cadetblue;">(AKTİF)</span> </h2>
 
 
                     }
                     else if (ViewBag.sessionStatus == false)
                     {
-                        <h1>   (@ViewBag.sessionName) DÖNEMİ @ViewBag.branchName SINIFI <span style="font-weight: bold; color: red;">(PASİF)</span> </h1>
+            <h2>   (@ViewBag.sessionName) DÖNEMİ @ViewBag.branchName SINIFI @ViewBag.lessonName DERSİ <span style="font-weight: bold; color: red;">(PASİF)</span> </h2>
 
                     }
                     else
                     {
-                        <h1>   (@ViewBag.sessionName) DÖNEMİ @ViewBag.branchName SINIFI <span style="font-weight: bold; color: lightblue;">(DÜZENLENEBİLİR)</span> </h1>
+            <h2>   (@ViewBag.sessionName) DÖNEMİ @ViewBag.branchName SINIFI @ViewBag.lessonName DERSİ <span style="font-weight: bold; color: lightblue;">(DÜZENLENEBİLİR)</span> </h2>
 
                     }
 
@@ -68,49 +68,49 @@
                     @foreach (var item in Model)
                     {
                         count = count + 1;
-                        <tr>
-                            <td>@count</td>
-                            <td>@item.FirstName</td>
-                            <td>@item.SecondName</td>
-                            <td>@(item.Status ? "Aktif" :"Pasif" )</td>
-                            <td>@item.SıraNo</td>
+                    <tr>
+                        <td>@count</td>
+                        <td>@item.FirstName</td>
+                        <td>@item.SecondName</td>
+                        @{if (item.Status)
+                            {
 
-                            <td>@(item.LessonNote==-1 ? "GİRİLMEDİ" :item.LessonNote)</td>
-                            <td>@(item.Devamsızlık==-1 ? "GİRİLMEDİ" :item.Devamsızlık)</td>
-                            @{ if (item.Status)
-                                {
-
-
-
-                                    <td>@(item.Average <= 0 ? "--" : item.Average.ToString())</td>
-
-
-                                }
-                                else
-                                {
-                                    <td style="font-weight: bold; color: red;"> PASİF</td>
-
-
-
-
-
-                                }
+                                <td style="font-weight: bold; color: cadetblue;">AKTİF</td>
                             }
+                            else
+                            {
+                                <td style="font-weight: bold; color: red;">PASİF</td>
+
+                            }
+                        }
+                        
+                        <td>@item.SıraNo</td>
+
+                        <td>@(item.LessonNote==-1 ? "GİRİLMEDİ" :item.LessonNote)</td>
+                        <td>@(item.Devamsızlık==-1 ? "GİRİLMEDİ" :item.Devamsızlık)</td>
 
 
-                            <td><a class="btn btn-primary" asp-action="StudentDetailsForTeacher" asp-controller="Teacher" asp-route-userSessionId="@item.StudentSessionId" asp-route-lessonId="@ViewBag.lessonId">KARNE</a></td>
 
-                            @{if (ViewBag.sessionStatus)
-                                {
-                                    <td><a class="btn btn-danger" asp-action="TeacherNotes" asp-controller="Teacher" asp-route-userSessionId="@item.StudentSessionId" asp-route-lessonId="@ViewBag.lessonId">Not İşlemleri</a></td>
-                                } }
+                        <td>@(item.Average <= 0 ? "--" : @String.Format("{0:0.00}", item.Average))</td>
 
 
 
 
 
 
-                        </tr>
+                        <td><a class="btn btn-primary" asp-action="StudentDetailsForTeacher" asp-controller="Teacher" asp-route-userSessionId="@item.StudentSessionId" asp-route-lessonId="@ViewBag.lessonId">KARNE</a></td>
+
+                        @{if (ViewBag.sessionStatus)
+                            {
+                                <td><a class="btn btn-danger" asp-action="TeacherNotes" asp-controller="Teacher" asp-route-userSessionId="@item.StudentSessionId" asp-route-lessonId="@ViewBag.lessonId">Not İşlemleri</a></td>
+                            } }
+
+
+
+
+
+
+                    </tr>
                     }
                 </tbody>
 

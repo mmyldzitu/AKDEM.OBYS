@@ -38,6 +38,30 @@ namespace AKDEM.OBYS.Business.Managers
             _createStudentDtoValidator = createStudentDtoValidator;
             _loginDtoValidator = loginDtoValidator;
         }
+        public async Task<bool> IsPasswordRight(int userId, string password)
+        {
+            var query = _uow.GetRepositry<AppUser>().GetQuery();
+            var user = await query.Where(x => x.Id == userId).SingleOrDefaultAsync();
+            if (user != null)
+            {
+                if (user.Password == password)
+                {
+                    return true;
+                }
+                return false;
+            }
+            return false;
+        }
+        public async Task UserPasswordUpdate(int userId, string newPassword)
+        {
+            var query = _uow.GetRepositry<AppUser>().GetQuery();
+            var user = await query.Where(x => x.Id == userId).SingleOrDefaultAsync();
+            if (user != null)
+            {
+                user.Password = newPassword;
+            }
+            await _uow.SaveChangesAsync();
+        }
         public async Task<IResponse<AppTeacherCreateDto>> CreateTeacherWithRoleAsync(AppTeacherCreateDto dto, int roleId)
         {
             var validationResult = _createDtoValidator.Validate(dto);
@@ -56,15 +80,33 @@ namespace AKDEM.OBYS.Business.Managers
             }
             return new Response<AppTeacherCreateDto>(dto, validationResult.ConvertToCustomValidationError());
         }
-        public async Task<IResponse<List<AppTeacherListDto>>> GetAllTeacherAsync(int roleId)
+        public async Task<IResponse<List<AppTeacherListDto>>> GetAllTeacherAsync(int roleId, bool status)
         {
-            var teacherList = await _uow.GetRepositry<AppUser>().GetAllAsync(x => x.AppUserRoles.Any(x => x.RoleId == roleId));
+            var teacherList = await _uow.GetRepositry<AppUser>().GetAllAsync(x => x.AppUserRoles.Any(x => x.RoleId == roleId  ) && x.Status==status);
             if (teacherList == null)
             {
                 return new Response<List<AppTeacherListDto>>(ResponseType.NotFound, "Görüntülenecek Öğretmen Bilgisi Bulunamadı");
             }
             var dto = _mapper.Map<List<AppTeacherListDto>>(teacherList);
             return new Response<List<AppTeacherListDto>>(ResponseType.Success, dto);
+        }
+        public async Task ChangeTeacherStatus(int userId)
+        {
+            var query = _uow.GetRepositry<AppUser>().GetQuery();
+            var teacher = await query.Where(x => x.Id == userId).SingleOrDefaultAsync();
+            if (teacher != null)
+            {
+                if (teacher.Status)
+                {
+                    teacher.Status = false;
+                }
+                else
+                {
+                    teacher.Status = true;
+                }
+
+            }
+            await _uow.SaveChangesAsync();
         }
 
         public async Task<List<AppStudentListDto>> GetAllStudentAsync(RoleType type, ClassType classType)
@@ -186,6 +228,22 @@ namespace AKDEM.OBYS.Business.Managers
                 }
             }
             return firstName +" "+ secondName;
+        }
+        public async Task<List<string>> GetTeacherNameForPresident()
+        {
+            List<string> teacherDefinitions = new List<string>();
+            string definition = "";
+            var query = _uow.GetRepositry<AppUser>().GetQuery();
+            var teachers = await query.Where(x => x.AppUserRoles.Any(x => x.RoleId == 2) && x.Status == true).ToListAsync();
+            if (teachers.Count != 0)
+            {
+                foreach( var teacher in teachers)
+                {
+                    definition = teacher.DepartReason + " " + teacher.FirstName + " " + teacher.SecondName;
+                    teacherDefinitions.Add(definition);
+                }
+            }
+            return teacherDefinitions;
         }
 
     }

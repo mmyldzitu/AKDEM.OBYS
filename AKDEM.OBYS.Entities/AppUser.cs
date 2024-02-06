@@ -17,7 +17,7 @@ namespace AKDEM.OBYS.Entities
         public string ImagePath { get; set; }
         public double TotalAverage { get; set; }
         public int SıraNo { get; set; }
-
+        public string DepartReason { get; set; }
         public double TotalWarningCount { get; set; }
         public int? BranchId { get; set; }
         public AppBranch AppBranch { get; set; }
@@ -27,7 +27,7 @@ namespace AKDEM.OBYS.Entities
 
         public List<AppUserRole> AppUserRoles { get; set; }
         public List<AppUserSession> AppUserSessions { get; set; }
-        
+        public List<AppGraduated> AppGraduateds { get; set; }
         public List<AppLesson> AppLessons { get; set; }
 
 

@@ -25,5 +25,16 @@ namespace AKDEM.OBYS.Business.Services
         Task<int> GetActiveSessionId();
         Task<List<AppSessionListDto>> TeacherExSessionsAsync(int userId);
         Task<List<AppSessionListDto>> StudentExSessionsAsync(int userId);
+        Task<bool> IsThereSession(string sessionName);
+        Task<double> MinLessonNoteOfSession(int sessionId);
+        Task<double> MinAverageNoteOfSession(int sessionId);
+        Task<int> MinAbsenteismOfSession(int sessionId);
+        Task<int> PreviousSessionOfUser(int userSessionId, int sessionId);
+        Task<AppSessionListDto> SessionCriterias(int sessionId);
+        Task<AppSessionUpdateDto> UpdateSessionCriterias(int sessionId);
+        Task UpdateSessionCriteriasPost(AppSessionUpdateDto dto);
+        Task<bool> IfLessonAlreadyExists(string definition, int userId);
+        Task RemoveUserSessionsBecauseOfBeingPassive(int sessionId, int userId);
+        Task<string> ReturnPresidentName(int sessionId);
     }
 }

@@ -30,6 +30,7 @@ namespace AKDEM.OBYS.DataAccess.Context
             modelBuilder.ApplyConfiguration(new AppScheduleConfiguration());
             modelBuilder.ApplyConfiguration(new AppScheduleDetailConfiguration());
             modelBuilder.ApplyConfiguration(new AppSessionBranchConfiguration());
+            modelBuilder.ApplyConfiguration(new AppGraduatedConfiguration());
         }
         public DbSet<AppBranch> AppBranches { get; set; }
         public DbSet<AppClass> AppClasses { get; set; }
@@ -44,6 +45,7 @@ namespace AKDEM.OBYS.DataAccess.Context
         public DbSet<AppSchedule> AppSchedules { get; set; }
         public DbSet<AppScheduleDetail> AppScheduleDetails { get; set; }
         public DbSet<AppSessionBranch> AppSessionBranches { get; set; }
+        public DbSet<AppGraduated> AppGraduateds { get; set; }
 
     }
 }

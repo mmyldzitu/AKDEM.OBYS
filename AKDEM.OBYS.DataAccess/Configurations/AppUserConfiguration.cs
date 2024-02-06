@@ -20,6 +20,7 @@ namespace AKDEM.OBYS.DataAccess.Configurations
             // builder.Property(x => x.ImagePath).HasMaxLength(500).IsRequired();
             builder.HasOne(x => x.AppBranch).WithMany(x => x.AppUsers).HasForeignKey(x => x.BranchId).OnDelete(DeleteBehavior.ClientSetNull);
             builder.HasOne(x => x.AppClass).WithMany(x => x.AppUsers).HasForeignKey(x => x.ClassId).OnDelete(DeleteBehavior.ClientSetNull);
+            
 
         }
     }

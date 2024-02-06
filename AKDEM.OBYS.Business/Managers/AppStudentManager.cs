@@ -57,6 +57,26 @@ namespace AKDEM.OBYS.Business.Managers
             return new List<AppStudentListDto>();
 
         }
+        public async Task<string> ReturnDepartReasonOfStudent(int userId)
+        {
+            var query = _uow.GetRepositry<AppUser>().GetQuery();
+            var user = await query.Where(x => x.Id == userId).SingleOrDefaultAsync();
+            if (user != null)
+            {
+                return user.DepartReason;
+            }
+            return "";
+        }
+        public async Task<bool> ReturnStatusOfStudent(int userId)
+        {
+            var query = _uow.GetRepositry<AppUser>().GetQuery();
+            var user = await query.Where(x => x.Id == userId).SingleOrDefaultAsync();
+            if (user != null)
+            {
+                return user.Status;
+            }
+            return false;
+        }
 
 
         public async Task<List<AppStudentListDto>> GetAllStudentAsync(RoleType type)
@@ -97,7 +117,11 @@ namespace AKDEM.OBYS.Business.Managers
         public async Task<List<AppStudentListDto>> GetStudentsWithBranchAndSessionAsync(int branchId, int sessionId)
         {
             var query = _uow.GetRepositry<AppUser>().GetQuery();
-            var list = await query.Include(x => x.AppBranch).ThenInclude(x => x.AppClass).Where(x => x.AppUserSessions.Any(x => x.BranchId == branchId) && x.AppUserSessions.Any(x => x.SessionId == sessionId)).ToListAsync();
+            var list = await query
+    .Where(x => x.AppUserSessions.Any(s => s.BranchId == branchId && s.SessionId == sessionId))
+    .Include(x => x.AppBranch)
+        .ThenInclude(x => x.AppClass)
+    .ToListAsync();
             var descList = list.OrderByDescending(x => x.TotalAverage).ToList();
             return _mapper.Map<List<AppStudentListDto>>(descList);
         }
@@ -123,7 +147,7 @@ namespace AKDEM.OBYS.Business.Managers
 
             return _mapper.Map<List<AppStudentListDto>>(descList);
         }
-        
+
 
 
 
@@ -219,6 +243,26 @@ namespace AKDEM.OBYS.Business.Managers
             var list = await query.Include(x => x.AppBranch).ThenInclude(x => x.AppClass).Where(x => x.AppUserRoles.Any(x => x.RoleId == (int)type) && x.ClassId == classId).ToListAsync();
             return _mapper.Map<List<AppStudentListDto>>(list);
         }
+        public async Task ControlUserSessionWhenUpdating(int userId, int sessionId)
+        {
+            var query = _uow.GetRepositry<AppUserSession>().GetQuery();
+            var entity = await query.Where(x => x.SessionId == sessionId && x.UserId == userId).SingleOrDefaultAsync();
+            if (entity != null)
+            {
+                var query2 = _uow.GetRepositry<AppUserSessionLesson>().GetQuery();
+                var entities = await query2.Where(x => x.UserSessionId == entity.Id).ToListAsync();
+                if (entities.Count != 0)
+                {
+                    foreach (var item in entities)
+                    {
+                        _uow.GetRepositry<AppUserSessionLesson>().Remove(item);
+
+                    }
+                }
+                _uow.GetRepositry<AppUserSession>().Remove(entity);
+                await _uow.SaveChangesAsync();
+            }
+        }
         public async Task ChangeStudentBranch(int studentId, int branchId, int classId)
         {
             var query = _uow.GetRepositry<AppUser>().GetQuery();
@@ -247,6 +291,20 @@ namespace AKDEM.OBYS.Business.Managers
 
             }
             return "/images/user.png";
+        }
+        public async Task ChangeBranchForStudent(int userId, int newBranchId)
+        {
+            var query =  _uow.GetRepositry<AppUser>().GetQuery();
+            var users = await query.Where(x => x.Id == userId).ToListAsync();
+            if (users.Count != 0)
+            {
+                foreach(var user in users)
+                {
+                    user.BranchId = newBranchId;
+                }
+            }
+            await _uow.SaveChangesAsync();
+
         }
     }
 }

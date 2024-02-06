@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace AKDEM.OBYS.Dto.AppWarningDtos
 {
-    public class AppWarningCreateDto : IDto
+    public class AppWarningCreateDto:IDto 
     {
         public double WarningCount { get; set; } = 0;
         public DateTime WarningTime { get; set; }

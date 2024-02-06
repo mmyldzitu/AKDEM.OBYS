@@ -28,6 +28,10 @@ namespace AKDEM.OBYS.Business.Services
         Task<List<AppStudentListDto>> GraduatedStudenstBySessionId(int sessionId);
         Task<List<AppStudentListDto>> GetStudentsWithBranchAndSessionAndLessonAsync(int branchId, int sessionId, int lessonId);
         Task<string> ReturnUserImg(int userId);
+        Task ControlUserSessionWhenUpdating(int userId, int sessionId);
+        Task ChangeBranchForStudent(int userId, int newBranchId);
+        Task<bool> ReturnStatusOfStudent(int userId);
+        Task<string> ReturnDepartReasonOfStudent(int userId);
 
 
     }

@@ -25,5 +25,6 @@ namespace AKDEM.OBYS.Business.Services
         Task<double> GetLessonNoteByUserSessionIdAndLessonId(int userSessionId, int lessonId);
         Task<int> GetLessonDevamsByUserSessionIdAndLessonId(int userSessionId, int lessonId);
         Task<IResponse<List<AppUserSessionLessonUpdateDto>>> GetAppUserSessionLessonsByUserSessionIdAndLessonId(int userSessionId, int lessonId);
+        Task RemoveUserSessionLessonsByUserSessionId(int userSessionId);
     }
 }

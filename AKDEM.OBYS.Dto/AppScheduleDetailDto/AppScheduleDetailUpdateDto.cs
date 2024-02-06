@@ -9,6 +9,6 @@ namespace AKDEM.OBYS.Dto.AppScheduleDetailDto
 {
     public class AppScheduleDetailUpdateDto : IUpdateDto
     {
-        public int Id { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public int Id { get ; set; }
     }
 }

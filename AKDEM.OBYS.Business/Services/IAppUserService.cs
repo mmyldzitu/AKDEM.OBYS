@@ -15,7 +15,7 @@ namespace AKDEM.OBYS.Business.Services
    public  interface IAppUserService:IGenericService<AppTeacherCreateDto,AppTeacherUpdateDto,AppTeacherListDto,AppUser>
     {
         Task<IResponse<AppTeacherCreateDto>> CreateTeacherWithRoleAsync(AppTeacherCreateDto dto, int roleId);
-        Task<IResponse<List<AppTeacherListDto>>> GetAllTeacherAsync(int roleId);
+        Task<IResponse<List<AppTeacherListDto>>> GetAllTeacherAsync(int roleId,bool status);
 
         Task<List<AppStudentListDto>> GetAllStudentAsync(RoleType type, ClassType classType);
         Task<IResponse<AppStudentUpdateDto>> CreateStudentWithRoleAsync(AppStudentUpdateDto dto, int roleId);
@@ -23,6 +23,10 @@ namespace AKDEM.OBYS.Business.Services
         Task<IResponse<AppTeacherListDto>> CheckUserAsync(AppUserLoginDto dto);
         Task<IResponse<List<AppRoleListDto>>> GetRolesByUserIdAsync(int userId);
         Task<string> GetUserNameById(int userId);
+        Task<bool> IsPasswordRight(int userId, string password);
+        Task UserPasswordUpdate(int userId, string newPassword);
+        Task ChangeTeacherStatus(int userId);
+        Task<List<string>> GetTeacherNameForPresident();
 
 
 

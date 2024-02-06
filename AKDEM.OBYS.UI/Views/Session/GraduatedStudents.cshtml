@@ -33,6 +33,7 @@
                         <th>Mezuniyet Derecesi(Genel)</th>
 
                         <th>Mezuniyet Derecesi(Şube)</th>
+                        <th>Sertifika</th>
 
 
 
@@ -56,6 +57,7 @@
                             <td>@item.BranchDegree</td>
 
                             <td>@item.ClassDegree</td>
+                            <td><a style="color:navy; text-decoration:underline" asp-action="Certificate" asp-controller="Session" asp-route-sessionId="@ViewBag.sessionId" asp-route-userId="@item.UserId">Sertifika</a></td>
 
 
                         </tr>

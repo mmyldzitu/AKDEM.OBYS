@@ -12,7 +12,19 @@ namespace AKDEM.OBYS.Business.ValidationRules.AppUserSessionLesson
     {
         public AppUserSessionLessonUpdateDtoValidator()
         {
+            RuleFor(x => x.Not)
+                .InclusiveBetween(-5, 100)
+                .WithMessage("Lütfen 0 ile 100 arasında geçerli bir not değeri giriniz.");
 
+
+            RuleFor(x => x.Devamsızlık)
+                .InclusiveBetween(-5, 1000)
+                .WithMessage("Lütfen devamsızlık için uygun bir sayısal değer giriniz.");
+                
         }
+
+
+        
+
     }
 }

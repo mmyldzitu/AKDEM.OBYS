@@ -1,16 +1,28 @@
-﻿@model List<AppWarningListDto>
+﻿@model StudentWarningsModel
 @{
     Layout = "_Layout";
     int count = 0;
 }
 <div class="text-right">
-    <a id="pdfButton" class="btn btn-success" asp-action="GenerateAndDownloadPdf2" asp-controller="Student" asp-route-myFileName="@($"{ViewBag.userName}_IHTARLAR")"asp-route-userId="@ViewBag.userId">PDF</a>
+    <a id="pdfButton" class="btn btn-success" asp-action="GenerateAndDownloadPdf2" asp-controller="Student" asp-route-myFileName="@($"{ViewBag.userName}_IHTARLAR")" asp-route-userId="@ViewBag.userId">PDF</a>
 </div>
+<hr />
+@{ if (!Model.Status)
+    {
+
+        <h5>
+            <span style=" color: red;">@Model.DepartReason</span>
+        </h5>
+
+    }
+
+}
+<hr />
 <div class="mt-2">
     <h1>(@ViewBag.userName) BÜTÜN İHTARLARI</h1>
 </div>
 
-@{ if (Model.Count != 0)
+@{ if (Model.DepartReason != "NotExists")
     {
 
 
@@ -21,12 +33,12 @@
                     <th>İhtar Katkısı</th>
                     <th>İhtar Sebebi</th>
                     <th>İhtar Tarihi</th>
-                  
+
 
                 </tr>
             </thead>
             <tbody>
-                @foreach (var item in Model)
+                @foreach (var item in Model.AppWarnings)
                 {
                     count = count + 1;
                     <tr>

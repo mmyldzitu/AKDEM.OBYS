@@ -1,4 +1,4 @@
-﻿@model List<AppWarningListDto>
+﻿@model StudentWarningsModel
 @{
     Layout = "_Layout";
     int count = 0;
@@ -10,6 +10,17 @@
     </div>
     <h1>@ViewBag.userName @ViewBag.sessionName DÖNEMİ İHTARLARI</h1>
 </div>
+
+<hr />
+
+@{      if (!Model.Status) { 
+    
+    <h5><span style=" color: red;">@Model.DepartReason</span>
+    </h5>
+    
+    }
+
+ }
 
 <hr />
 <table class="mt-3 table table-sm table-hover">
@@ -28,7 +39,7 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model)
+        @foreach (var item in Model.AppWarnings)
         {
             count = count + 1;
         <tr>
@@ -54,5 +65,5 @@
 
 
 </table>
-<a class="btn btn-outline-success" asp-action="PassiveStudents" asp-controller="Warning" asp-route-sessionId="@ViewBag.sessionId">Listeye Dön</a>
+<a id="turntolist" class="btn btn-outline-success" asp-action="PassiveStudents" asp-controller="Warning" asp-route-sessionId="@ViewBag.sessionId">Listeye Dön</a>
 

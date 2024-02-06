@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace AKDEM.OBYS.Dto.Interfaces
 {
-   public  interface IDto
+   public interface IDto
     {
     }
 }

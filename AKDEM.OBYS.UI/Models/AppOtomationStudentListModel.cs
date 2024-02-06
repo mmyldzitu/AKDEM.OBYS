@@ -18,6 +18,8 @@ namespace AKDEM.OBYS.UI.Models
         public int BranchDegree { get; set; } = 0;
         public int TotalSessionDegree { get; set; } = 0;
         public int TotalDegree { get; set; } = 0;
+        public double SessionLessonWarningCount { get; set; } = 0;
+        public double SessionAbsentWarningCount { get; set; } = 0;
         public double SessionWarningCount { get; set; } = 0;
         public bool Status { get; set; }
         public double WarningCount { get; set; } = 0;

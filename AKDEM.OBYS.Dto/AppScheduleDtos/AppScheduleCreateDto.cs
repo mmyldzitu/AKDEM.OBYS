@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace AKDEM.OBYS.Dto.AppScheduleDtos
 {
-    public class AppScheduleCreateDto:IDto
+    public class AppScheduleCreateDto : IDto
     {
         public string Definition { get; set; }
         public int SessionBranchId { get; set; }

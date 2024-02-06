@@ -18,11 +18,13 @@ namespace AKDEM.OBYS.Business.Managers
         private readonly IMapper _mapper;
         private readonly IUow _uow;
         private readonly IAppBranchService _appBranchService;
-        public AppUserSessionManager(IMapper mapper, IValidator<AppUserSessionCreateDto> createDtoValidator, IValidator<AppUserSessionUpdateDto> updateDtovalidator, IUow uow, IAppBranchService appBranchService) : base(mapper, createDtoValidator, updateDtovalidator, uow)
+        private readonly IAppUserSessionLessonService _appUserSessionLessonService;
+        public AppUserSessionManager(IMapper mapper, IValidator<AppUserSessionCreateDto> createDtoValidator, IValidator<AppUserSessionUpdateDto> updateDtovalidator, IUow uow, IAppBranchService appBranchService, IAppUserSessionLessonService appUserSessionLessonService) : base(mapper, createDtoValidator, updateDtovalidator, uow)
         {
             _mapper = mapper;
             _uow = uow;
             _appBranchService = appBranchService;
+            _appUserSessionLessonService = appUserSessionLessonService;
         }
         public async Task CreateUserSessionAsync(List<AppUserSessionCreateDto> dtos)
         {
@@ -253,7 +255,16 @@ namespace AKDEM.OBYS.Business.Managers
             }
             return 0;
         }
-
+        public async Task<bool> IfThereIsAnyUserSession(int userId, int sessionId)
+        {
+            var query = _uow.GetRepositry<AppUserSession>().GetQuery();
+            var entity = await query.Where(x => x.UserId == userId && x.AppSession.Id == sessionId).SingleOrDefaultAsync();
+            if (entity != null)
+            {
+                return true;
+            }
+            return false;
+        }
         public async Task<int> GetSessionIdByUserSessionId(int userSessionId)
         {
             var entity = await _uow.GetRepositry<AppUserSession>().FindByFilterAsync(x => x.Id == userSessionId);
@@ -351,6 +362,17 @@ namespace AKDEM.OBYS.Business.Managers
 
             }
             return 0;
+        }
+        public async Task RemoveUserSessionsAndLessons(int sessionId, int userId)
+        {
+            var query = _uow.GetRepositry<AppUserSession>().GetQuery();
+            var entity = await query.Where(x => x.AppSession.Id == sessionId && x.AppUser.Id == userId).SingleOrDefaultAsync();
+            if (entity != null)
+            {
+                await _appUserSessionLessonService.RemoveUserSessionLessonsByUserSessionId(entity.Id);
+                _uow.GetRepositry<AppUserSession>().Remove(entity);
+            }
+            await _uow.SaveChangesAsync();
         }
         public async Task<double> ReturnSessionAverage(int userSessionId)
         {
@@ -640,7 +662,7 @@ namespace AKDEM.OBYS.Business.Managers
         public async Task<string> ReturnPassiveDateByUserId(int userId)
         {
             var query = _uow.GetRepositry<AppUserSession>().GetQuery();
-            var entity = await query.Include(x => x.AppSession).Where(x => x.Status == false && x.AppUser.Id == userId).FirstOrDefaultAsync();
+            var entity = await query.Include(x => x.AppSession).Where(x => x.Status == false && x.AppUser.Id == userId).OrderBy(x => x.Id).LastOrDefaultAsync();
             if (entity != null)
             {
                 return entity.AppSession.Definition;

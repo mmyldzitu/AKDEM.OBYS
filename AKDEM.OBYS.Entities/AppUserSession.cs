@@ -10,6 +10,8 @@ namespace AKDEM.OBYS.Entities
     {
         public double Average { get; set; }
         public double SessionWarningCount { get; set; }
+        public double SessionLessonWarningCount { get; set; }
+        public double SessionAbsentWarningCount { get; set; }
         public List<AppUserSessionLesson> AppUserSessionLessons { get; set; }
         public int UserId { get; set; }
         public AppUser AppUser { get; set; }

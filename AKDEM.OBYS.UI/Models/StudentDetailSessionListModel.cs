@@ -14,6 +14,8 @@ namespace AKDEM.OBYS.UI.Models
         public double TotalAverage { get; set; }
         public double SessionWarningCount { get; set; }
         public double TotalWarningCount { get; set; }
+        public double LessonWarningCount { get; set; }
+        public double AbsenteismWarningCount { get; set; }
         public AppBranchListDto AppBranch { get; set; }
         public AppClassListDto AppClass { get; set; }
         public int BranchId { get; set; }

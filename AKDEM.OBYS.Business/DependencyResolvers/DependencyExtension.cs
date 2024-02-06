@@ -3,6 +3,7 @@ using AKDEM.OBYS.Business.Mappings;
 using AKDEM.OBYS.Business.Services;
 using AKDEM.OBYS.Business.ValidationRules.AppAccount;
 using AKDEM.OBYS.Business.ValidationRules.AppBranch;
+using AKDEM.OBYS.Business.ValidationRules.AppGraduated;
 using AKDEM.OBYS.Business.ValidationRules.AppLesson;
 using AKDEM.OBYS.Business.ValidationRules.AppSchedule;
 using AKDEM.OBYS.Business.ValidationRules.AppScheduleDetail;
@@ -16,6 +17,7 @@ using AKDEM.OBYS.DataAccess.Context;
 using AKDEM.OBYS.DataAccess.UnitOfWork;
 using AKDEM.OBYS.Dto.AppAccountDtos;
 using AKDEM.OBYS.Dto.AppBranchDtos;
+using AKDEM.OBYS.Dto.AppGraduatedDtos;
 using AKDEM.OBYS.Dto.AppLessonDtos;
 using AKDEM.OBYS.Dto.AppScheduleDetailDto;
 using AKDEM.OBYS.Dto.AppScheduleDtos;
@@ -68,6 +70,7 @@ namespace AKDEM.OBYS.Business.DependencyResolvers
             services.AddScoped<IAppUserSessionService, AppUserSessionManager>();
             services.AddScoped<IAppWarningService, AppWarningManager>();
             services.AddScoped<IAppSessionBranchService, AppSessionBranchManager>();
+            services.AddScoped<IAppGraduatedService, AppGraduatedManager>();
 
 
             services.AddTransient<IValidator<AppLessonCreateDto>, AppLessonCreateDtoValidator>();
@@ -99,6 +102,11 @@ namespace AKDEM.OBYS.Business.DependencyResolvers
 
             services.AddTransient<IValidator<AppSessionBranchUpdateDto>, AppSessionBranchUpdateDtoValidator>();
             services.AddTransient<IValidator<AppSessionBranchCreateDto>, AppSessionBranchCreateDtoValidator>();
+
+
+            services.AddTransient<IValidator<AppGraduatedUpdateDto>, AppGraduatedUpdateDtoValidator>();
+            services.AddTransient<IValidator<AppGraduatedCreateDto>, AppGraduatedCreateDtoValidator>();
+
 
             services.AddTransient<IValidator<AppUserLoginDto>, AppUserLoginDtoValidator>();
 

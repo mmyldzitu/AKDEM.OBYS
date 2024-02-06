@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace AKDEM.OBYS.Dto.AppAccountDtos
 {
-    public class AppUserLoginDto:IDto
+    public class AppUserLoginDto
     {
         public string Email { get; set; }
         public string Password { get; set; }

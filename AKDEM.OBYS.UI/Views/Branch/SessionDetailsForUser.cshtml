@@ -53,7 +53,7 @@
                     {
                         <li class="list-group-item">
 
-                            <strong>Durum:</strong> <span style="font-weight: bold; color: red;">PASİF</span>
+                            <strong>Durum:</strong> <span style="font-weight: bold; color: red;">PASİF ( @Model.AppStudent.DepartReason )</span>
                         </li>
                     }
 
@@ -118,11 +118,20 @@
     <div class="row">
         <div class="col-md-6">
             <ul class="list-group">
-                <li class="list-group-item"><strong>Dönem Ortalaması:</strong> @(Model.AppStudentSession.Average <0 ? "---": @String.Format("{0:0.00}", Model.AppStudentSession.Average)) </li>
+                <li class="list-group-item"><strong>Dönem Ortalaması:</strong> @(Model.AppStudentSession.Average < 0 ? "---": @String.Format("{0:0.00}", Model.AppStudentSession.Average)) </li>
 
-                <li class="list-group-item"><strong>Genel Ortalama:</strong>  @(Model.AppStudentSession.TotalAverage <0 ? "---": @String.Format("{0:0.00}", Model.AppStudentSession.TotalAverage))</li>
-                <li class="list-group-item"><strong>Dönem İhtar Sayısı:</strong> @Model.AppStudentSession.SessionWarningCount</li>
-                <li class="list-group-item"><strong>Genel İhtar Sayısı:</strong>   @Model.AppStudentSession.TotalWarningCount</li>
+                <li class="list-group-item"><strong>Genel Ortalama:</strong>  @(Model.AppStudentSession.TotalAverage < 0 ? "---": @String.Format("{0:0.00}", Model.AppStudentSession.TotalAverage))</li>
+
+
+                <li class="list-group-item" style="display: flex; justify-content: space-between;">
+                    <span><strong>Dönem Ders İhtar Sayısı:</strong> @Model.AppStudentSession.LessonWarningCount</span>
+                    <span><strong>Dönem Devamsızlık İhtar Sayısı:</strong>   @Model.AppStudentSession.AbsenteismWarningCount</span>
+                </li>
+                <li class="list-group-item" style="display: flex; justify-content: space-between;">
+                    <span><strong>Dönem Başarı İhtar Sayısı:</strong> @Model.AppStudentSession.SessionWarningCount</span>
+                    <span><strong>Genel Başarı İhtar Sayısı:</strong> @Model.AppStudentSession.TotalWarningCount</span>
+
+                </li>
 
 
             </ul>
@@ -188,7 +197,7 @@
         </div>
     
     </div>
-
+    <br />
     <a id="turnList" class="btn btn-outline-dark" asp-action="UserDetails" asp-controller="Branch" asp-route-userId="@Model.AppStudent.Id">Listeye Dön</a>
 
 </div>

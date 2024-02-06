@@ -18,5 +18,6 @@ namespace AKDEM.OBYS.Dto.AppSessionBranchDtos
         public AppBranchListDto AppBranch { get; set; }
         public int ScheduleId { get; set; }
         public AppScheduleListDto AppSchedule { get; set; }
+       
     }
 }

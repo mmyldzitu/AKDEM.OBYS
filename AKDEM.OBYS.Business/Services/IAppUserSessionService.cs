@@ -19,7 +19,7 @@ namespace AKDEM.OBYS.Business.Services
         Task TotalAverageByUserId(int userId,int sessionId);
         Task TotalAverageByUserIdGeneral(int userId);
         Task<int> UserSessionIdByUserIdAndSessionId(int userId, int sessionId);
-        
+        Task<bool> IfThereIsAnyUserSession(int userId, int sessionId);
         Task<int> GetSessionIdByUserSessionId(int userSessionId);
          Task<int> GetBranchIdByUserSessionId(int userSessionId);
         Task RemoveUserSessionBySessionId(int sessionId);
@@ -42,5 +42,6 @@ namespace AKDEM.OBYS.Business.Services
         Task<bool>GetUserSessionStatus(int userSessionId);
         Task<string> ReturnPassiveDateByUserId(int userId);
         Task<string> LastBranchNameByUserAndSessionId(int sessionId, int userId);
+        Task RemoveUserSessionsAndLessons(int sessionId, int userId);
     }
 }

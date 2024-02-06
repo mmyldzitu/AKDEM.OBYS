@@ -11,15 +11,15 @@
         <h1> @ViewBag.header</h1>
     </div>
     <div id="branchButtons" class="text-right">
-        <a asp-action="GetStudents" asp-controller="User" asp-route-classType="@((int)ClassType.Tamamı)">Tüm Öğrenciler</a>|
+        <a style="color:navy; text-decoration:underline;" asp-action="GetStudents" asp-controller="User" asp-route-classType="@((int)ClassType.Tamamı)">Tüm Öğrenciler</a>    |
 
-        <a asp-action="GetStudents" asp-controller="User" asp-route-classType="@((int)ClassType.Hazırlık)">Hazırlık</a>|
-        <a asp-action="GetStudents" asp-controller="User" asp-route-classType="@((int)ClassType.Bir)">Birinci Sınıf</a>|
-        <a asp-action="GetStudents" asp-controller="User" asp-route-classType="@((int)ClassType.iki)">İkinci Sınıf</a>|
-        <a asp-action="GetStudents" asp-controller="User" asp-route-classType="@((int)ClassType.Üç)">Üçüncü Sınıf</a>|
-        <a asp-action="GetStudents" asp-controller="User" asp-route-classType="@((int)ClassType.Dört)">Dördüncü Sınıf</a>|
-        <a asp-action="GetStudents" asp-controller="User" asp-route-classType="@((int)ClassType.Mezun)">Mezunlar</a>|
-        <a asp-action="GetStudents" asp-controller="User" asp-route-classType="@((int)ClassType.Pasif)">Pasif Öğrenciler</a>
+        <a style="color:navy; text-decoration:underline;" asp-action="GetStudents" asp-controller="User" asp-route-classType="@((int)ClassType.Hazırlık)">Hazırlık</a>    |
+        <a style="color:navy; text-decoration:underline;"asp-action="GetStudents" asp-controller="User" asp-route-classType="@((int)ClassType.Bir)">Birinci Sınıf</a>    |
+        <a style="color:navy; text-decoration:underline;"asp-action="GetStudents" asp-controller="User" asp-route-classType="@((int)ClassType.iki)">İkinci Sınıf</a>    |
+        <a style="color:navy; text-decoration:underline;"asp-action="GetStudents" asp-controller="User" asp-route-classType="@((int)ClassType.Üç)">Üçüncü Sınıf</a>    |
+        <a style="color:navy; text-decoration:underline;"asp-action="GetStudents" asp-controller="User" asp-route-classType="@((int)ClassType.Dört)">Dördüncü Sınıf</a>    |
+        <a style="color:navy; text-decoration:underline;"asp-action="GetStudents" asp-controller="User" asp-route-classType="@((int)ClassType.Mezun)">Mezunlar</a>    |
+        <a style="color:navy; text-decoration:underline;"asp-action="GetStudents" asp-controller="User" asp-route-classType="@((int)ClassType.Pasif)">Pasif Öğrenciler</a>    |
 
     </div>
 
@@ -83,7 +83,23 @@
                 <td>@count</td>
                 <td> <a asp-action="UserDetails" asp-controller="Branch" asp-route-userId="@item.Id"> <span style="font-weight: bold; color: darkblue; text-decoration: underline">@item.FirstName @item.SecondName</span> </a></td>
                 <td>@item.SıraNo</td>
-                <td>@(item.Status==true ? "Aktif":"Pasif")</td>
+                @{if (ViewBag.classType == ClassType.Mezun)
+                    {
+                        <td>Mezun</td>
+
+                    }
+                    else
+                    {
+                        <td>@(item.Status==true ? "Aktif":"Pasif")</td>
+
+                    }
+
+
+                }
+
+
+
+
                 <td>@item.Email</td>
                 <td>@item.PhoneNumber</td>
                 <td><img src="@item.ImagePath" height="150" width="150" /></td>

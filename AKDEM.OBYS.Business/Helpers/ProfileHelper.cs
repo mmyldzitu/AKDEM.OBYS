@@ -26,7 +26,8 @@ namespace AKDEM.OBYS.Business.Helpers
             new AppUserSessionLessonProfile(),
             new AppWarningProfile(),
             new AppSessionBranchProfile(),
-            new AppRoleProfile()
+            new AppRoleProfile(),
+            new AppGraduatedProfile(),
             
             };
 

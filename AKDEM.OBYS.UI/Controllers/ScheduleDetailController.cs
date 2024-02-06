@@ -7,10 +7,14 @@ using AKDEM.OBYS.Dto.AppUserSessionDtos;
 using AKDEM.OBYS.Dto.AppUserSessionLessonDtos;
 using AKDEM.OBYS.UI.Models;
 using AutoMapper;
+using FluentValidation;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using PuppeteerSharp;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -26,8 +30,11 @@ namespace AKDEM.OBYS.UI.Controllers
         private readonly IAppUserSessionLessonService _appUserSessionLessonService;
         private readonly IAppSessionService _appSessionService;
         private readonly IAppWarningService _appWarningService;
+        private readonly IWebHostEnvironment _webHostEnvironment;
 
-        public ScheduleDetailController(IAppLessonService appLessonService, IAppScheduleService appScheduleService, IAppScheduleDetailService appScheduleDetailService, IMapper mapper, IAppUserSessionService appUserSessionService, IAppUserSessionLessonService appUserSessionLessonService, IAppSessionService appSessionService, IAppWarningService appWarningService)
+        private readonly IValidator<AppScheduleDetailCreateModel> _appScheduleDetailCreateModelValidator;
+
+        public ScheduleDetailController(IAppLessonService appLessonService, IAppScheduleService appScheduleService, IAppScheduleDetailService appScheduleDetailService, IMapper mapper, IAppUserSessionService appUserSessionService, IAppUserSessionLessonService appUserSessionLessonService, IAppSessionService appSessionService, IAppWarningService appWarningService, IValidator<AppScheduleDetailCreateModel> appScheduleDetailCreateModelValidator, IWebHostEnvironment webHostEnvironment)
         {
             _appLessonService = appLessonService;
             _appScheduleService = appScheduleService;
@@ -37,13 +44,20 @@ namespace AKDEM.OBYS.UI.Controllers
             _appUserSessionLessonService = appUserSessionLessonService;
             _appSessionService = appSessionService;
             _appWarningService = appWarningService;
+            _appScheduleDetailCreateModelValidator = appScheduleDetailCreateModelValidator;
+            _webHostEnvironment = webHostEnvironment;
         }
         public async Task<IActionResult> Index(int id)
         {
-            ViewBag.name = await _appScheduleService.GetNameByScheduleId(id);
+            string name = await _appScheduleService.GetNameByScheduleId(id);
             ViewBag.scheduleId = id;
             ViewBag.sessionBranchId = await _appScheduleService.GetSessionBranchIdByAppScheduleId(id);
             int sessionId = await _appScheduleService.GetSessionIdByScheduleId(id);
+            string sessionName = await _appSessionService.ReturnSessionName(sessionId);
+            ViewBag.sessionName = sessionName;
+            ViewBag.sessionName2 = sessionName.Replace("/", "_");
+            ViewBag.name = name;
+            ViewBag.name2 = name.Replace("/", "_");
             ViewBag.sessionStatus2 = await _appSessionService.GetStatus2FromSessionId(sessionId);
             return View();
         }
@@ -51,11 +65,11 @@ namespace AKDEM.OBYS.UI.Controllers
             public async Task<IActionResult> CreateScheduleDetail(int sessionBranchId)
              {
             int sessionId = await _appScheduleService.GetSessionIdBySessionBranchId(sessionBranchId);
-
+            int branchId = await _appScheduleService.GetBranchIdBySessionBranchId(sessionBranchId);
             int scheduleId = await _appScheduleService.GetAppScheduleIdBySessionBranchIdAsync(sessionBranchId);
 
                 var list = new List<AppScheduleDetailLessonModel>();
-            var items = await _appLessonService.GetLessonsByTeacher();
+            var items = await _appLessonService.GetLessonsByTeacher(true);
             foreach (var item in items)
             {
                 list.Add(new AppScheduleDetailLessonModel
@@ -82,15 +96,17 @@ namespace AKDEM.OBYS.UI.Controllers
             ViewBag.scheduleId = scheduleId;
             ViewBag.sessionId = sessionId;
             //ViewBag.branchId = branchId;
-            return View(new AppScheduleDetailCreateModel());
+            return View(new AppScheduleDetailCreateModel {SessionId=sessionId, BranchId=branchId, ApScheduleId=scheduleId});
         }
         [HttpPost]
         public async Task<IActionResult> CreateScheduleDetail(AppScheduleDetailCreateModel model)
         {
+                    ViewBag.scheduleId = model.ApScheduleId;
+
             //int sessionId = await _appScheduleService.GetSessionIdByScheduleId(model.ApScheduleId);
             //------------------SELECTBOXLAR-----------------
             var list = new List<AppScheduleDetailLessonModel>();
-            var items = await _appLessonService.GetLessonsByTeacher();
+            var items = await _appLessonService.GetLessonsByTeacher(true);
             foreach (var item in items)
             {
                 list.Add(new AppScheduleDetailLessonModel
@@ -119,33 +135,45 @@ namespace AKDEM.OBYS.UI.Controllers
             //----------SELECTBOXLAR------------------
 
 
-
-
-
-            AppScheduleDetailCreateDto dto = new();
-            dto.ApScheduleId = model.ApScheduleId;
-            dto.Day = model.Day;
-            dto.Hours = $"{model.FirstHour}-{model.LastHour}";
-            dto.LessonId = model.LessonId;
-            var result = await _appScheduleDetailService.CreateAsync(dto);
-            
-            if (result.ResponseType == ResponseType.Success)
+            var modelResult = _appScheduleDetailCreateModelValidator.Validate(model);
+            if (modelResult.IsValid)
             {
-                ViewBag.scheduleId = model.ApScheduleId;
-                //ViewBag.sessionId = sessionId;
-                ViewBag.confirmMessage = 1;
-                ViewBag.alertMessage = "Ders Bilgisi Cizelgeye Basariyla Eklenmistir. Yeni Dersler Eklemeye Devam Edebilirsiniz";
-                return View(new AppScheduleDetailCreateModel());
-            }
-            else
-            {
-                foreach(var error in result.ValidationErrors)
+                AppScheduleDetailCreateDto dto = new();
+                dto.ApScheduleId = model.ApScheduleId;
+                dto.Day = model.Day;
+                dto.Hours = $"{model.FirstHour}-{model.LastHour}";
+                dto.LessonId = model.LessonId;
+                var result = await _appScheduleDetailService.CreateAsync(dto);
+
+                if (result.ResponseType == ResponseType.Success)
                 {
-                    ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
+                    
+                    //ViewBag.sessionId = sessionId;
+                    ViewBag.confirmMessage = 1;
+                    ViewBag.alertMessage = "Ders Bilgisi Cizelgeye Basariyla Eklenmistir. Yeni Dersler Eklemeye Devam Edebilirsiniz";
+                    return View(new AppScheduleDetailCreateModel());
                 }
-                return View(result.Data);
+                else
+                {
 
+                   
+
+                    foreach (var error in result.ValidationErrors)
+                    {
+                        ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
+                    }
+                    return View(result.Data);
+
+                }
             }
+            
+            foreach (var error in modelResult.Errors)
+            {
+                ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
+            }
+            return View(model);
+
+         
         }
 
         [HttpGet]
@@ -196,6 +224,58 @@ namespace AKDEM.OBYS.UI.Controllers
 
             var hoursForScheduleDistinct = hoursForSchedule.Distinct().ToList();
             AppScheduleDetailsForJsonModel model = new(){ ScheduleHours = hoursForScheduleDistinct, AppScheduleDetails = models };
+
+            return Json(model);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetScheduleDetailandHours2(int scheduleId, int userId)
+        {
+            var hourList = await _appScheduleDetailService.GetHoursByScheduleIdAsync(scheduleId);
+            var scheduleDetailList = await _appScheduleDetailService.GetScheduleDetailsByScheduleIdForTeacher(scheduleId, userId);
+            var branchName = await _appScheduleService.GetBranchNameByScheduleId(scheduleId);
+            List<Models.AppScheduleDetailsTeacherModel> models = new();
+            foreach (var item in scheduleDetailList)
+            {
+                Models.AppScheduleDetailsTeacherModel schedulemodel = new Models.AppScheduleDetailsTeacherModel
+                {
+                    AppLesson = item.AppLesson,
+                    AppSchedule = item.AppSchedule,
+                    Day = item.Day,
+                    ıd = item.Id,
+                    Hours = item.Hours,
+                    LessonId = item.LessonId,
+                    BranchDefinition = branchName,
+                };
+                models.Add(schedulemodel);
+            }
+            static List<string> GetHoursOrdered(List<string> hourList)
+            {
+
+                List<Tuple<DateTime, DateTime>> hoursTupList = new();
+                foreach (var item in hourList)
+                {
+                    string[] hourParts = item.Split("-");
+                    DateTime firstTime = DateTime.ParseExact(hourParts[0].Trim(), "HH:mm", null);
+                    DateTime lastTime = DateTime.ParseExact(hourParts[1].Trim(), "HH:mm", null);
+                    hoursTupList.Add(new Tuple<DateTime, DateTime>(firstTime, lastTime));
+                }
+                hoursTupList.Sort((x, y) => x.Item1.CompareTo(y.Item1));
+                List<string> hoursOrdered = new();
+                foreach (var tup in hoursTupList)
+                {
+                    string orderedHourPart = $"{tup.Item1:HH:mm}-{tup.Item2:HH:mm}";
+                    hoursOrdered.Add(orderedHourPart);
+                }
+                return hoursOrdered;
+
+
+
+            }
+            List<string> hoursForSchedule = GetHoursOrdered(hourList);
+
+            var hoursForScheduleDistinct = hoursForSchedule.Distinct().ToList();
+            AppScheduleDetailsForJsonModel model = new() { ScheduleHours = hoursForScheduleDistinct, AppScheduleDetails = models };
 
             return Json(model);
         }
@@ -260,7 +340,82 @@ namespace AKDEM.OBYS.UI.Controllers
             return RedirectToAction("CreateSchedule", "Schedule", new { id = sessionId });
         }
 
+        public async Task<IActionResult> GenerateAndDownloadPdf(string myFileName, int scheduleId)
+        {
+            // PDF oluştur
+            await GeneratePdfAsync(myFileName, scheduleId);
 
+            // PDF dosyasının geçici konumunu belirtin
+            var pdfPath = $"wwwroot/pdf/{myFileName}.pdf";
+
+            // PDF dosyasının varlığını kontrol et
+            if (System.IO.File.Exists(pdfPath))
+            {
+                // PDF dosyasını kullanıcıya indirme
+                var fileBytes = System.IO.File.ReadAllBytes(pdfPath);
+                var fileName = $"{myFileName}.pdf";
+
+                // PDF dosyasını indir
+                return File(fileBytes, "application/pdf", fileName);
+            }
+            else
+            {
+                // Hata durumunu ele alabilirsiniz
+                return NotFound("PDF dosyası bulunamadı.");
+            }
+        }
+
+        private async Task GeneratePdfAsync(string myFileName, int scheduleId)
+        {
+            await new BrowserFetcher().DownloadAsync();
+            using (var browser = await Puppeteer.LaunchAsync(new LaunchOptions { Headless = true }))
+            {
+                using (var page = await browser.NewPageAsync())
+                {
+                    // Razor sayfasının URL'sini belirtin
+                    var razorPageUrl = Url.Action("Index", "ScheduleDetail", new { id = scheduleId }, Request.Scheme);
+                    await page.GoToAsync(razorPageUrl);
+                    await page.EvaluateFunctionAsync(@"() => {
+                                // PDF Oluştur butonunu gizle
+                                const pdfButton = document.getElementById('pdfButton');
+                                if (pdfButton) {
+                                    pdfButton.style.display = 'none';
+                                }
+const buttons = document.getElementById('buttondiv');
+                                if (buttons) {
+                                    buttons.style.display = 'none';
+                                }
+                                
+
+                                // Seçilecek kolon başlıkları
+                                const selectedColumns = ['Saat', 'Pazartesi','Salı','Çarşamba','Perşembe', 'Cuma', 'Cumartesi', 'Pazar'];
+
+                                // Diğer elementleri gizle (isteğe bağlı)
+                                document.querySelectorAll('th, td').forEach(element => {
+                                    const columnIndex = element.cellIndex;
+                                    const columnHeader = document.querySelector('th:nth-child(' + (columnIndex + 1) + ')');
+
+                                    if (columnHeader && !selectedColumns.includes(columnHeader.innerText.trim())) {
+                                        element.style.display = 'none';
+                                    }
+                                });
+                            }");
+
+
+                    // Razor sayfasının HTML içeriğini alın
+                    var htmlContent = await page.GetContentAsync();
+
+                    // HTML içeriğini PDF'ye çevir
+                    var pdfBuffer = await page.PdfDataAsync();
+                    var wwwrootPath = _webHostEnvironment.WebRootPath;
+                    var pdfPath = Path.Combine(wwwrootPath, "pdf", $"{myFileName}.pdf");
+
+                    // PDF'yi kaydedin
+                    System.IO.File.WriteAllBytes(pdfPath, pdfBuffer);
+
+                }
+            }
+        }
 
 
 

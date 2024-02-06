@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace AKDEM.OBYS.Dto.AppUserSessionDtos
 {
-    public class AppUserSessionCreateDto : IDto
+    public class AppUserSessionCreateDto :IDto
     {
         public double Average { get; set; } = -1;
         public int SessionWarningCount { get; set; } = 0;

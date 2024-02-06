@@ -45,6 +45,14 @@
                 <td></td>
             </tr>
             <tr>
+                <td bgcolor="Cadetblue"><a asp-action="SessionCriterias" asp-controller="Student" asp-route-sessionId="@ViewBag.sessionId">DÖNEM YÖNETMELİĞİ</a></td>
+                <td>  <strong>@ViewBag.sessionName</strong> DÖNEMİNE AİT YÖNETMELİK </td>
+            </tr>
+            <tr>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
                 <td bgcolor="Cadetblue"><a asp-action="StudentDetailsStudent" asp-controller="Student" asp-route-sessionId="@ViewBag.sessionId" asp-route-userId="@ViewBag.userId">DÖNEM ÖZETİM</a></td>
                 <td>  <strong>@ViewBag.sessionName</strong> DÖNEMİNE AİT GEÇMİŞ DÖNEM ÖZETİNİZ </td>
             </tr>

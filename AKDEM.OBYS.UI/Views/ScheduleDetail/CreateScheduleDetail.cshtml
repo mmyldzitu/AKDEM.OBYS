@@ -14,9 +14,6 @@
             text-align: left;
             padding: 8px;
         }
-        
-       
-
     </style>
 
 }
@@ -33,9 +30,9 @@
 <br />
 <div class="container-fluid">
     <form asp-action="CreateScheduleDetail" asp-controller="ScheduleDetail" method="post" enctype="multipart/form-data">
-        @*<input type="hidden" asp-for="SessionId" value="@ViewBag.sessionId" />
-            <input type="hidden" asp-for="BranchId" value="@ViewBag.branchId" />*@
-        <input type="hidden" asp-for="ApScheduleId" value="@ViewBag.scheduleId" />
+        <input type="hidden" asp-for="SessionId" />
+        <input type="hidden" asp-for="BranchId" />
+        <input type="hidden" asp-for="ApScheduleId" />
 
         <div class="row">
             <div class="col-md-3">
@@ -65,13 +62,14 @@
         <div class="mb-3 text-bg-danger" asp-validation-summary="All">
 
         </div>
+        <br />
     </form>
 </div>
 
 
 
 
-<table id="dersProgramiTable" >
+<table id="dersProgramiTable">
     <thead>
         <tr>
             <th>Saat</th>
@@ -84,22 +82,54 @@
 <br />
 <table style="max-width:500px" id="dersProgramiOnizle" class="table-borderless  ">
     <tbody>
-
-    </tbody >
+    </tbody>
 </table>
 <div class="text-right">
     <a class="btn btn-outline-info" asp-action="SaveChanges" asp-controller="ScheduleDetail" asp-route-scheduleId="@ViewBag.scheduleId">KAYDET</a>
 
-   </div>
+</div>
 
 
 @section script{
 
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 
+
+
+    
     <script>
 
+        @*$(document).ready(function () {
+            setUpPage();
+            console.log("Selam");
+        });
+            function setUpPage() {
 
+                var gunler = ["Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma","Cumartesi","Pazar"];
+
+        var baslikSatiri = $("<tr>").append("<th>Saat</th>");
+        gunler.forEach(function (gun) {
+            baslikSatiri.append("<th>" + gun + "</th>");
+        });
+        $("#dersProgramiTable thead tr").remove();
+        $("#dersProgramiTable thead").append(baslikSatiri);
+
+
+
+
+
+        $.get('/ScheduleDetail/GetScheduleDetailandHours', { scheduleId: @ViewBag.scheduleId }, function (data) {
+                // Şube ayrıntılarını güncelle
+
+                updateTable(data);
+        });
+        $.get('/ScheduleDetail/GetScheduleDetailandHours', { scheduleId: @ViewBag.scheduleId }, function (data) {
+                // Şube ayrıntılarını güncelle
+
+                updateTable2(data);
+        });
+
+            }*@
         var gunler = ["Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma","Cumartesi","Pazar"];
 
         var baslikSatiri = $("<tr>").append("<th>Saat</th>");
@@ -136,18 +166,18 @@
             // Saat aralıkları üzerinde döngü
             $.each(data.scheduleHours, function (index, saat) {
                 var satir = $("<tr>").append("<td>" + saat + "</td>");
-                
+
 
                 // Günler üzerinde döngü
                 gunler.forEach(function (gun) {
                     // İlgili gün ve saatteki dersi bul
                     var ders = data.appScheduleDetails.find(x => x.day == gun && x.hours == saat);
-                    
+
                     // Ders bilgisini al
-                    
+
                     var dersBilgisi = ders ? ders.appLesson.definition : "";
                     var saatBilgisi = ders ? `(\n${saat})`: "";
-                    
+
 
 
                     satir.append("<td>" + dersBilgisi +   saatBilgisi  + "</td>");
@@ -169,13 +199,13 @@
         }
         let derslerSet = new Set();
         let dtoSet = new Set();
-        
+
         function updateTable2(data) {
 
 
-            
+
             $.each(data.appScheduleDetails, function (index, dto) {
-                
+
                 dtoSet.add(dto);
 
             });
@@ -190,28 +220,30 @@
             });
             var uniqueDerslerArray = Array.from(derslerSet);
             var dtoarray = Array.from(dtoSet);
-            
-            
+
+
             uniqueDerslerArray.forEach(function (ders,index) {
                 var satir = $("<tr>").append("<td>" + "-->" + "</td>").addClass(" font-weight-bold")
                 var dersSatir = $("<td>").text(ders).addClass(" font-weight-bolder")
                 var lesson = dtoarray.find(x => x.appLesson.definition == ders);
-                
+
                 var id = lesson.ıd;
-                
-                
+
+
                 satir.append(dersSatir);
                 var link1 = $('<a>').text("X")
                     .attr('href', '/ScheduleDetail/RemoveScheduleDetail?id='+id)
                     .addClass("btn btn-outline-danger text-danger font-weight-bold");
-                    
+
                 satir.append(link1);
-                
+
                 $("#dersProgramiOnizle tbody").append(satir);
             });
         }
-        
+
     </script>
+    
 
 
-    }
+
+}

@@ -27,6 +27,16 @@ namespace AKDEM.OBYS.Business.Managers
             _uow = uow;
             _mapper = mapper;
         }
+        public async Task<bool> IfBranchAlreadyExists(string definition)
+        {
+            var query = _uow.GetRepositry<AppBranch>().GetQuery();
+            var entity = await query.Where(x => x.Definition == definition && x.Status == true).SingleOrDefaultAsync();
+            if (entity != null)
+            {
+                return false;
+            }
+            return true;
+        }
         public async Task<List<AppBranchListDto>> GetList()
         {
             var query = _uow.GetRepositry<AppBranch>().GetQuery();
@@ -48,13 +58,27 @@ namespace AKDEM.OBYS.Business.Managers
             }
             await _uow.SaveChangesAsync();
         }
+        public async Task RemoveEmptyBranches()
+        {
+            var query = _uow.GetRepositry<AppBranch>().GetQuery();
+            var list = await query.Where(x => x.Status == true && !x.Definition.Contains("Mezun") && x.AppUserSessions.All(x => x.AppUser.Status == false)).ToListAsync();
+            if (list.Count != 0)
+            {
+                foreach ( var branch in list)
+                {
+                    branch.Status =false;
+                }
+            }
+             await _uow.SaveChangesAsync();
+        }
         public async Task<List<AppBranchListDto>> GetBranchListWithSessionId(int sessionId)
         {
             var query = _uow.GetRepositry<AppBranch>().GetQuery();
-            var list = await query.Include(x => x.AppClass).Where(x => x.AppUserSessions.Any(x=>x.SessionId==sessionId)).ToListAsync();
+            var list = await query.Include(x => x.AppClass).Where(x => x.AppUserSessions.Any(x => x.SessionId == sessionId)).ToListAsync();
             if (list.Count != 0)
             {
-                return _mapper.Map<List<AppBranchListDto>>(list);
+                var descList = list.OrderByDescending(x => (int)Enum.Parse(typeof(ClassType), x.AppClass.Definition));
+                return _mapper.Map<List<AppBranchListDto>>(descList);
 
             }
             return new List<AppBranchListDto>();
@@ -62,7 +86,7 @@ namespace AKDEM.OBYS.Business.Managers
         public async Task<List<AppBranchListDto>> GetListWithClassId(int classId)
         {
             var query = _uow.GetRepositry<AppBranch>().GetQuery();
-            var list = await query.Include(x => x.AppClass).Where(x=>x.ClassId==classId).ToListAsync();
+            var list = await query.Include(x => x.AppClass).Where(x=>x.ClassId==classId && x.Status==true).ToListAsync();
             if (list.Count != 0)
             {
                 return _mapper.Map<List<AppBranchListDto>>(list);
@@ -138,6 +162,16 @@ namespace AKDEM.OBYS.Business.Managers
                 return mappedList;
             }
             return new AppClassListDto();
+        }
+        public async Task<int> ReturnClassTypeOfUser(int userId)
+        {
+            var query = _uow.GetRepositry<AppUser>().GetQuery();
+            var user = await query.Include(x => x.AppClass).Where(x => x.Id == userId).SingleOrDefaultAsync();
+            if (user != null)
+            {
+                return (int)user.ClassId;
+            }
+            return 0;
         }
         public async Task<AppBranchListDto> FindBranchByNameAndStatus(string name)
         {

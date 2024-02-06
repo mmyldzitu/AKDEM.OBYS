@@ -87,7 +87,20 @@ namespace AKDEM.OBYS.Business.Managers
             
             else return 0;
         }
+        public async Task RemoveUserSessionLessonsByUserSessionId(int userSessionId)
+        {
+            var query = _uow.GetRepositry<AppUserSessionLesson>().GetQuery();
+            var entities = await query.Where(x => x.AppUserSession.Id == userSessionId).ToListAsync();
+            if (entities.Count != 0)
+            {
+                foreach(var entity in entities)
+                {
+                    _uow.GetRepositry<AppUserSessionLesson>().Remove(entity);
 
+                }
+            }
+            await _uow.SaveChangesAsync();
+        }
         public async Task CreateUserSessionLessonAsyncByUserSessions(List<AppUserSessionLessonCreateDto> dtos)
         {
            foreach ( var dto in dtos)

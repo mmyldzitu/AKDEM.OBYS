@@ -19,12 +19,14 @@ namespace AKDEM.OBYS.Business.Managers
         private readonly IMapper _mapper;
         private readonly IAppUserSessionService _appUserSessionService;
         private readonly IAppStudentService _appStudentService;
-        public AppWarningManager(IMapper mapper, IValidator<AppWarningCreateDto> createDtoValidator, IValidator<AppWarningUpdateDto> updateDtoValidator, IUow uow, IAppUserSessionService appUserSessionService, IAppStudentService appStudentService) : base(mapper, createDtoValidator, updateDtoValidator, uow)
+        private readonly IAppSessionService _appSessionService;
+        public AppWarningManager(IMapper mapper, IValidator<AppWarningCreateDto> createDtoValidator, IValidator<AppWarningUpdateDto> updateDtoValidator, IUow uow, IAppUserSessionService appUserSessionService, IAppStudentService appStudentService, IAppSessionService appSessionService) : base(mapper, createDtoValidator, updateDtoValidator, uow)
         {
             _uow = uow;
             _mapper = mapper;
             _appUserSessionService = appUserSessionService;
             _appStudentService = appStudentService;
+            _appSessionService = appSessionService;
         }
         public async Task RemoveWarningByUserId(int userId)
         {
@@ -63,9 +65,11 @@ namespace AKDEM.OBYS.Business.Managers
                 }
                 for (int i = 0; i < userSessionIds.Count; i++)
                 {
-                    double swc = await SessionWarningCountByUserSessionId(userSessionIds[i]);
+                    double slwc = await SessionLessonWarningCountByUserSessionId(userSessionIds[i]);
+                    double awc = await AbsenteismWarningCountByUserSessionId(userSessionIds[i]);
+                    double swc = await SessionWarningCountByUserSessionId(userSessionIds[i],slwc);
                     double twc = await TotalWarningCountByUserId(userIds[i],sessionId);
-                    await ChangeStudentStatusBecasuseOfWarning(userIds[i], swc, twc, userSessionIds[i]);
+                    await ChangeStudentStatusBecasuseOfWarning(userIds[i], swc, awc, twc, userSessionIds[i]);
                 }
                 await _uow.SaveChangesAsync();
             }
@@ -82,9 +86,12 @@ namespace AKDEM.OBYS.Business.Managers
                 }
 
                 await _uow.SaveChangesAsync();
-                double swc = await SessionWarningCountByUserSessionId(userSessionId);
-                double twc = await TotalWarningCountByUserId(userId,sessionId);
-                await ChangeStudentStatusBecasuseOfWarning(userId, swc, twc, userSessionId);
+                double awc = await AbsenteismWarningCountByUserSessionId(userSessionId);
+
+                double slwc = await SessionLessonWarningCountByUserSessionId(userSessionId);
+                double swc = await SessionWarningCountByUserSessionId(userSessionId, slwc);
+                double twc = await TotalWarningCountByUserId(userId, sessionId);
+                await ChangeStudentStatusBecasuseOfWarning(userId, swc, awc, twc, userSessionId);
 
 
             }
@@ -102,16 +109,130 @@ namespace AKDEM.OBYS.Business.Managers
                 var mappedEntity = _mapper.Map<AppWarning>(dto);
                 await _uow.GetRepositry<AppWarning>().CreateAsync(mappedEntity);
                 await _uow.SaveChangesAsync();
-                double swc = await SessionWarningCountByUserSessionId(userSessionId);
+                double awc = await AbsenteismWarningCountByUserSessionId(userSessionId);
+
+                double slwc = await SessionLessonWarningCountByUserSessionId(userSessionId);
+                double swc = await SessionWarningCountByUserSessionId(userSessionId,slwc);
                 double twc = await TotalWarningCountByUserId(userId,sessionId);
-                await ChangeStudentStatusBecasuseOfWarning(userId, swc, twc, userSessionId);
+                await ChangeStudentStatusBecasuseOfWarning(userId, swc,awc, twc, userSessionId);
             }
 
             
         }
+
+        public async Task CreateAbsenteismWarningByDtoandString(AppWarningCreateDto dto, string name, int userId, int userSessionId)
+        {
+            int sessionId = await _appUserSessionService.GetSessionIdByUserSessionId(userSessionId);
+
+
+
+            var control = await ControlIfAbsenteismWarningAlreadyExists(name, userSessionId);
+
+            if (!control)
+            {
+                var mappedEntity = _mapper.Map<AppWarning>(dto);
+                await _uow.GetRepositry<AppWarning>().CreateAsync(mappedEntity);
+                await _uow.SaveChangesAsync();
+                double slwc = await SessionLessonWarningCountByUserSessionId(userSessionId);
+
+                double awc = await AbsenteismWarningCountByUserSessionId(userSessionId);
+                double swc = await SessionWarningCountByUserSessionId(userSessionId, slwc);
+                double twc = await TotalWarningCountByUserId(userId, sessionId);
+                await ChangeStudentStatusBecasuseOfWarning(userId, swc, awc, twc, userSessionId);
+            }
+
+
+        }
+        public async Task<bool> ControlIfAbsenteismWarningAlreadyExists(string name, int userSessionId)
+        {
+            
+
+            var query = _uow.GetRepositry<AppWarning>().GetQuery();
+            var control = await query.Where(x => x.UserSessionId == userSessionId && x.WarningReason.Contains("DEVAMSIZLIK İHTARI")).ToListAsync();
+            
+                if (control.Count == 0)
+                {
+                    return false;
+                }
+                else
+                {
+                
+                foreach(var entity in control)
+                {
+                    if (entity.WarningReason.Contains(name))
+                    {
+                        return true;
+
+                    }
+                    
+                }
+                return false;
+                
+                  }
+
+           
+
+        }
+       
+        public async Task<double> AbsenteismWarningCountByUserSessionId(int userSessionId)
+        {
+            var entities = await _uow.GetRepositry<AppWarning>().GetAllAsync(x => x.UserSessionId == userSessionId);
+            double absenteismWarningCount = 0;
+            if (entities.Count != 0)
+            {
+                foreach (var entity in entities)
+                {
+                    if (entity.WarningReason.Contains("DEVAMSIZLIK İHTARI"))
+                    {
+                        absenteismWarningCount += entity.WarningCount;
+                    }
+                }
+                return absenteismWarningCount;
+            }
+            return 0;
+        }
+        public async Task RemoveAbsenteismWarningByString(string lessonName, int userId, int userSessionId)
+        {
+            int sessionId = await _appUserSessionService.GetSessionIdByUserSessionId(userSessionId);
+            var query = _uow.GetRepositry<AppWarning>().GetQuery();
+            var entities = await query.Where(x => x.UserSessionId == userSessionId && x.WarningReason.Contains("DEVAMSIZLIK İHTARI")).ToListAsync();
+            //var entities = await _uow.GetRepositry<AppWarning>().GetAllAsync(x => x.UserSessionId == userSessionId && x.WarningReason.Contains(lessonName));
+            if (entities.Count != 0)
+            {
+                foreach (var entity in entities)
+                {
+                    if (entity.WarningReason.Contains(lessonName))
+                    {
+                        _uow.GetRepositry<AppWarning>().Remove(entity);
+
+                    }
+
+                }
+
+                await _uow.SaveChangesAsync();
+                double slwc = await SessionLessonWarningCountByUserSessionId(userSessionId);
+
+                double awc = await AbsenteismWarningCountByUserSessionId(userSessionId);
+                double swc = await SessionWarningCountByUserSessionId(userSessionId, slwc);
+                double twc = await TotalWarningCountByUserId(userId, sessionId);
+                await ChangeStudentStatusBecasuseOfWarning(userId, swc, awc, twc, userSessionId);
+            }
+        }
+        public async Task<double> ReturnAwc(int userSessionId)
+        {
+            var query = _uow.GetRepositry<AppUserSession>().GetQuery();
+            var entity = await query.Where(x => x.Id == userSessionId).SingleOrDefaultAsync();
+            if (entity != null)
+            {
+                return entity.SessionAbsentWarningCount;
+
+            }
+            return 0;
+        }
+
         public async Task<bool> ControlIfLessonWarningAlreadyExists(string name,int userSessionId)
         {
-            if(name.Contains("dönem ortalaması"))
+            if(name.Contains("DÖNEM BAŞARISIZLIĞI İHTARI"))
             {
 
                 var control2 = await _uow.GetRepositry<AppWarning>().FindByFilterAsync(x => x.UserSessionId == userSessionId && x.WarningReason.Contains(name));
@@ -128,7 +249,7 @@ namespace AKDEM.OBYS.Business.Managers
             else
             {
 
-                var control = await _uow.GetRepositry<AppWarning>().GetAllAsync(x => x.UserSessionId == userSessionId);
+                var control = await _uow.GetRepositry<AppWarning>().GetAllAsync(x => x.UserSessionId == userSessionId && x.WarningReason.Contains("DERS BAŞARI İHTARI"));
                 if (control.Count != 0)
                 {
                     int sayac = 0;
@@ -165,48 +286,110 @@ namespace AKDEM.OBYS.Business.Managers
         public async Task RemoveWarningByString(string lessonName,int userId,int userSessionId)
         {
             int sessionId = await _appUserSessionService.GetSessionIdByUserSessionId(userSessionId);
-            var entities = await _uow.GetRepositry<AppWarning>().GetAllAsync(x => x.UserSessionId == userSessionId && x.WarningReason.Contains(lessonName));
+            var query = _uow.GetRepositry<AppWarning>().GetQuery();
+            var entities = await query.Where(x => x.UserSessionId == userSessionId && x.WarningReason.Contains(lessonName)).ToListAsync();
+            //var entities = await _uow.GetRepositry<AppWarning>().GetAllAsync(x => x.UserSessionId == userSessionId && x.WarningReason.Contains(lessonName));
             if (entities.Count != 0)
             {
                 foreach( var entity in entities)
+                {
+                    
+                    _uow.GetRepositry<AppWarning>().Remove(entity);
+                }
+
+                await _uow.SaveChangesAsync();
+                double slwc = await SessionLessonWarningCountByUserSessionId(userSessionId);
+                double awc = await AbsenteismWarningCountByUserSessionId(userSessionId);
+                double swc = await SessionWarningCountByUserSessionId(userSessionId,slwc);
+                double twc = await TotalWarningCountByUserId(userId,sessionId);
+                await ChangeStudentStatusBecasuseOfWarning(userId, swc,awc, twc, userSessionId);
+            }
+        }
+
+        public async Task RemoveLessonWarnings(string mystring, int userId, int userSessionId)
+        {
+            int sessionId = await _appUserSessionService.GetSessionIdByUserSessionId(userSessionId);
+            var entities = await _uow.GetRepositry<AppWarning>().GetAllAsync(x => x.UserSessionId == userSessionId && x.WarningReason.Contains(mystring));
+            if (entities.Count != 0)
+            {
+                foreach (var entity in entities)
                 {
                     _uow.GetRepositry<AppWarning>().Remove(entity);
                 }
 
                 await _uow.SaveChangesAsync();
-                double swc = await SessionWarningCountByUserSessionId(userSessionId);
-                double twc = await TotalWarningCountByUserId(userId,sessionId);
-                await ChangeStudentStatusBecasuseOfWarning(userId, swc, twc, userSessionId);
+                double slwc = await SessionLessonWarningCountByUserSessionId(userSessionId);
+                double awc = await AbsenteismWarningCountByUserSessionId(userSessionId);
+                double swc = await SessionWarningCountByUserSessionId(userSessionId, slwc);
+                double twc = await TotalWarningCountByUserId(userId, sessionId);
+                await ChangeStudentStatusBecasuseOfWarning(userId, swc,awc, twc, userSessionId);
             }
         }
+
+
+
         public async Task<int> FindWarningCountByString(string lessonName, int userSessionId)
         {
             var entities = await _uow.GetRepositry<AppWarning>().GetAllAsync(x => x.UserSessionId == userSessionId && x.WarningReason.Contains(lessonName));
             return entities.Count();
         }
-        public async Task<double> SessionWarningCountByUserSessionId(int userSessionId)
+        public async Task<double> SessionWarningCountByUserSessionId(int userSessionId, double slwc)
         {
+
             var entities = await _uow.GetRepositry<AppWarning>().GetAllAsync(x => x.UserSessionId==userSessionId);
+            
+            
+
             double sessionWarningCount = 0;
             if (entities.Count !=0)
             {
                 foreach(var entity in entities)
                 {
-                    sessionWarningCount = sessionWarningCount + entity.WarningCount;
+                    if( entity.WarningReason.Contains("DÖNEM BAŞARISIZLIĞI İHTARI"))
+                    {
+                        sessionWarningCount += entity.WarningCount;
+                    }
+                   
                 }
+               
                 return sessionWarningCount;
+            }
+            return 0;
+        }
+        public async Task<double> SessionLessonWarningCountByUserSessionId(int userSessionId)
+        {
+            var query = _uow.GetRepositry<AppWarning>().GetQuery();
+            var entities = await query.Where(x => x.UserSessionId == userSessionId).ToListAsync();
+            
+            double sessionLessonWarningCount = 0;
+            if (entities.Count != 0)
+            {
+                foreach (var entity in entities)
+                {
+                    if (entity.WarningReason.Contains("DERS BAŞARI İHTARI"))
+                    {
+                        sessionLessonWarningCount += entity.WarningCount;
+                    }
+                }
+                return sessionLessonWarningCount;
             }
             return 0;
         }
         public async Task<double> TotalWarningCountByUserId(int userId,int sessionId)
         {
-            var entities = await _uow.GetRepositry<AppWarning>().GetAllAsync(x => x.AppUserSession.UserId == userId && x.AppUserSession.SessionId<=sessionId);
             double totalWarningCount = 0;
+            var query = _uow.GetRepositry<AppWarning>().GetQuery();
+            var entities = await query.Where(x => x.AppUserSession.UserId == userId && x.AppUserSession.SessionId <= sessionId).ToListAsync();
+            
             if (entities.Count != 0)
             {
-                foreach (var entity in entities)
+                
+                foreach( var entity in entities)
                 {
-                    totalWarningCount = totalWarningCount + entity.WarningCount;
+                    if(entity.WarningReason.Contains("DÖNEM BAŞARISIZLIĞI İHTARI"))
+                    {
+                        totalWarningCount += entity.WarningCount;
+                    }
                 }
                 return totalWarningCount;
             }
@@ -214,17 +397,25 @@ namespace AKDEM.OBYS.Business.Managers
         }
         public async Task<double> TotalWarningCountByUserIdGeneral(int userId)
         {
-            var entities = await _uow.GetRepositry<AppWarning>().GetAllAsync(x => x.AppUserSession.UserId == userId );
             double totalWarningCount = 0;
+            var query = _uow.GetRepositry<AppWarning>().GetQuery();
+            var entities = await query.Where(x => x.AppUserSession.UserId == userId ).ToListAsync();
+
             if (entities.Count != 0)
             {
+
                 foreach (var entity in entities)
                 {
-                    totalWarningCount = totalWarningCount + entity.WarningCount;
+                    if (entity.WarningReason.Contains("DÖNEM BAŞARISIZLIĞI İHTARI"))
+                    {
+                        totalWarningCount += entity.WarningCount;
+                    }
                 }
                 return totalWarningCount;
             }
             return 0;
+
+
         }
         public async Task<List<AppWarningListDto>> AppWarningByUserSessionId(int userSessionId)
         {
@@ -270,14 +461,19 @@ namespace AKDEM.OBYS.Business.Managers
             var entity = await _uow.GetRepositry<AppWarning>().FindAsync(id);
             _uow.GetRepositry<AppWarning>().Remove(entity);
             await _uow.SaveChangesAsync();
-            double swc = await SessionWarningCountByUserSessionId(userSessionId);
+            double slwc = await SessionLessonWarningCountByUserSessionId(userSessionId);
+            double awc = await AbsenteismWarningCountByUserSessionId(userSessionId);
+            double swc = await SessionWarningCountByUserSessionId(userSessionId,slwc);
             double twc = await TotalWarningCountByUserId(userId,sessionId);
-            await ChangeStudentStatusBecasuseOfWarning(userId, swc, twc, userSessionId);
+            await ChangeStudentStatusBecasuseOfWarning(userId, swc,awc, twc, userSessionId);
 
         }
         
-        public async Task ChangeStudentStatusBecasuseOfWarning(int userId, double sessionWarningCount, double totalWarningCount, int userSessionId)
+        public async Task ChangeStudentStatusBecasuseOfWarning(int userId, double sessionWarningCount, double absenteismWarningCount, double totalWarningCount, int userSessionId)
         {
+            int sessionId = await _appUserSessionService.GetSessionIdByUserSessionId(userSessionId);
+            int exSessionId = await _appSessionService.PreviousSessionOfUser(userSessionId, sessionId);
+            double exSwc = await ReturnSwc(exSessionId);
             var query = _uow.GetRepositry<AppUser>().GetQuery();
             var query2 = _uow.GetRepositry<AppUserSession>().GetQuery();
             var entity = await query.Where(x => x.Id == userId).SingleOrDefaultAsync();
@@ -286,27 +482,63 @@ namespace AKDEM.OBYS.Business.Managers
             {
                 entity.TotalWarningCount = totalWarningCount;
                 entity2.SessionWarningCount = sessionWarningCount;
-
-                if (entity2.SessionWarningCount >= 2 )
-                {
-                    entity2.Status = false;
-                    entity.Status = false;
-                    
-
-                }
-                if (entity2.SessionWarningCount >= 2 || entity.TotalWarningCount >= 3)
+                entity2.SessionAbsentWarningCount = absenteismWarningCount;
+                
+                if ( entity.TotalWarningCount >= 3)
                 {
                     
                     entity.Status = false;
                     entity2.Status = false;
+                    entity.DepartReason = "Toplam Başarıszlık İhtarı Sayısı 3'e Ulaştığı İçin Öğrenci Pasif Duruma Düşmüştür";
+                    await _appSessionService.RemoveUserSessionsBecauseOfBeingPassive(sessionId, userId);
+
 
                 }
+
                 else
                 {
-                    entity2.Status = true;
-                    entity.Status = true;
-                    await _appStudentService.CreateStudentOrChangeStatusProcessForUserSessionandUSerSessionLessons(userId);
+                    if (entity2.SessionWarningCount > 0 && exSwc > 0)
+                    {
+
+                        entity2.Status = false;
+                        entity.Status = false;
+                        entity.DepartReason = "Üst Üste İki Dönem Başarısızlık İhtarı Alınması Nedeniyle Öğrenci Pasif Duruma Düşmüştür";
+                        await _appSessionService.RemoveUserSessionsBecauseOfBeingPassive(sessionId, userId);
+
+                    }
+                    else
+                    {
+                        if (entity2.SessionAbsentWarningCount >= 2)
+                        {
+
+                            entity2.Status = false;
+                            entity.Status = false;
+                            entity.DepartReason = "Aynı Dönem İçerisinde İki veya Daha Fazla Devamsızlık İhtarı Alınması Nedeniyle Öğrenci Pasif Duruma Düşmüştür";
+                            await _appSessionService.RemoveUserSessionsBecauseOfBeingPassive(sessionId, userId);
+
+
+                        }
+                        else
+                        {
+                            entity2.Status = true;
+                            entity.Status = true;
+                            entity.DepartReason = "";
+                            await _appStudentService.CreateStudentOrChangeStatusProcessForUserSessionandUSerSessionLessons(userId);
+                        }
+
+                    }
+
+
+                    
+                    
+                    
+                        
+                    
+
                 }
+
+                
+               
                     
 
                 

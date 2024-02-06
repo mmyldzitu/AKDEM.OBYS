@@ -13,5 +13,9 @@ namespace AKDEM.OBYS.Dto.AppSessionDtos
         public string Definition { get; set; }
         public bool Status { get; set; }
         public bool Status2 { get; set; }
+        public string Sessionpresident { get; set; }
+        public double MinAverageNote { get; set; }
+        public double MinLessonNote { get; set; }
+        public int MinAbsenteeism { get; set; }
     }
 }

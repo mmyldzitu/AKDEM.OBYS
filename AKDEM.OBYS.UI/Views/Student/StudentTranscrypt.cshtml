@@ -9,9 +9,24 @@
 @{if (modelCount != 0)
     {
 
+
+
+
+
         <div class="container-fluid">
-            <div class="text-right">
-                <a id="pdfButton" class="btn btn-success" asp-action="GenerateAndDownloadPdf4" asp-controller="Branch" asp-route-myFileName="@($"{Model.AppStudent.FirstName.ToUpper()}_{Model.AppStudent.SecondName.ToUpper()}_TRANSKRİPT")" asp-route-userId="@ViewBag.userId">PDF</a>
+            <div id="buttons" class="text-right">
+                
+                    <a id="pdfButton" class="btn btn-outline-secondary" asp-action="GenerateAndDownloadStudentTranscryptPdf" asp-controller="Student" asp-route-myFileName="@($"{Model.AppStudent.FirstName.ToUpper()}_{Model.AppStudent.SecondName.ToUpper()}_TRANSKRİPT")" asp-route-userId="@ViewBag.userId">PDF</a>
+                
+
+
+                @{if (Model.AppStudent.AppClass.Definition == "Mezun")
+                    {
+                            <a class="btn btn-outline-secondary" asp-action="Certificate" asp-controller="Student" asp-route-userId="@Model.AppStudent.Id">SERTİFİKA</a>
+
+                        
+                    }
+                }
             </div>
             <h2>@Model.AppStudent.FirstName @Model.AppStudent.SecondName TRANSKRİPT</h2>
             <hr />
@@ -35,6 +50,8 @@
                             else if (!Model.AppStudent.Status && Model.AppStudent.AppClass.Definition != "Mezun")
                             {
                                 <li class="list-group-item"><strong> Ayrılık Dönemi:</strong>     <getPassiveStudentInfo user-id="@Model.AppStudent.Id"></getPassiveStudentInfo></li>
+                                <li class="list-group-item"><strong> Ayrılık Sebebi:</strong>  @Model.AppStudent.DepartReason   </li>
+
                                 <li class="list-group-item"><strong> Ayrıldığı Şube:</strong>     @Model.AppStudent.AppBranch.Definition</li>
                             }
                             else
@@ -145,12 +162,20 @@
                 <div class="row">
                     <div class="col-md-6">
                         <ul class="list-group">
-                            <li class="list-group-item"><strong>Dönem Ortalaması:</strong> @(item.AppStudentSession.Average <0 ? "---": @String.Format("{0:0.00}", item.AppStudentSession.Average)) </li>
+                            <li class="list-group-item"><strong>Dönem Ortalaması:</strong> @(item.AppStudentSession.Average < 0 ? "---": @String.Format("{0:0.00}", item.AppStudentSession.Average)) </li>
 
-                            <li class="list-group-item"><strong>Genel Ortalama:</strong>  @(item.AppStudentSession.TotalAverage <0 ? "---": @String.Format("{0:0.00}", item.AppStudentSession.TotalAverage))</li>
-                            <li class="list-group-item"><strong>Dönem İhtar Sayısı:</strong> @item.AppStudentSession.SessionWarningCount</li>
-                            <li class="list-group-item"><strong>Genel İhtar Sayısı:</strong>   @item.AppStudentSession.TotalWarningCount</li>
-                            <li class="list-group-item"><strong>Dönem Sınıfı:</strong>   @item.AppStudentSession.AppClass.Definition</li>
+                            <li class="list-group-item"><strong>Genel Ortalama:</strong>  @(item.AppStudentSession.TotalAverage < 0 ? "---": @String.Format("{0:0.00}", item.AppStudentSession.TotalAverage))</li>
+
+
+                            <li class="list-group-item" style="display: flex; justify-content: space-between;">
+                                <span><strong>Dönem Ders İhtar Sayısı:</strong> @item.AppStudentSession.LessonWarningCount</span>
+                                <span><strong>Dönem Devamsızlık İhtar Sayısı:</strong>   @item.AppStudentSession.AbsenteismWarningCount</span>
+                            </li>
+                            <li class="list-group-item" style="display: flex; justify-content: space-between;">
+                                <span><strong>Dönem Başarı İhtar Sayısı:</strong> @item.AppStudentSession.SessionWarningCount</span>
+                                <span><strong>Genel Başarı İhtar Sayısı:</strong> @item.AppStudentSession.TotalWarningCount</span>
+
+                            </li>
 
 
                         </ul>

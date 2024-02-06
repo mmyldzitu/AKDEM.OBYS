@@ -1,0 +1,234 @@
+﻿@model AppGraduatedListDto
+@*@{
+    Layout = "_Layout";
+}*@
+
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            position: relative;
+            width: 1200px;
+            height: 1000px;
+            margin: 20px auto 0;
+        }
+
+        .overlay {
+            position: absolute;
+            top: 36%;
+            left: 62%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: white;
+        }
+
+        .overlay2 {
+            position: absolute;
+            font-family: Lato, sans-serif;
+            top: 78%;
+            left: 18%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: white;
+        }
+
+        .overlay3 {
+            position: absolute;
+            font-family: Lato, sans-serif;
+            top: 80%;
+            left: 18%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: white;
+        }
+
+        .overlay4 {
+            position: absolute;
+            top: 70%;
+            left: 44%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: navy;
+        }
+
+        .overlay5 {
+            position: absolute;
+            top: 80%;
+            left: 48%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: navy;
+        }
+
+        .duz-beyaz-cizgi {
+            border-top: 1px solid white; /* 1 piksel kalınlığında beyaz çizgi */
+        }
+
+        .duz-siyah-cizgi {
+            border-top: 1px solid black; /* 1 piksel kalınlığında beyaz çizgi */
+        }
+
+        .name {
+            font-family: Georgia, serif;
+            font-style: italic;
+            font-size: 70px;
+            color: navy;
+            position: absolute;
+            transform: translate(-50%, -50%);
+            display: flex;
+            flex-direction: row; /* Yatay sıralama için */
+        }
+
+        .certificate-no {
+            position: absolute;
+            transform: translate(-50%, -50%);
+            font-size: 12px;
+            
+
+            display: flex;
+            flex-direction: row; /* Yatay sıralama için */
+        }
+
+        .president {
+            position: absolute;
+            transform: translate(-50%, -50%);
+            font-size: 22px;
+            display: flex;
+            flex-direction: row; /* Yatay sıralama için */
+        }
+
+        .details {
+            position: absolute;
+            transform: translate(-50%, -50%);
+            font-size: 12px;
+            display: flex;
+            flex-direction: row; /* Yatay sıralama için */
+        }
+
+        .engellenmis-satir {
+            white-space: nowrap;
+        }
+
+        .name span {
+            margin-right: 10px; /* İki kelime arasında bir boşluk ekleyebilirsiniz */
+        }
+
+
+        img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        .top-links {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            background-color: transparent;
+        }
+
+            .top-links a {
+                text-decoration: none;
+                padding: 15px;
+                color: #ffffff; /* Beyaz renkli metin */
+                background-color: #2F4F4F; /* Yeşil renkli arka plan */
+                border-radius: 5px; /* Kenar yumuşatma */
+            }
+
+        .left-link {
+            margin-top: 50px;
+            margin-left: 165px;
+        }
+
+        .right-link {
+            margin-top: 50px;
+            margin-right: 150px;
+        }
+    </style>
+
+    
+    <body>
+        <div id="buttons" class="top-links">
+            <a class="left-link" asp-action="GraduatedStudents" asp-controller="Session" asp-route-sessionId="@ViewBag.sessionId">Programa Dön</a>
+            <a class="right-link" asp-action="GenerateAndDownloadPdfCertificate" asp-controller="Session" asp-route-myFileName="@($"{Model.studentName}_Sertifika")" asp-route-userId="@Model.UserId" asp-route-sessionId="@ViewBag.sessionId">PDF Olarak İndir</a>
+        </div>
+        @{if (Model.studentName != "NotExists")
+            {
+
+
+                <div class="container">
+                    <img src="/images/mytemplate3.png" alt="Your Photo">
+                    <div class="overlay">
+                        <div class="name">
+                            <span class="engellenmis-satir">@Model.studentName</span>
+
+                        </div>
+
+                    </div>
+
+                    <div class="overlay2">
+
+                        <div class="certificate-no duz-beyaz-cizgi engellenmis-satir">
+
+                            <label>Sertifika No:</label>
+                            <label>@Model.belgeNo</label>
+
+                        </div>
+                    </div>
+                    <div class="overlay5">
+
+                        <div class="details duz-siyah-cizgi engellenmis-satir">
+
+                            <label>Program kapsamında alınan eğitimler transkriptte yer almaktadır.</label>
+
+
+                        </div>
+                    </div>
+                    <div class="overlay3">
+
+                        <div class="certificate-no engellenmis-satir">
+
+
+                            <label>@Model.Date</label>
+
+                        </div>
+                    </div>
+                    <div class="overlay4">
+
+                        <div class="president">
+
+
+                            <span><span class="engellenmis-satir">@Model.President</span> Başkan </span>
+
+
+                        </div>
+                    </div>
+
+                </div>
+
+
+            }
+            else
+            {
+    <div class="container">
+        <div class="overlay">
+            <div class="name">
+                <span class="engellenmis-satir">Sertifika Oluşturulmadı</span>
+
+            </div>
+
+        </div>
+    </div>
+                
+
+                
+            }
+        }
+
+    </body>

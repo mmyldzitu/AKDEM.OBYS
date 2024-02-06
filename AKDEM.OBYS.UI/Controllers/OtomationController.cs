@@ -4,6 +4,7 @@ using AKDEM.OBYS.Dto.AppUserSessionDtos;
 using AKDEM.OBYS.Dto.AppUserSessionLessonDtos;
 using AKDEM.OBYS.Dto.AppWarningDtos;
 using AKDEM.OBYS.UI.Models;
+using FluentValidation;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -27,9 +28,10 @@ namespace AKDEM.OBYS.UI.Controllers
         private readonly IAppSessionService _appSessionService;
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly IAppUserService _appUserService;
+        private readonly IValidator<AppUserSessionLessonUpdateDto> _appUserSessionLessonupdateDtoValidator;
 
 
-        public OtomationController(IAppBranchService appBranchService, IAppStudentService appStudentService, IAppUserSessionService appUserSessionService, IAppUserSessionLessonService appUserSessionLessonService, IAppWarningService appWarningService, IAppLessonService appLessonService, IAppSessionService appSessionService, IWebHostEnvironment webHostEnvironment, IAppUserService appUserService)
+        public OtomationController(IAppBranchService appBranchService, IAppStudentService appStudentService, IAppUserSessionService appUserSessionService, IAppUserSessionLessonService appUserSessionLessonService, IAppWarningService appWarningService, IAppLessonService appLessonService, IAppSessionService appSessionService, IWebHostEnvironment webHostEnvironment, IAppUserService appUserService, IValidator<AppUserSessionLessonUpdateDto> appUserSessionLessonupdateDtoValidator)
         {
             _appBranchService = appBranchService;
             _appStudentService = appStudentService;
@@ -40,6 +42,7 @@ namespace AKDEM.OBYS.UI.Controllers
             _appSessionService = appSessionService;
             _webHostEnvironment = webHostEnvironment;
             _appUserService = appUserService;
+            _appUserSessionLessonupdateDtoValidator = appUserSessionLessonupdateDtoValidator;
         }
 
         public async Task<IActionResult> Index(int sessionId)
@@ -82,9 +85,12 @@ namespace AKDEM.OBYS.UI.Controllers
             foreach (var student in students)
             {
                 int userSessionId = await _appUserSessionService.UserSessionIdByUserIdAndSessionId(student.Id, model.SessionId);
-                double swc = await _appWarningService.SessionWarningCountByUserSessionId(userSessionId);
+                double slwc = await _appWarningService.SessionLessonWarningCountByUserSessionId(userSessionId);
+                double swc = await _appWarningService.SessionWarningCountByUserSessionId(userSessionId,slwc);
                 double twc = await _appWarningService.TotalWarningCountByUserId(student.Id, model.SessionId);
-                await _appWarningService.ChangeStudentStatusBecasuseOfWarning(student.Id, swc, twc, userSessionId);
+                double awc = await _appWarningService.AbsenteismWarningCountByUserSessionId(userSessionId);
+                
+                await _appWarningService.ChangeStudentStatusBecasuseOfWarning(student.Id, swc, awc, twc, userSessionId);
 
                 studentList.Add(new AppOtomationStudentListModel
                 {
@@ -114,18 +120,20 @@ namespace AKDEM.OBYS.UI.Controllers
                     
 
                     StudentSessionId = await _appUserSessionService.UserSessionIdByUserIdAndSessionId(student.Id, model.SessionId),
-                    
+
+                    SessionAbsentWarningCount = await _appWarningService.ReturnAwc(userSessionId),
 
                     WarningCount = await _appWarningService.ReturnTwc(student.Id),
-                    
+                    SessionLessonWarningCount=await _appWarningService.SessionLessonWarningCountByUserSessionId(userSessionId),
 
-                    SessionWarningCount = await _appWarningService.ReturnSwc(userSessionId)
+                    SessionWarningCount = await _appWarningService.ReturnSwc(userSessionId),
                 }) ; ;
 
-
-                double swc2 = await _appWarningService.SessionWarningCountByUserSessionId(userSessionId);
+                double slwc2 = await _appWarningService.SessionLessonWarningCountByUserSessionId(userSessionId);
+                double awc2 = await _appWarningService.AbsenteismWarningCountByUserSessionId(userSessionId);
+                double swc2 = await _appWarningService.SessionWarningCountByUserSessionId(userSessionId,slwc2);
                 double twc2 = await _appWarningService.TotalWarningCountByUserIdGeneral(student.Id);
-                await _appWarningService.ChangeStudentStatusBecasuseOfWarning(student.Id, swc2, twc2, userSessionId);
+                await _appWarningService.ChangeStudentStatusBecasuseOfWarning(student.Id, swc2, awc2, twc2, userSessionId);
             }
             return View(studentList);
         }
@@ -156,10 +164,13 @@ namespace AKDEM.OBYS.UI.Controllers
             foreach (var student in students)
             {
                 int userSessionId = await _appUserSessionService.UserSessionIdByUserIdAndSessionId(student.Id, sessionId);
+                double slwc = await _appWarningService.SessionLessonWarningCountByUserSessionId(userSessionId);
 
-                double swc = await _appWarningService.SessionWarningCountByUserSessionId(userSessionId);
+                double swc = await _appWarningService.SessionWarningCountByUserSessionId(userSessionId,slwc);
                 double twc = await _appWarningService.TotalWarningCountByUserId(student.Id, sessionId);
-                await _appWarningService.ChangeStudentStatusBecasuseOfWarning(student.Id, swc, twc, userSessionId);
+                double awc = await _appWarningService.AbsenteismWarningCountByUserSessionId(userSessionId);
+                
+                await _appWarningService.ChangeStudentStatusBecasuseOfWarning(student.Id, swc, awc, twc, userSessionId);
 
 
                 studentList.Add(new AppOtomationStudentListModel
@@ -179,13 +190,19 @@ namespace AKDEM.OBYS.UI.Controllers
                     Average = await _appUserSessionService.ReturnSessionAverage(userSessionId),
                     TotalAverage = await _appUserSessionService.ReturnTotalAverage(student.Id),
                     StudentSessionId = await _appUserSessionService.UserSessionIdByUserIdAndSessionId(student.Id, sessionId),
+                    SessionAbsentWarningCount = await _appWarningService.ReturnAwc(userSessionId),
                     WarningCount = await _appWarningService.ReturnTwc(student.Id),
-                    SessionWarningCount = await _appWarningService.ReturnSwc(userSessionId)
-                }) ; ;
+                    SessionLessonWarningCount = await _appWarningService.SessionLessonWarningCountByUserSessionId(userSessionId),
 
-                double swc2 = await _appWarningService.SessionWarningCountByUserSessionId(userSessionId);
+                    SessionWarningCount = await _appWarningService.ReturnSwc(userSessionId)
+                }); ; ;
+
+                double slwc2 = await _appWarningService.SessionLessonWarningCountByUserSessionId(userSessionId);
+                double swc2 = await _appWarningService.SessionWarningCountByUserSessionId(userSessionId,slwc2);
                 double twc2 = await _appWarningService.TotalWarningCountByUserIdGeneral(student.Id);
-                await _appWarningService.ChangeStudentStatusBecasuseOfWarning(student.Id, swc2, twc2, userSessionId);
+                double awc2 = await _appWarningService.AbsenteismWarningCountByUserSessionId(userSessionId);
+                
+                await _appWarningService.ChangeStudentStatusBecasuseOfWarning(student.Id, swc2,awc2, twc2, userSessionId);
             }
             return View(studentList);
         }
@@ -201,79 +218,142 @@ namespace AKDEM.OBYS.UI.Controllers
         [HttpPost]
         public async Task<IActionResult> Notes(List<AppUserSessionLessonUpdateDto> dtos)
         {
-            int userSessionId = dtos[0].UserSessionId;
-            int userId = await _appUserSessionService.GetUserIdByUserSessionId(userSessionId);
-            string userName = await _appUserSessionService.GetUserNameByUserSessionId(userSessionId);
-
-            int sessionId = await _appUserSessionService.GetSessionIdByUserSessionId(userSessionId);
-            //BURASI
-
-            int branchId = await _appUserSessionService.GetBranchIdByUserSessionId(userSessionId);
-
-
-            await _appUserSessionLessonService.UpdateUserSessionLessonsAsync(dtos);
-            foreach(var dto in dtos)
+            bool allWalid = true;
+             foreach(var dto in dtos)
             {
-                if (dto.Not != -1)
+                var result = _appUserSessionLessonupdateDtoValidator.Validate(dto);
+                if (!result.IsValid)
                 {
-                    await _appUserSessionService.FindAverageOfSessionWithUserAndSession(userId, sessionId);
-                    await _appUserSessionService.TotalAverageByUserId(userId,sessionId);
-                }
-            }
-            
-            double average = await _appUserSessionService.ReturnSessionAverage(userSessionId);
-
-            int notminuscount = 0;
-            foreach (var dto in dtos)
-            {
-                string lesson = await _appLessonService.GetLessonNameByLessonId(dto.LessonId);
-
-                if (dto.Not != -1 && dto.Not <50)
-                {
-                    var newdto = new AppWarningCreateDto
+                    allWalid = false;
+                    foreach ( var error in result.Errors)
                     {
-                        UserSessionId = userSessionId,
-                        WarningCount = 0.5,
-                        WarningReason = $"{userName} ismindeki öğrenci {lesson} isimli dersten 50'nin altında not aldığı için DERS BAŞARI İHTARI almıştır",
-                        WarningTime = DateTime.Now
-                    };
-                    await _appWarningService.CreateWarningByDtoandString(newdto, lesson,userId, userSessionId);
-
+                        ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
+                    }
                 }
-                else
-                {
-                    await _appWarningService.RemoveWarningByString(lesson,userId, userSessionId);
-
-                }
-                if (dto.Not != -1)
-                {
-                    notminuscount += 1;
-                }
-
-                
             }
-            if (dtos.Count == notminuscount)
+            if (allWalid)
             {
-                if (average < 70)
+                int userSessionId = dtos[0].UserSessionId;
+                int userId = await _appUserSessionService.GetUserIdByUserSessionId(userSessionId);
+                string userName = await _appUserSessionService.GetUserNameByUserSessionId(userSessionId);
+
+                int sessionId = await _appUserSessionService.GetSessionIdByUserSessionId(userSessionId);
+                //BURASI
+                double sessionMinLessonNote = await _appSessionService.MinLessonNoteOfSession(sessionId);
+                double sessionMinAverageNote = await _appSessionService.MinAverageNoteOfSession(sessionId);
+                int sessionMinAbsenteism = await _appSessionService.MinAbsenteismOfSession(sessionId);
+                int branchId = await _appUserSessionService.GetBranchIdByUserSessionId(userSessionId);
+
+
+                await _appUserSessionLessonService.UpdateUserSessionLessonsAsync(dtos);
+                foreach (var dto in dtos)
+                {
+                    if (dto.Not != -1)
+                    {
+                        await _appUserSessionService.FindAverageOfSessionWithUserAndSession(userId, sessionId);
+                        await _appUserSessionService.TotalAverageByUserId(userId, sessionId);
+                    }
+                }
+
+                double average = await _appUserSessionService.ReturnSessionAverage(userSessionId);
+
+                int notminuscount = 0;
+                foreach (var dto in dtos)
+                {
+                    string lesson = await _appLessonService.GetLessonNameByLessonId(dto.LessonId);
+
+                    if (dto.Not != -1 &&  dto.Not < sessionMinLessonNote)
+                    {
+                        var newdto = new AppWarningCreateDto
+                        {
+                            UserSessionId = userSessionId,
+                            WarningCount = 1,
+                            WarningReason = $"{userName} ismindeki öğrenci {lesson} isimli dersten {sessionMinLessonNote}'nin altında not aldığı için DERS BAŞARI İHTARI almıştır",
+                            WarningTime = DateTime.Now
+                        };
+                        await _appWarningService.CreateWarningByDtoandString(newdto, lesson, userId, userSessionId);
+                        
+
+                    }
+                    else
+                    {
+                        await _appWarningService.RemoveWarningByString(lesson, userId, userSessionId);
+
+                    }
+                    if (dto.Devamsızlık != -1 &&  dto.Devamsızlık >sessionMinAbsenteism)
+                    {
+                        var newdto = new AppWarningCreateDto
+                        {
+                            UserSessionId = userSessionId,
+                            WarningCount = 1,
+                            WarningReason = $"{userName} ismindeki öğrenci {lesson} isimli derste {sessionMinAbsenteism} günün üzerinde devamsızlık yaptığı için  DEVAMSIZLIK İHTARI almıştır",
+                            WarningTime = DateTime.Now
+                        };
+                        await _appWarningService.CreateAbsenteismWarningByDtoandString(newdto, lesson, userId, userSessionId);
+
+
+                    }
+                    else
+                    {
+                        await _appWarningService.RemoveAbsenteismWarningByString(lesson, userId, userSessionId);
+
+                    }
+
+
+
+
+
+
+                    if (dto.Not != -1)
+                    {
+                        notminuscount += 1;
+                    }
+
+
+                }
+                var slwc = await _appWarningService.SessionLessonWarningCountByUserSessionId(userSessionId);
+                if (slwc >= 2 && average >= sessionMinAverageNote)
                 {
                     var newdto = new AppWarningCreateDto
                     {
                         UserSessionId = userSessionId,
                         WarningCount = 1,
-                        WarningReason = $"{userName} isimli öğrenci; dönem ortalaması 70'in altında olması sebebiyle DÖNEM BAŞARISIZLIĞI İHTARI almıştır",
+                        WarningReason = $"{userName} ismindeki öğrenci iki veya daha fazla dersten ihtar aldığı için  DÖNEM BAŞARISIZLIĞI İHTARI almıştır",
                         WarningTime = DateTime.Now
                     };
-                    await _appWarningService.CreateWarningByDtoandString(newdto, "dönem ortalaması", userId, userSessionId);
+                    await _appWarningService.CreateWarningByDtoandString(newdto, "DÖNEM BAŞARISIZLIĞI İHTARI", userId, userSessionId);
                 }
                 else
                 {
-                    await _appWarningService.RemoveWarningByString("dönem ortalaması", userId, userSessionId);
-                }
-            }
-            
+                    await _appWarningService.RemoveWarningByString("iki veya daha fazla dersten", userId, userSessionId);
 
+                }
+                if (dtos.Count == notminuscount)
+                {
+                    if (average < sessionMinAverageNote)
+                    {
+                        var newdto = new AppWarningCreateDto
+                        {
+                            UserSessionId = userSessionId,
+                            WarningCount = 1,
+                            WarningReason = $"{userName} isimli öğrenci; dönem ortalaması {sessionMinAverageNote}'in altında olması sebebiyle DÖNEM BAŞARISIZLIĞI İHTARI almıştır",
+                            WarningTime = DateTime.Now
+                        };
+                        await _appWarningService.CreateWarningByDtoandString(newdto, "DÖNEM BAŞARISIZLIĞI İHTARI", userId, userSessionId);
+                       
+                    }
+                    else
+                    {
+                        await _appWarningService.RemoveWarningByString("sebebiyle DÖNEM BAŞARISIZLIĞI İHTARI", userId, userSessionId);
+                    }
+                }
+
+                
+
+                return RedirectToAction("BranchDetails", "Otomation", new { SessionId = sessionId, BranchId = branchId });
+            }
+            return View(dtos);
             
-            return RedirectToAction("BranchDetails", "Otomation", new { SessionId = sessionId, BranchId = branchId });
         }
         public async Task<IActionResult> StudentDetails(int userSessionId)
         {
@@ -288,10 +368,11 @@ namespace AKDEM.OBYS.UI.Controllers
 
             //BURASI
             var branchId = await _appUserSessionService.GetBranchIdByUserSessionId(userSessionId);
-
-            double swc = await _appWarningService.SessionWarningCountByUserSessionId(userSessionId);
+            double slwc = await _appWarningService.SessionLessonWarningCountByUserSessionId(userSessionId);
+            double awc = await _appWarningService.AbsenteismWarningCountByUserSessionId(userSessionId);
+            double swc = await _appWarningService.SessionWarningCountByUserSessionId(userSessionId,slwc);
             double twc = await _appWarningService.TotalWarningCountByUserId(userId, sessionId);
-            await _appWarningService.ChangeStudentStatusBecasuseOfWarning(userId, swc, twc, userSessionId);
+            await _appWarningService.ChangeStudentStatusBecasuseOfWarning(userId, swc,awc, twc, userSessionId);
 
             string sessionName= await _appSessionService.ReturnSessionName(sessionId);
             ViewBag.sessionName = sessionName;
@@ -313,6 +394,8 @@ namespace AKDEM.OBYS.UI.Controllers
                 Status = await _appUserSessionService.GetUserSessionStatus(userSessionId),
                 SessionWarningCount = await _appWarningService.ReturnSwc(userSessionId),
                 TotalAverage = await _appUserSessionService.ReturnTotalAverage(userId),
+                AbsenteismWarningCount= await _appWarningService.ReturnAwc(userSessionId),
+                LessonWarningCount= await _appWarningService.SessionLessonWarningCountByUserSessionId(userSessionId),
                 TotalWarningCount = await _appWarningService.ReturnTwc(userId)
             };
 
@@ -340,7 +423,9 @@ namespace AKDEM.OBYS.UI.Controllers
             int userSessionId = await _appUserSessionService.UserSessionIdByUserIdAndSessionId(userId, sessionId);
             ViewBag.userSessionId = userSessionId;
             var warningList = await _appWarningService.AppWarningByUserSessionId(userSessionId);
-            return View(warningList);
+            var status = await _appStudentService.ReturnStatusOfStudent(userId);
+            var departReason = await _appStudentService.ReturnDepartReasonOfStudent(userId);
+            return View(new StudentWarningsModel { AppWarnings=warningList, Status=status, DepartReason=departReason});
 
         }
         public async Task<IActionResult> RemoveWarning(int sessionId, int userId, int id)
@@ -415,11 +500,15 @@ namespace AKDEM.OBYS.UI.Controllers
                              if (paragraph) {
                                           paragraph.style.display = 'none';
                             }
+const turningbutton = document.getElementById('turnToSession');
+                             if (turningbutton) {
+                                          turningbutton.style.display = 'none';
+                            }
 
                     
 
                                                 // Seçilecek kolon başlıkları
-                                const selectedColumns = ['#', 'İsim', 'Soyisim', 'Dönem Ortalaması', 'Genel Ortalama', 'Şube Sıralaması(Genel)', 'Şube Sıralaması(Dönem)', 'Sınıf Sıralaması(Genel)', 'Sınıf Sıralaması(Dönem)', 'Dönem İhtarları','Toplam İhtarlar'];
+                                const selectedColumns = ['#', 'İsim', 'Soyisim', 'Dönem Ortalaması', 'Genel Ortalama', 'Şube Sıralaması(Genel)', 'Şube Sıralaması(Dönem)', 'Sınıf Sıralaması(Genel)', 'Sınıf Sıralaması(Dönem)', 'Dönem Ders İhtarları','Dönem Başarı İhtarları','Dönem Devamsızlık İhtarları','Toplam Başarı İhtarları'];
 
                                 // Diğer elementleri gizle (isteğe bağlı)
                                 document.querySelectorAll('th, td').forEach(element => {

@@ -7,11 +7,15 @@ using System.Threading.Tasks;
 
 namespace AKDEM.OBYS.Dto.AppSessionDtos
 {
-   public class AppSessionCreateDto:IDto
+   public class AppSessionCreateDto : IDto
     {
         public string Definition { get; set; }
         public bool Status { get; set; } = true;
         public bool Status2 { get; set; } = true;
+        public double MinAverageNote { get; set; }
+        public string SessionPresident { get; set; }
+        public double MinLessonNote { get; set; } 
+        public int MinAbsenteeism { get; set; } 
 
 
     }

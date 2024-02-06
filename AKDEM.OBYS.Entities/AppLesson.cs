@@ -10,6 +10,7 @@ namespace AKDEM.OBYS.Entities
     {
         public string Definition { get; set; }
         public int UserId { get; set; }
+        public bool Status { get; set; }
         public AppUser AppUser { get; set; }
         public List<AppUserSessionLesson> AppUserSessionLessons { get; set; }
         public List<AppScheduleDetail> AppScheduleDetails { get; set; }

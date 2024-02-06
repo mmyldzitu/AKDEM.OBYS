@@ -1,4 +1,5 @@
-﻿using AKDEM.OBYS.Dto.AppLessonDtos;
+﻿using AKDEM.OBYS.Business.Services;
+using AKDEM.OBYS.Dto.AppLessonDtos;
 using FluentValidation;
 using System;
 using System.Collections.Generic;
@@ -10,11 +11,23 @@ namespace AKDEM.OBYS.Business.ValidationRules.AppLesson
 {
    public class AppLessonUpdateDtoValidator:AbstractValidator<AppLessonUpdateDto>
     {
-        public AppLessonUpdateDtoValidator()
+        private readonly IAppSessionService _appSessionService;
+        public AppLessonUpdateDtoValidator(IAppSessionService appSessionService)
         {
             RuleFor(x => x.Id).NotEmpty();
             RuleFor(x => x.Definition).MaximumLength(200).NotEmpty().WithMessage("Lütfen dersin adını 200 karakterden uzun olmayacak şekilde giriniz");
             RuleFor(x => x.UserId).NotEmpty().WithMessage("Lütfen dersin hocasını seçiniz.");
+            RuleFor(x => x)
+               .MustAsync(async (model, token) => await IsLessonAlready(model.Definition, model.UserId))
+               .WithMessage("Aynı Ders ve Öğretmen İsmiyle Oluşmuş Bir Ders Bulunmakta!");
+
+            
+            _appSessionService = appSessionService;
+        }
+        private async Task<bool> IsLessonAlready(string definition, int userId)
+        {
+            var control = await _appSessionService.IfLessonAlreadyExists(definition, userId);
+            return !control;
         }
     }
 }

@@ -3,6 +3,7 @@ using AKDEM.OBYS.Common;
 using AKDEM.OBYS.Common.Enums;
 using AKDEM.OBYS.Dto.AppScheduleDtos;
 using AKDEM.OBYS.UI.Models;
+using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
@@ -22,9 +23,10 @@ namespace AKDEM.OBYS.UI.Controllers
         private readonly IAppScheduleDetailService _appScheduleDetailService;
         private readonly IAppSessionService _appSessionService;
         private readonly IAppWarningService _appWarningService;
+        private readonly IValidator<AppScheduleCreateModel> _appScheduleCreateModelValidator;
 
 
-        public ScheduleController(IAppScheduleService appScheduleService, IAppLessonService appLessonService, IAppBranchService appBranchService, IAppUserSessionService appUserSessionService, IAppUserSessionLessonService appUserSessionLessonService, IAppScheduleDetailService appScheduleDetailService, IAppSessionService appSessionService, IAppWarningService appWarningService)
+        public ScheduleController(IAppScheduleService appScheduleService, IAppLessonService appLessonService, IAppBranchService appBranchService, IAppUserSessionService appUserSessionService, IAppUserSessionLessonService appUserSessionLessonService, IAppScheduleDetailService appScheduleDetailService, IAppSessionService appSessionService, IAppWarningService appWarningService, IValidator<AppScheduleCreateModel> appScheduleCreateModelValidator)
         {
             _appScheduleService = appScheduleService;
             _appLessonService = appLessonService;
@@ -34,6 +36,7 @@ namespace AKDEM.OBYS.UI.Controllers
             _appScheduleDetailService = appScheduleDetailService;
             _appSessionService = appSessionService;
             _appWarningService = appWarningService;
+            _appScheduleCreateModelValidator = appScheduleCreateModelValidator;
         }
 
         public async Task<IActionResult> Index(int id)
@@ -62,10 +65,7 @@ namespace AKDEM.OBYS.UI.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateSchedule(AppScheduleCreateModel model)
         {
-            AppScheduleCreateDto dto = new();
-            dto.Definition = model.Definition;
-            dto.SessionBranchId = await _appScheduleService.GetSessionBranchIdBySessionIdandBranchId(model.SessionId, model.BranchId);
-            var result = await _appScheduleService.CreateScheduleAsync(dto);
+            var modelResult = _appScheduleCreateModelValidator.Validate(model);
             var list = new List<AppScheduleSelectModel>();
             var items = await _appBranchService.GetBranchListNotScheduleAsync(model.SessionId);
             foreach (var item in items)
@@ -78,23 +78,39 @@ namespace AKDEM.OBYS.UI.Controllers
             }
             ViewBag.branches = new SelectList(list, "Id", "BranchDetail");
             ViewBag.sessionId = model.SessionId;
-           
-            if (result.ResponseType == ResponseType.Success)
+            if (modelResult.IsValid)
             {
-                ViewBag.message = 1; 
-                ViewBag.sessionBranchId = dto.SessionBranchId;
-                ViewBag.branchId = model.BranchId;
+                AppScheduleCreateDto dto = new();
+                dto.Definition = model.Definition;
+                dto.SessionBranchId = await _appScheduleService.GetSessionBranchIdBySessionIdandBranchId(model.SessionId, model.BranchId);
+                var result = await _appScheduleService.CreateScheduleAsync(dto);
+                
 
-                return View(new AppScheduleCreateModel());
-            }
-            else
-            {
-                foreach (var item in result.ValidationErrors)
+                if (result.ResponseType == ResponseType.Success)
                 {
-                    ModelState.AddModelError(item.PropertyName, item.ErrorMessage);
+                    ViewBag.message = 1;
+                    ViewBag.sessionBranchId = dto.SessionBranchId;
+                    ViewBag.branchId = model.BranchId;
+
+                    return View(new AppScheduleCreateModel());
                 }
-                return View(result.Data);
+                else
+                {
+                    foreach (var item in result.ValidationErrors)
+                    {
+                        ModelState.AddModelError(item.PropertyName, item.ErrorMessage);
+                    }
+                    return View(result.Data);
+                }
+
+                
             }
+            foreach (var error in modelResult.Errors)
+            {
+                ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
+            }
+            return View(model);
+
 
 
         }

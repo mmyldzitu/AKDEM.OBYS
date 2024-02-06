@@ -45,10 +45,18 @@
                 <td></td>
             </tr>
             <tr>
+                <td bgcolor="Cadetblue"><a asp-action="SessionCriterias" asp-controller="Teacher" asp-route-sessionId="@ViewBag.sessionId">DÖNEM YÖNETMELİĞİ</a></td>
+                <td>  <strong>@ViewBag.sessionName</strong> DÖNEMİNE AİT YÖNETMELİK </td>
+            </tr>
+            <tr>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
                 <td bgcolor="Cadetblue"><a asp-action="TeacherLessons" asp-controller="Teacher" asp-route-sessionId="@ViewBag.sessionId" asp-route-userId="@ViewBag.userId">DERSLERİM</a></td>
                 <td>  <strong>@ViewBag.sessionName</strong> DÖNEMİNE AİT GEÇMİŞ  DERSLERİNİZ </td>
             </tr>
-            
+
 
 
 

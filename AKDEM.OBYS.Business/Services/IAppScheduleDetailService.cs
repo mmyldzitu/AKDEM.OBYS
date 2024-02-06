@@ -20,6 +20,7 @@ namespace AKDEM.OBYS.Business.Services
         Task RemoveScheduleDetailsByScheduleId(int scheduleId);
         Task RemoveScheduleDetailBySessionId(int sessionId);
         Task<List<AppScheduleDetailListDto>> GetScheduleDetailsForTeacher(int sessionId, int userId);
-        Task<List<AppScheduleDetailListDto>> GetScheduleDetailsByScheduleIdDistinct(int scheduldeId);
+        Task<List<AppScheduleDetailListDto>> GetScheduleDetailsByScheduleIdDistinct(int scheduldeId, int userId);
+        Task<List<AppScheduleDetailListDto>> GetScheduleDetailsByScheduleIdForTeacher(int scheduldeId, int userId);
     }
 }

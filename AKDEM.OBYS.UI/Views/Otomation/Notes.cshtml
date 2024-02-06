@@ -13,7 +13,9 @@
                     {
                         <input type="hidden" asp-for="@Model[i].Id" />
                         <input type="hidden" asp-for="@Model[i].LessonId" />
-                        <input type="hidden" asp-for="@Model[i].AppLesson" />
+                        <input type="hidden" asp-for="@Model[i].AppLesson.Definition" />
+                        <input type="hidden" asp-for="@Model[i].AppLesson.AppUser.FirstName" />
+                        <input type="hidden" asp-for="@Model[i].AppLesson.AppUser.SecondName" />
 
                         <input type="hidden" asp-for="@Model[i].UserSessionId" />
 

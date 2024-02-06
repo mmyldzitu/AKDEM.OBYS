@@ -22,6 +22,7 @@ namespace AKDEM.OBYS.Dto.AppUserDtos
         public int ClassId { get; set; }
         public int SıraNo { get; set; }
         public double TotalAverage { get; set; }
+        public string DepartReason { get; set; }
         public AppClassListDto AppClass { get; set; }
         public int BranchId { get; set; }
         public double TotalWarningCount { get; set; }

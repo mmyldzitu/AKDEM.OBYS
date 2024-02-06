@@ -35,6 +35,7 @@
                         else if (!Model.AppStudent.Status && Model.AppStudent.AppClass.Definition != "Mezun")
                         {
                             <li class="list-group-item"><strong> Ayrılık Dönemi:</strong>     <getPassiveStudentInfo user-id="@Model.AppStudent.Id"></getPassiveStudentInfo></li>
+                            <li class="list-group-item"><strong> Ayrılık Sebebi:</strong>  @Model.AppStudent.DepartReason   </li>
                             <li class="list-group-item"><strong> Ayrıldığı Şube:</strong>     @Model.AppStudent.AppBranch.Definition</li>
                         }
                         else
@@ -145,12 +146,20 @@
             <div class="row">
                 <div class="col-md-6">
                     <ul class="list-group">
-                        <li class="list-group-item"><strong>Dönem Ortalaması:</strong> @(item.AppStudentSession.Average <0 ? "---": @String.Format("{0:0.00}", item.AppStudentSession.Average)) </li>
+                        <li class="list-group-item"><strong>Dönem Ortalaması:</strong> @(item.AppStudentSession.Average < 0 ? "---": @String.Format("{0:0.00}", item.AppStudentSession.Average)) </li>
 
-                        <li class="list-group-item"><strong>Genel Ortalama:</strong>  @(item.AppStudentSession.TotalAverage <0 ? "---": @String.Format("{0:0.00}", item.AppStudentSession.TotalAverage))</li>
-                        <li class="list-group-item"><strong>Dönem İhtar Sayısı:</strong> @item.AppStudentSession.SessionWarningCount</li>
-                        <li class="list-group-item"><strong>Genel İhtar Sayısı:</strong>   @item.AppStudentSession.TotalWarningCount</li>
-                        <li class="list-group-item"><strong>Dönem Sınıfı:</strong>   @item.AppStudentSession.AppClass.Definition</li>
+                        <li class="list-group-item"><strong>Genel Ortalama:</strong>  @(item.AppStudentSession.TotalAverage < 0 ? "---": @String.Format("{0:0.00}", item.AppStudentSession.TotalAverage))</li>
+
+
+                        <li class="list-group-item" style="display: flex; justify-content: space-between;">
+                            <span><strong>Dönem Ders İhtar Sayısı:</strong> @item.AppStudentSession.LessonWarningCount</span>
+                            <span><strong>Dönem Devamsızlık İhtar Sayısı:</strong>   @item.AppStudentSession.AbsenteismWarningCount</span>
+                        </li>
+                        <li class="list-group-item" style="display: flex; justify-content: space-between;">
+                            <span><strong>Dönem Başarı İhtar Sayısı:</strong> @item.AppStudentSession.SessionWarningCount</span>
+                            <span><strong>Genel Başarı İhtar Sayısı:</strong> @item.AppStudentSession.TotalWarningCount</span>
+
+                        </li>
 
 
                     </ul>

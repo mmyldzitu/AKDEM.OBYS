@@ -22,17 +22,48 @@ namespace AKDEM.OBYS.Business.Managers
             _uow = uow;
             _mapper = mapper;
         }
-        public async Task<List<AppLessonListDto>> GetLessonsByTeacher()
+        public async Task<List<AppLessonListDto>> GetLessonsByTeacher(bool status)
         {
             var query = _uow.GetRepositry<AppLesson>().GetQuery();
-            var lessons = await query.Include(x => x.AppUser).ToListAsync();
+            var lessons = await query.Include(x => x.AppUser).Where(x=>x.Status==status).ToListAsync();
             var mappedList= _mapper.Map<List<AppLessonListDto>>(lessons);
             return mappedList;
         }
+        public async Task ChangeLessonStatus(int id)
+        {
+            var query = _uow.GetRepositry<AppLesson>().GetQuery();
+            var lesson = await query.Where(x => x.Id == id).SingleOrDefaultAsync();
+            if (lesson != null)
+            {
+                if (lesson.Status)
+                {
+                    lesson.Status = false;
+                }
+                else { lesson.Status = true; }
+            }
+            await _uow.SaveChangesAsync();
+        }
+        public async Task<string> ReturnJustLessonName(int lessonId)
+        {
+            var query = _uow.GetRepositry<AppLesson>().GetQuery();
+            var lesson = await query.Where(x => x.Id == lessonId).SingleOrDefaultAsync();
+            if (lesson != null)
+            {
+                return lesson.Definition;
+            }
+            return "";
+        }
         public async Task<string> GetLessonNameByLessonId(int lessonId)
         {
-            var entity = await _uow.GetRepositry<AppLesson>().FindByFilterAsync(x => x.Id == lessonId);
-            return entity.Definition;
+            string definition = "";
+            var query = _uow.GetRepositry<AppLesson>().GetQuery();
+            var entity = await query.Include(x => x.AppUser).Where(x => x.Id == lessonId).SingleOrDefaultAsync();
+            if (entity != null)
+            {
+                definition = $"{entity.Definition}({entity.AppUser.FirstName} {entity.AppUser.SecondName})";
+            }
+            
+            return definition;
         }
         public async Task<List<AppLessonListDto>> TeacherActiveLessons(int sessionId, int userId)
         {
@@ -44,6 +75,20 @@ namespace AKDEM.OBYS.Business.Managers
                 return mappedList;
             }
             return new List<AppLessonListDto>();
+        }
+        
+        public async Task AppLessonCreate(AppLessonCreateDto dto)
+        {
+            var mappedDto = _mapper.Map<AppLesson>(dto);
+            await _uow.GetRepositry<AppLesson>().CreateAsync(mappedDto);
+            await _uow.SaveChangesAsync();
+        }
+        public async Task AppLessonUpdate(AppLessonUpdateDto dto)
+        {
+            var entity = await _uow.GetRepositry<AppLesson>().FindByFilterAsync(x=>x.Id==dto.Id);
+            var mappedDto = _mapper.Map<AppLesson>(dto);
+            _uow.GetRepositry<AppLesson>().Update(mappedDto, entity);
+            await _uow.SaveChangesAsync();
         }
 
 

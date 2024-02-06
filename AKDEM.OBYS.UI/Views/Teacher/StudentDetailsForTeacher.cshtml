@@ -6,7 +6,7 @@
 }
 <div class="container-fluid">
     <div class="text-right">
-        <a id="pdfButton" class="btn btn-success" asp-action="GenerateAndDownloadPdf2" asp-controller="Otomation" asp-route-myFileName="@($"{Model.AppStudent.FirstName.ToUpper()}_{Model.AppStudent.SecondName.ToUpper()}_{ViewBag.sessionName2}")" asp-route-userSessionId="@ViewBag.userSessionId" asp-route-branchId="@ViewBag.branchId">PDF</a>
+        <a id="pdfButton" class="btn btn-success" asp-action="GenerateAndDownloadPdfStudentDetails" asp-controller="Teacher" asp-route-myFileName="@($"{Model.AppStudent.FirstName.ToUpper()}_{Model.AppStudent.SecondName.ToUpper()}_{ViewBag.sessionName2}")" asp-route-userSessionId="@ViewBag.userSessionId" asp-route-lessonId="@ViewBag.lessonId">PDF</a>
     </div>
 
 
@@ -41,7 +41,7 @@
                     {
                         <li class="list-group-item">
 
-                            <strong>Durum:</strong> <span style="font-weight: bold; color: red;">PASİF</span>
+                            <strong>Durum:</strong> <span style="font-weight: bold; color: red;">PASİF ( @Model.AppStudent.DepartReason )</span>
                         </li>
                     }
                 }
@@ -105,11 +105,20 @@
     <div class="row">
         <div class="col-md-6">
             <ul class="list-group">
-                <li class="list-group-item"><strong>Dönem Ortalaması:</strong> @(Model.AppStudentSession.Average <0 ? "---": @String.Format("{0:0.00}", Model.AppStudentSession.Average)) </li>
+                <li class="list-group-item"><strong>Dönem Ortalaması:</strong> @(Model.AppStudentSession.Average < 0 ? "---": @String.Format("{0:0.00}", Model.AppStudentSession.Average)) </li>
 
-                <li class="list-group-item"><strong>Genel Ortalama:</strong>  @(Model.AppStudentSession.TotalAverage <0 ? "---": @String.Format("{0:0.00}", Model.AppStudentSession.TotalAverage))</li>
-                <li class="list-group-item"><strong>Dönem İhtar Sayısı:</strong> @Model.AppStudentSession.SessionWarningCount</li>
-                <li class="list-group-item"><strong>Genel İhtar Sayısı:</strong>   @Model.AppStudentSession.TotalWarningCount</li>
+                <li class="list-group-item"><strong>Genel Ortalama:</strong>  @(Model.AppStudentSession.TotalAverage < 0 ? "---": @String.Format("{0:0.00}", Model.AppStudentSession.TotalAverage))</li>
+
+
+                <li class="list-group-item" style="display: flex; justify-content: space-between;">
+                    <span><strong>Dönem Ders İhtar Sayısı:</strong> @Model.AppStudentSession.LessonWarningCount</span>
+                    <span><strong>Dönem Devamsızlık İhtar Sayısı:</strong>   @Model.AppStudentSession.AbsenteismWarningCount</span>
+                </li>
+                <li class="list-group-item" style="display: flex; justify-content: space-between;">
+                    <span><strong>Dönem Başarı İhtar Sayısı:</strong> @Model.AppStudentSession.SessionWarningCount</span>
+                    <span><strong>Genel Başarı İhtar Sayısı:</strong> @Model.AppStudentSession.TotalWarningCount</span>
+
+                </li>
 
 
             </ul>

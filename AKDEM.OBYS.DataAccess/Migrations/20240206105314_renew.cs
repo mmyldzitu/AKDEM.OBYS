@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace AKDEM.OBYS.DataAccess.Migrations
 {
-    public partial class first : Migration
+    public partial class renew : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -40,8 +40,12 @@ namespace AKDEM.OBYS.DataAccess.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Definition = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    MinAverageNote = table.Column<double>(type: "float", nullable: false),
+                    MinLessonNote = table.Column<double>(type: "float", nullable: false),
+                    MinAbsenteeism = table.Column<int>(type: "int", nullable: false),
                     Status = table.Column<bool>(type: "bit", nullable: false),
-                    Status2 = table.Column<bool>(type: "bit", nullable: false)
+                    Status2 = table.Column<bool>(type: "bit", nullable: false),
+                    SessionPresident = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -55,7 +59,8 @@ namespace AKDEM.OBYS.DataAccess.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Definition = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
-                    ClassId = table.Column<int>(type: "int", nullable: false)
+                    ClassId = table.Column<int>(type: "int", nullable: false),
+                    Status = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -109,6 +114,7 @@ namespace AKDEM.OBYS.DataAccess.Migrations
                     ImagePath = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     TotalAverage = table.Column<double>(type: "float", nullable: false),
                     SıraNo = table.Column<int>(type: "int", nullable: false),
+                    DepartReason = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     TotalWarningCount = table.Column<double>(type: "float", nullable: false),
                     BranchId = table.Column<int>(type: "int", nullable: true),
                     ClassId = table.Column<int>(type: "int", nullable: true)
@@ -151,13 +157,38 @@ namespace AKDEM.OBYS.DataAccess.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "AppGraduateds",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    President = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    year = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Date = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    studentName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    belgeNo = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AppGraduateds", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_AppGraduateds_AppUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AppUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "AppLessons",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Definition = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
-                    UserId = table.Column<int>(type: "int", nullable: false)
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    Status = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -204,10 +235,13 @@ namespace AKDEM.OBYS.DataAccess.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Average = table.Column<double>(type: "float", nullable: false),
                     SessionWarningCount = table.Column<double>(type: "float", nullable: false),
+                    SessionLessonWarningCount = table.Column<double>(type: "float", nullable: false),
+                    SessionAbsentWarningCount = table.Column<double>(type: "float", nullable: false),
                     UserId = table.Column<int>(type: "int", nullable: false),
                     SessionId = table.Column<int>(type: "int", nullable: false),
                     BranchId = table.Column<int>(type: "int", nullable: false),
-                    ClassId = table.Column<int>(type: "int", nullable: false)
+                    ClassId = table.Column<int>(type: "int", nullable: false),
+                    Status = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -316,6 +350,11 @@ namespace AKDEM.OBYS.DataAccess.Migrations
                 column: "ClassId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_AppGraduateds_UserId",
+                table: "AppGraduateds",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_AppLessons_UserId",
                 table: "AppLessons",
                 column: "UserId");
@@ -402,6 +441,9 @@ namespace AKDEM.OBYS.DataAccess.Migrations
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "AppGraduateds");
+
             migrationBuilder.DropTable(
                 name: "AppScheduleDetails");
 

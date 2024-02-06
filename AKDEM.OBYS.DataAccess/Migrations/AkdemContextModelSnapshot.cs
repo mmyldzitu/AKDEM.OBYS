@@ -61,6 +61,38 @@ namespace AKDEM.OBYS.DataAccess.Migrations
                     b.ToTable("AppClasses");
                 });
 
+            modelBuilder.Entity("AKDEM.OBYS.Entities.AppGraduated", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Date")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("President")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("belgeNo")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("studentName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("year")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("AppGraduateds");
+                });
+
             modelBuilder.Entity("AKDEM.OBYS.Entities.AppLesson", b =>
                 {
                     b.Property<int>("Id")
@@ -72,6 +104,9 @@ namespace AKDEM.OBYS.DataAccess.Migrations
                         .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
+
+                    b.Property<bool>("Status")
+                        .HasColumnType("bit");
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");
@@ -162,6 +197,18 @@ namespace AKDEM.OBYS.DataAccess.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
+                    b.Property<int>("MinAbsenteeism")
+                        .HasColumnType("int");
+
+                    b.Property<double>("MinAverageNote")
+                        .HasColumnType("float");
+
+                    b.Property<double>("MinLessonNote")
+                        .HasColumnType("float");
+
+                    b.Property<string>("SessionPresident")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<bool>("Status")
                         .HasColumnType("bit");
 
@@ -208,6 +255,9 @@ namespace AKDEM.OBYS.DataAccess.Migrations
 
                     b.Property<int?>("ClassId")
                         .HasColumnType("int");
+
+                    b.Property<string>("DepartReason")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -295,8 +345,14 @@ namespace AKDEM.OBYS.DataAccess.Migrations
                     b.Property<int>("ClassId")
                         .HasColumnType("int");
 
+                    b.Property<double>("SessionAbsentWarningCount")
+                        .HasColumnType("float");
+
                     b.Property<int>("SessionId")
                         .HasColumnType("int");
+
+                    b.Property<double>("SessionLessonWarningCount")
+                        .HasColumnType("float");
 
                     b.Property<double>("SessionWarningCount")
                         .HasColumnType("float");
@@ -385,6 +441,17 @@ namespace AKDEM.OBYS.DataAccess.Migrations
                         .IsRequired();
 
                     b.Navigation("AppClass");
+                });
+
+            modelBuilder.Entity("AKDEM.OBYS.Entities.AppGraduated", b =>
+                {
+                    b.HasOne("AKDEM.OBYS.Entities.AppUser", "AppUser")
+                        .WithMany("AppGraduateds")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("AppUser");
                 });
 
             modelBuilder.Entity("AKDEM.OBYS.Entities.AppLesson", b =>
@@ -583,6 +650,8 @@ namespace AKDEM.OBYS.DataAccess.Migrations
 
             modelBuilder.Entity("AKDEM.OBYS.Entities.AppUser", b =>
                 {
+                    b.Navigation("AppGraduateds");
+
                     b.Navigation("AppLessons");
 
                     b.Navigation("AppUserRoles");

@@ -8,9 +8,10 @@ using System.Threading.Tasks;
 
 namespace AKDEM.OBYS.Dto.AppLessonDtos
 {
-   public class AppLessonCreateDto:IDto
+   public class AppLessonCreateDto : IDto
     {
         public string Definition { get; set; }
+        public bool Status { get; set; } = true;
         public int UserId { get; set; }
         
     }

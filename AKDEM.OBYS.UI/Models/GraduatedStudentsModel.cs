@@ -7,6 +7,7 @@ namespace AKDEM.OBYS.UI.Models
 {
     public class GraduatedStudentsModel
     {
+        public int UserId { get; set; }
         public string Name { get; set; }
         public int SıraNo { get; set; }
         public string Branch { get; set; }
