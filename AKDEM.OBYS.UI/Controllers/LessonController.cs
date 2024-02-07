@@ -8,6 +8,7 @@ using AKDEM.OBYS.UI.Models;
 using DinkToPdf;
 using DinkToPdf.Contracts;
 using FluentValidation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -25,6 +26,7 @@ using System.Threading.Tasks;
 
 namespace AKDEM.OBYS.UI.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class LessonController : Controller
     {
         private readonly IAppLessonService _appLessonService;

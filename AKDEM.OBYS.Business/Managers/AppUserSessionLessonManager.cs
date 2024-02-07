@@ -122,7 +122,9 @@ namespace AKDEM.OBYS.Business.Managers
             {
                 foreach (var userSession in dtos)
                 {
-                    var entities = await _uow.GetRepositry<AppUserSessionLesson>().GetAllAsync(x => x.UserSessionId == userSession);
+                    var query = _uow.GetRepositry<AppUserSessionLesson>().GetQuery();
+                    var entities = await query.Where(x => x.UserSessionId == userSession).ToListAsync();
+                    
                     if (entities.Count!=0)
                     {
                         foreach( var entity in entities)
@@ -174,7 +176,9 @@ namespace AKDEM.OBYS.Business.Managers
         }
         public async Task RemoveUserSessionLessonBySessionId (int sessionId)
         {
-            var entities = await _uow.GetRepositry<AppUserSessionLesson>().GetAllAsync(x => x.AppUserSession.AppSession.Id == sessionId);
+            var query = _uow.GetRepositry<AppUserSessionLesson>().GetQuery();
+            var entities = await query.Where(x => x.AppUserSession.AppSession.Id == sessionId).ToListAsync();
+            
             if (entities.Count != 0)
             {
                 foreach(var item in entities)

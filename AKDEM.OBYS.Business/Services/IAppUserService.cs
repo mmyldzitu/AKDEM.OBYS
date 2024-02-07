@@ -27,6 +27,8 @@ namespace AKDEM.OBYS.Business.Services
         Task UserPasswordUpdate(int userId, string newPassword);
         Task ChangeTeacherStatus(int userId);
         Task<List<string>> GetTeacherNameForPresident();
+        Task<bool> IfEmailAlreadyExists(string definition);
+        
 
 
 

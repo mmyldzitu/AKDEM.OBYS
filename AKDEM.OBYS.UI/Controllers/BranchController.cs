@@ -7,6 +7,7 @@ using AKDEM.OBYS.UI.Extensions;
 using AKDEM.OBYS.UI.Models;
 using AutoMapper;
 using FluentValidation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -20,6 +21,7 @@ using System.Threading.Tasks;
 
 namespace AKDEM.OBYS.UI.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class BranchController : Controller
     {
         private readonly IAppBranchService _appBranchService;
@@ -528,6 +530,10 @@ namespace AKDEM.OBYS.UI.Controllers
                                 const newClassbutton = document.getElementById('newClass');
                                                                 if (newClassbutton) {
                                                                     newClassbutton.style.display = 'none';
+                                                                }
+const mergeButton = document.getElementById('mergeBranches');
+                                                                if (mergeButton) {
+                                                                    mergeButton.style.display = 'none';
                                                                 }
 
                                 // Seçilecek kolon başlıkları

@@ -10,6 +10,7 @@ using AKDEM.OBYS.UI.Extensions;
 using AKDEM.OBYS.UI.Models;
 using AutoMapper;
 using FluentValidation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -23,6 +24,7 @@ using System.Threading.Tasks;
 
 namespace AKDEM.OBYS.UI.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class UserController : Controller
     {
         private readonly IAppUserService _appUserService;
@@ -38,9 +40,10 @@ namespace AKDEM.OBYS.UI.Controllers
         private readonly IAppWarningService _appWarningService;
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly IAppGraduatedService _appGraduatedService;
+        private readonly IValidator<AppStudentCreateModel> _appStudentCreateModelValidator;
 
 
-        public UserController(IAppUserService appUserService, IMapper mapper, IValidator<AppTeacherUpdateModel> teacherUpdateModelValidator, IAppBranchService appBranchService, IAppStudentService appStudentService, IAppSessionService appSessionService, IAppUserSessionService appUserSessionService, IAppUserSessionLessonService appUserSessionLessonService, IAppScheduleDetailService appScheduleDetailService, IAppWarningService appWarningService, IWebHostEnvironment webHostEnvironment, IAppGraduatedService appGraduatedService)
+        public UserController(IAppUserService appUserService, IMapper mapper, IValidator<AppTeacherUpdateModel> teacherUpdateModelValidator, IAppBranchService appBranchService, IAppStudentService appStudentService, IAppSessionService appSessionService, IAppUserSessionService appUserSessionService, IAppUserSessionLessonService appUserSessionLessonService, IAppScheduleDetailService appScheduleDetailService, IAppWarningService appWarningService, IWebHostEnvironment webHostEnvironment, IAppGraduatedService appGraduatedService, IValidator<AppStudentCreateModel> appStudentCreateModelValidator)
         {
             _appUserService = appUserService;
             _mapper = mapper;
@@ -54,6 +57,7 @@ namespace AKDEM.OBYS.UI.Controllers
             _appWarningService = appWarningService;
             _webHostEnvironment = webHostEnvironment;
             _appGraduatedService = appGraduatedService;
+            _appStudentCreateModelValidator = appStudentCreateModelValidator;
         }
 
         public async Task<IActionResult> GetTeachers(bool status=true)
@@ -276,70 +280,86 @@ namespace AKDEM.OBYS.UI.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateStudent(AppStudentCreateModel model, int classId=1)
         {
-            AppStudentCreateDto dto = new();
-
-            if (model.ImagePath != null)
+            var list = new List<AppClassListDto>();
+            var items = Enum.GetValues(typeof(ClassType));
+            foreach (int item in items)
             {
-                var fileName = Guid.NewGuid().ToString();
-                var extName = Path.GetExtension(model.ImagePath.FileName);
-                string path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "studentImages", fileName + extName);
-                string pathforDb = Path.Combine("\\", "images", "studentImages", fileName + extName);
-                var stream = new FileStream(path, FileMode.Create);
-                await model.ImagePath.CopyToAsync(stream);
-                dto.ImagePath = pathforDb;
+                list.Add(new AppClassListDto
+                {
+                    ClassId = item,
+                    Definition = Enum.GetName(typeof(ClassType), item)
+                });
             }
-            dto.SıraNo = model.SıraNo;
-            dto.FirstName = model.FirstName;
-            dto.SecondName = model.SecondName;
-            dto.PhoneNumber = model.PhoneNumber;
-            dto.Email = model.Email;
-            dto.Password = model.Email;
-            dto.BranchId = model.BranchId;
-            dto.ClassId = model.ClassId;
-            dto.Status = model.Status;
-            dto.DepartReason = "";
-            var response = await _appStudentService.CreateStudentWithRoleAsync(dto, (int)RoleType.Student);
-            if (response.ResponseType == ResponseType.ValidationError)
+            ViewBag.classes = new SelectList(list, "ClassId", "Definition");
+
+
+            var list2 = new List<AppBranchListDto>();
+            var items2 = await _appBranchService.GetList();
+            foreach (var item in items2)
             {
-                foreach (var error in response.ValidationErrors)
+                list2.Add(new AppBranchListDto
+                {
+                    Id = item.Id,
+
+                    Definition = item.Definition
+                }); ;
+            }
+            ViewBag.branches = new SelectList(list2, "Id", "Definition");
+
+            var modelResult = await _appStudentCreateModelValidator.ValidateAsync(model);
+            if (modelResult.IsValid)
+            {
+                AppStudentCreateDto dto = new();
+
+                if (model.ImagePath != null)
+                {
+                    var fileName = Guid.NewGuid().ToString();
+                    var extName = Path.GetExtension(model.ImagePath.FileName);
+                    string path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "studentImages", fileName + extName);
+                    string pathforDb = Path.Combine("\\", "images", "studentImages", fileName + extName);
+                    var stream = new FileStream(path, FileMode.Create);
+                    await model.ImagePath.CopyToAsync(stream);
+                    dto.ImagePath = pathforDb;
+                }
+                dto.SıraNo = model.SıraNo;
+                dto.FirstName = model.FirstName;
+                dto.SecondName = model.SecondName;
+                dto.PhoneNumber = model.PhoneNumber;
+                dto.Email = model.Email;
+                dto.Password = model.Email;
+                dto.BranchId = model.BranchId;
+                dto.ClassId = model.ClassId;
+                dto.Status = model.Status;
+                dto.DepartReason = "";
+                var response = await _appStudentService.CreateStudentWithRoleAsync(dto, (int)RoleType.Student);
+                if (response.ResponseType == ResponseType.ValidationError)
+                {
+                    foreach (var error in response.ValidationErrors)
+                    {
+                        ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
+
+                    }
+
+                    return View(model);
+                }
+
+                int thisUserId = await _appUserService.GetUserIdByNameSecondNameandEmail(dto.FirstName, dto.SecondName, dto.Email);
+                //BURASI
+                await _appStudentService.CreateStudentOrChangeStatusProcessForUserSessionandUSerSessionLessons(thisUserId);
+
+
+                return RedirectToAction("GetStudents", new { classType = classId });
+
+
+            }
+            else
+            {
+                foreach(var error in modelResult.Errors)
                 {
                     ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
-
                 }
-                var list = new List<AppClassListDto>();
-                var items = Enum.GetValues(typeof(ClassType));
-                foreach (int item in items)
-                {
-                    list.Add(new AppClassListDto
-                    {
-                        ClassId = item,
-                        Definition = Enum.GetName(typeof(ClassType), item)
-                    });
-                }
-                ViewBag.classes = new SelectList(list, "ClassId", "Definition");
-
-
-                var list2 = new List<AppBranchListDto>();
-                var items2 = await _appBranchService.GetList();
-                foreach (var item in items2)
-                {
-                    list2.Add(new AppBranchListDto
-                    {
-                        Id = item.Id,
-
-                        Definition = item.Definition
-                    }); ;
-                }
-                ViewBag.branches = new SelectList(list2, "Id", "Definition");
                 return View(model);
             }
-
-            int thisUserId = await _appUserService.GetUserIdByNameSecondNameandEmail(dto.FirstName, dto.SecondName, dto.Email);
-            //BURASI
-            await _appStudentService.CreateStudentOrChangeStatusProcessForUserSessionandUSerSessionLessons(thisUserId);
-
-
-            return RedirectToAction("GetStudents" ,new { classType=classId });
 
 
         }
@@ -493,7 +513,7 @@ namespace AKDEM.OBYS.UI.Controllers
             await _appUserSessionService.RemoveUserSessionByUserId(id);
             await _appWarningService.RemoveWarningByUserId(id);
             await _appGraduatedService.RemoveCertificateByUserId(id);
-            var response = await _appStudentService.RemoveAsync(id);
+            await _appStudentService.RemoveStudent(id);
 
             return RedirectToAction("GetStudents", new { classType = classId });
             

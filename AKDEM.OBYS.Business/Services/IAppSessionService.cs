@@ -36,5 +36,6 @@ namespace AKDEM.OBYS.Business.Services
         Task<bool> IfLessonAlreadyExists(string definition, int userId);
         Task RemoveUserSessionsBecauseOfBeingPassive(int sessionId, int userId);
         Task<string> ReturnPresidentName(int sessionId);
+        Task RemoveSession(int sessionId);
     }
 }

@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 namespace AKDEM.OBYS.UI.Controllers
 {
 
-
+    [Authorize(Roles = "Student")]
     public class StudentController : Controller
     {
         private readonly IAppSessionService _appSessionService;
@@ -240,7 +240,7 @@ namespace AKDEM.OBYS.UI.Controllers
 
 
         }
-        [Authorize(Roles = "Student")]
+        
 
         public async Task<IActionResult> StudentExSessions(int userId)
         {
@@ -248,7 +248,7 @@ namespace AKDEM.OBYS.UI.Controllers
             ViewBag.userId = userId;
             return View(sessions);
         }
-        [Authorize(Roles = "Student")]
+        
 
         public async Task<IActionResult> StudentExSessionDetails(int userId, int sessionId)
         {

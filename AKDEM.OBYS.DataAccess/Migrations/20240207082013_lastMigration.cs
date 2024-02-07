@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace AKDEM.OBYS.DataAccess.Migrations
 {
-    public partial class renew : Migration
+    public partial class lastMigration : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {

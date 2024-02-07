@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AKDEM.OBYS.DataAccess.Migrations
 {
     [DbContext(typeof(AkdemContext))]
-    [Migration("20240206105314_renew")]
-    partial class renew
+    [Migration("20240207082013_lastMigration")]
+    partial class lastMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

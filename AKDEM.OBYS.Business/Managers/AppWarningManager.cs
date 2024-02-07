@@ -30,7 +30,9 @@ namespace AKDEM.OBYS.Business.Managers
         }
         public async Task RemoveWarningByUserId(int userId)
         {
-            var entities = await _uow.GetRepositry<AppWarning>().GetAllAsync(x => x.AppUserSession.UserId == userId);
+            var query = _uow.GetRepositry<AppWarning>().GetQuery();
+            var entities = await query.Where(x => x.AppUserSession.UserId == userId).ToListAsync();
+            
             if (entities.Count != 0)
             {
                 foreach (var item in entities)
@@ -48,8 +50,10 @@ namespace AKDEM.OBYS.Business.Managers
         {
             List<int> userSessionIds = new List<int>();
             List<int> userIds = new List<int>();
+
+            var query = _uow.GetRepositry<AppWarning>().GetQuery();
+            var entities = await query.Where(x => x.AppUserSession.SessionId == sessionId).ToListAsync();
             
-            var entities = await _uow.GetRepositry<AppWarning>().GetAllAsync(x => x.AppUserSession.SessionId == sessionId);
             if (entities.Count != 0)
             {
                 foreach( var entity in entities)
@@ -76,7 +80,9 @@ namespace AKDEM.OBYS.Business.Managers
         }
         public async Task RemoveWarningByUserIdandSessionId(int userId,int sessionId,int userSessionId)
         {
-            var entities = await _uow.GetRepositry<AppWarning>().GetAllAsync(x => x.AppUserSession.UserId == userId && x.AppUserSession.SessionId==sessionId);
+            var query = _uow.GetRepositry<AppWarning>().GetQuery();
+            var entities = await query.Where(x => x.AppUserSession.UserId == userId).ToListAsync();
+            
             if (entities.Count != 0)
             {
                 foreach (var item in entities)
@@ -309,7 +315,9 @@ namespace AKDEM.OBYS.Business.Managers
         public async Task RemoveLessonWarnings(string mystring, int userId, int userSessionId)
         {
             int sessionId = await _appUserSessionService.GetSessionIdByUserSessionId(userSessionId);
-            var entities = await _uow.GetRepositry<AppWarning>().GetAllAsync(x => x.UserSessionId == userSessionId && x.WarningReason.Contains(mystring));
+            var query = _uow.GetRepositry<AppWarning>().GetQuery();
+            var entities = await query.Where(x => x.UserSessionId == userSessionId && x.WarningReason.Contains(mystring)).ToListAsync();
+            
             if (entities.Count != 0)
             {
                 foreach (var entity in entities)
@@ -330,13 +338,17 @@ namespace AKDEM.OBYS.Business.Managers
 
         public async Task<int> FindWarningCountByString(string lessonName, int userSessionId)
         {
-            var entities = await _uow.GetRepositry<AppWarning>().GetAllAsync(x => x.UserSessionId == userSessionId && x.WarningReason.Contains(lessonName));
+            var query = _uow.GetRepositry<AppWarning>().GetQuery();
+            var entities = await query.Where(x => x.UserSessionId == userSessionId && x.WarningReason.Contains(lessonName)).ToListAsync();
+            
             return entities.Count();
         }
         public async Task<double> SessionWarningCountByUserSessionId(int userSessionId, double slwc)
         {
 
-            var entities = await _uow.GetRepositry<AppWarning>().GetAllAsync(x => x.UserSessionId==userSessionId);
+            var query = _uow.GetRepositry<AppWarning>().GetQuery();
+            var entities = await query.Where(x => x.UserSessionId == userSessionId).ToListAsync();
+            
             
             
 
@@ -419,7 +431,9 @@ namespace AKDEM.OBYS.Business.Managers
         }
         public async Task<List<AppWarningListDto>> AppWarningByUserSessionId(int userSessionId)
         {
-            var entities = await _uow.GetRepositry<AppWarning>().GetAllAsync(x => x.UserSessionId == userSessionId);
+            var query = _uow.GetRepositry<AppWarning>().GetQuery();
+            var entities = await query.Where(x => x.UserSessionId == userSessionId).ToListAsync();
+            
             if (entities.Count != 0)
             {
                 var descList = entities.OrderByDescending(x => x.Id).ToList();
@@ -431,7 +445,9 @@ namespace AKDEM.OBYS.Business.Managers
 
         public async Task<List<AppWarningListDto>> AppWarningByUserId(int userId)
         {
-            var entities = await _uow.GetRepositry<AppWarning>().GetAllAsync(x => x.AppUserSession.UserId== userId);
+            var query = _uow.GetRepositry<AppWarning>().GetQuery();
+            var entities = await query.Where(x => x.AppUserSession.UserId == userId).ToListAsync();
+            
             if (entities.Count != 0)
             {
                 var descList = entities.OrderByDescending(x => x.Id).ToList();
@@ -458,8 +474,15 @@ namespace AKDEM.OBYS.Business.Managers
         {
             int sessionId = await _appUserSessionService.GetSessionIdByUserSessionId(userSessionId);
 
-            var entity = await _uow.GetRepositry<AppWarning>().FindAsync(id);
+            var query = _uow.GetRepositry<AppWarning>().GetQuery();
+            var entity = await query.Where(x => x.Id == id).SingleOrDefaultAsync();
+
+            if (entity != null)
+            {
             _uow.GetRepositry<AppWarning>().Remove(entity);
+
+
+            }
             await _uow.SaveChangesAsync();
             double slwc = await SessionLessonWarningCountByUserSessionId(userSessionId);
             double awc = await AbsenteismWarningCountByUserSessionId(userSessionId);

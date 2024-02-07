@@ -5,6 +5,7 @@ using AKDEM.OBYS.Dto.AppUserSessionLessonDtos;
 using AKDEM.OBYS.Dto.AppWarningDtos;
 using AKDEM.OBYS.UI.Models;
 using FluentValidation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -17,6 +18,7 @@ using System.Threading.Tasks;
 
 namespace AKDEM.OBYS.UI.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class OtomationController : Controller
     {
         private readonly IAppBranchService _appBranchService;

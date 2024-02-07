@@ -18,8 +18,8 @@ using System.Threading.Tasks;
 
 namespace AKDEM.OBYS.UI.Controllers
 {
-    
 
+    [Authorize(Roles = "Teacher")]
     public class TeacherController : Controller
     {
         private readonly IAppSessionService _appSessionService;
@@ -84,7 +84,7 @@ namespace AKDEM.OBYS.UI.Controllers
                 return View(new List<int>());
             }
         }
-        [Authorize(Roles = "Teacher")]
+        
         public async Task<IActionResult> TeacherLessons(int sessionId,int userId)
         {
             ViewBag.sessionStatus = await _appSessionService.GetStatusFromSessionId(sessionId);
@@ -211,7 +211,7 @@ namespace AKDEM.OBYS.UI.Controllers
 
 
         [HttpGet]
-        [Authorize(Roles = "Teacher")]
+        
 
         public async Task<IActionResult> TeacherNotes(int userSessionId, int lessonId)
         {
@@ -220,7 +220,7 @@ namespace AKDEM.OBYS.UI.Controllers
             return this.View(userSessionLessons.Data);
         }
         [HttpPost]
-        [Authorize(Roles = "Teacher")]
+        
 
         public async Task<IActionResult> TeacherNotes(List<AppUserSessionLessonUpdateDto> dtos)
         {
@@ -432,7 +432,7 @@ namespace AKDEM.OBYS.UI.Controllers
 
             return View(model);
         }
-        [Authorize(Roles = "Teacher")]
+        
 
         public async Task<IActionResult> TeacherExSessions(int userId)
         {
@@ -440,7 +440,7 @@ namespace AKDEM.OBYS.UI.Controllers
             ViewBag.userId = userId;
             return View(sessions);
         }
-        [Authorize(Roles = "Teacher")]
+       
 
         public async Task<IActionResult> TeacherExSessionDetails(int userId,int sessionId)
         {

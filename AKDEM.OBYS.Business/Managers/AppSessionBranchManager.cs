@@ -4,6 +4,7 @@ using AKDEM.OBYS.Dto.AppSessionBranchDtos;
 using AKDEM.OBYS.Entities;
 using AutoMapper;
 using FluentValidation;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -38,7 +39,9 @@ namespace AKDEM.OBYS.Business.Managers
         }
         public async Task  RemoveSessionBranchesBySessionId(int sessionId)
         {
-            var entities = await _uow.GetRepositry<AppSessionBranch>().GetAllAsync(x => x.SessionId == sessionId);
+            var query = _uow.GetRepositry<AppSessionBranch>().GetQuery();
+            var entities = await query.Where(x => x.SessionId == sessionId).ToListAsync();
+            
             if (entities.Count != 0)
             {
                 foreach(var item in entities)

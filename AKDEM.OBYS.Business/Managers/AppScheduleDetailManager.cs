@@ -88,7 +88,9 @@ namespace AKDEM.OBYS.Business.Managers
 
         public async Task RemoveByNameAsync(string name)
         {
-            var data = await _uow.GetRepositry<AppScheduleDetail>().GetAllAsync(x => x.AppLesson.Definition == name);
+            var query = _uow.GetRepositry<AppScheduleDetail>().GetQuery();
+            var data = await query.Where(x => x.AppLesson.Definition == name).ToListAsync();
+            
             foreach (var item in data)
             {
                  _uow.GetRepositry<AppScheduleDetail>().Remove(item);
@@ -136,7 +138,9 @@ namespace AKDEM.OBYS.Business.Managers
         }
         public async Task RemoveScheduleDetailsByScheduleId(int scheduleId)
         {
-            var entities = await _uow.GetRepositry<AppScheduleDetail>().GetAllAsync(x => x.ApScheduleId == scheduleId);
+            var query = _uow.GetRepositry<AppScheduleDetail>().GetQuery();
+            var entities = await query.Where(x => x.ApScheduleId == scheduleId).ToListAsync();
+            
             if (entities.Count != 0)
             {
                 foreach( var entity in entities)
@@ -148,7 +152,9 @@ namespace AKDEM.OBYS.Business.Managers
         }
         public async Task RemoveScheduleDetailBySessionId(int sessionId)
         {
-            var entities = await _uow.GetRepositry<AppScheduleDetail>().GetAllAsync(x => x.AppSchedule.AppSessionBranch.SessionId == sessionId);
+            var query = _uow.GetRepositry<AppScheduleDetail>().GetQuery();
+            var entities = await query.Where(x => x.AppSchedule.AppSessionBranch.SessionId == sessionId).ToListAsync();
+            
             if (entities.Count != 0)
             {
                 foreach( var item in entities)

@@ -306,5 +306,15 @@ namespace AKDEM.OBYS.Business.Managers
             await _uow.SaveChangesAsync();
 
         }
+        public async Task RemoveStudent(int userId)
+        {
+            var query = _uow.GetRepositry<AppUser>().GetQuery();
+            var user = await query.Where(x => x.Id == userId).SingleOrDefaultAsync();
+            if (user != null)
+            {
+                _uow.GetRepositry<AppUser>().Remove(user);
+            }
+            await _uow.SaveChangesAsync();
+        }
     }
 }

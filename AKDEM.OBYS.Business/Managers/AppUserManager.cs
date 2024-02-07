@@ -38,6 +38,16 @@ namespace AKDEM.OBYS.Business.Managers
             _createStudentDtoValidator = createStudentDtoValidator;
             _loginDtoValidator = loginDtoValidator;
         }
+        public async Task<bool> IfEmailAlreadyExists(string definition)
+        {
+            var query = _uow.GetRepositry<AppUser>().GetQuery();
+            var user = await query.Where(x => x.Email == definition).SingleOrDefaultAsync();
+            if (user == null)
+            {
+                return true;
+            }
+            return false;
+        }
         public async Task<bool> IsPasswordRight(int userId, string password)
         {
             var query = _uow.GetRepositry<AppUser>().GetQuery();

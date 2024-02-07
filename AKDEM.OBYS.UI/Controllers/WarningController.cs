@@ -1,5 +1,6 @@
 ﻿using AKDEM.OBYS.Business.Services;
 using AKDEM.OBYS.UI.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using PuppeteerSharp;
@@ -11,6 +12,7 @@ using System.Threading.Tasks;
 
 namespace AKDEM.OBYS.UI.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class WarningController : Controller
     {
         private readonly IAppWarningService _appWarningService;

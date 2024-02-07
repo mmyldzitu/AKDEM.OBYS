@@ -85,9 +85,15 @@ namespace AKDEM.OBYS.Business.Managers
         }
         public async Task AppLessonUpdate(AppLessonUpdateDto dto)
         {
-            var entity = await _uow.GetRepositry<AppLesson>().FindByFilterAsync(x=>x.Id==dto.Id);
-            var mappedDto = _mapper.Map<AppLesson>(dto);
-            _uow.GetRepositry<AppLesson>().Update(mappedDto, entity);
+            var query = _uow.GetRepositry<AppLesson>().GetQuery();
+            var entity = await query.Where(x => x.Id == dto.Id).SingleOrDefaultAsync();
+            if (entity != null)
+            {
+                var mappedDto = _mapper.Map<AppLesson>(dto);
+                _uow.GetRepositry<AppLesson>().Update(mappedDto, entity);
+            }
+            
+            
             await _uow.SaveChangesAsync();
         }
 

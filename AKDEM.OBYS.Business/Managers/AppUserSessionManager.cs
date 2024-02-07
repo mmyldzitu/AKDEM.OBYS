@@ -300,7 +300,9 @@ namespace AKDEM.OBYS.Business.Managers
         }
         public async Task<bool> GetUserSessionStatus(int userSessionId)
         {
-            var entity = await _uow.GetRepositry<AppUserSession>().FindByFilterAsync(x => x.Id == userSessionId);
+            var query = _uow.GetRepositry<AppUserSession>().GetQuery();
+            var entity = await query.Where(x => x.Id == userSessionId).SingleOrDefaultAsync();
+            
             if (entity != null)
             {
                 return entity.Status;
@@ -326,7 +328,9 @@ namespace AKDEM.OBYS.Business.Managers
         }
         public async Task RemoveUserSessionByUserId(int userId)
         {
-            var entities = await _uow.GetRepositry<AppUserSession>().GetAllAsync(x => x.UserId == userId);
+            var query = _uow.GetRepositry<AppUserSession>().GetQuery();
+            var entities = await query.Where(x => x.UserId == userId).ToListAsync();
+            
             if (entities.Count != 0)
             {
                 foreach (var item in entities)

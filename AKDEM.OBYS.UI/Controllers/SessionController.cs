@@ -21,6 +21,7 @@ using System.Threading.Tasks;
 
 namespace AKDEM.OBYS.UI.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class SessionController : Controller
     {
         private readonly IAppSessionService _appSessionService;
@@ -57,7 +58,7 @@ namespace AKDEM.OBYS.UI.Controllers
             _appGraduatedService = appGraduatedService;
         }
 
-        [Authorize(Roles = "Admin")]
+        
 
         public async Task<IActionResult> Index()
         {
@@ -80,14 +81,14 @@ namespace AKDEM.OBYS.UI.Controllers
 
 
         }
-        [Authorize(Roles = "Admin")]
+        
 
         public async Task<IActionResult> ChangeStatus(int id)
         {
             await _appSessionService.SetStatusAsync(id);
             return RedirectToAction("Index", "Session");
         }
-        [Authorize(Roles = "Admin")]
+        
 
         public async Task< IActionResult> CreateSession()
         {
@@ -120,7 +121,7 @@ namespace AKDEM.OBYS.UI.Controllers
             return View(new AppSessionCreateModel());
         }
         [HttpPost]
-        [Authorize(Roles = "Admin")]
+        
 
         public async Task<IActionResult> CreateSession(AppSessionCreateModel model)
         {
@@ -236,7 +237,7 @@ namespace AKDEM.OBYS.UI.Controllers
 
             await _appUserSessionService.TotalAverageAllUsers(sessionId);
 
-            await _appSessionService.RemoveAsync(sessionId);
+            await _appSessionService.RemoveSession(sessionId);
 
             return RedirectToAction("Index");
 

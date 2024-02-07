@@ -32,6 +32,7 @@ namespace AKDEM.OBYS.Business.Services
         Task ChangeBranchForStudent(int userId, int newBranchId);
         Task<bool> ReturnStatusOfStudent(int userId);
         Task<string> ReturnDepartReasonOfStudent(int userId);
+        Task RemoveStudent(int userId);
 
 
     }

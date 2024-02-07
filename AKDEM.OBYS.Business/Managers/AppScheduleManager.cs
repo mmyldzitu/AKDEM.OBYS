@@ -222,13 +222,22 @@ namespace AKDEM.OBYS.Business.Managers
         }
         public async Task<AppScheduleListDto> GetScheduleByScheduleId(int scheduleId)
         {
-            var schedule = await _uow.GetRepositry<AppSchedule>().FindByFilterAsync(x => x.Id == scheduleId);
-            var mappedSchedule = _mapper.Map<AppScheduleListDto>(schedule);
-            return mappedSchedule;
+            var query = _uow.GetRepositry<AppSchedule>().GetQuery();
+            var schedule = await query.Where(x => x.Id == scheduleId).SingleOrDefaultAsync();
+            if (schedule != null)
+            {
+                var mappedSchedule = _mapper.Map<AppScheduleListDto>(schedule);
+                return mappedSchedule;
+            }
+            return new AppScheduleListDto();
+            
+           
         }
         public async Task RemoveScheduleByScheduleId(int scheduleId)
         {
-            var entity = await _uow.GetRepositry<AppSchedule>().FindAsync(scheduleId);
+            var query = _uow.GetRepositry<AppSchedule>().GetQuery();
+            var entity = await query.Where(x => x.Id == scheduleId).SingleOrDefaultAsync();
+            
             if (entity != null)
             {
                 _uow.GetRepositry<AppSchedule>().Remove(entity);
@@ -237,7 +246,9 @@ namespace AKDEM.OBYS.Business.Managers
         }
         public async Task RemoveScheduleBySessionId(int sessionId)
         {
-            var entities = await _uow.GetRepositry<AppSchedule>().GetAllAsync(x => x.AppSessionBranch.SessionId == sessionId);
+            var query = _uow.GetRepositry<AppSchedule>().GetQuery();
+            var entities = await query.Where(x => x.AppSessionBranch.SessionId == sessionId).ToListAsync();
+            
             if (entities.Count != 0)
             {
                 foreach(var item in entities)

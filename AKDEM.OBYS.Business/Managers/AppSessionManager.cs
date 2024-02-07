@@ -37,6 +37,16 @@ namespace AKDEM.OBYS.Business.Managers
             }
             return 0;
         }
+        public async Task RemoveSession(int sessionId)
+        {
+            var query = _uow.GetRepositry<AppSession>().GetQuery();
+            var session = await query.Where(x => x.Id == sessionId).SingleOrDefaultAsync();
+            if (session != null)
+            {
+                _uow.GetRepositry<AppSession>().Remove(session);
+            }
+            await _uow.SaveChangesAsync();
+        }
         public async Task<bool> IfLessonAlreadyExists(string definition, int userId)
         {
             var query = _uow.GetRepositry<AppLesson>().GetQuery();
