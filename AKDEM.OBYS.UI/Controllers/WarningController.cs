@@ -8,11 +8,12 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace AKDEM.OBYS.UI.Controllers
 {
-    [Authorize(Roles = "Admin")]
+    
     public class WarningController : Controller
     {
         private readonly IAppWarningService _appWarningService;
@@ -31,7 +32,51 @@ namespace AKDEM.OBYS.UI.Controllers
             _webHostEnvironment = webHostEnvironment;
             _appUserService = appUserService;
         }
+        char[] charactersToReplace = { '/', ' ', '\\', '?', ':', '.', ',' };
+        char replacementChar = '_';
+        static string ReplaceMultipleChars(string input, char[] charactersToReplace, char replacementChar)
+        {
+            foreach (char c in charactersToReplace)
+            {
+                input = input.Replace(c, replacementChar);
+            }
+            return input;
+        }
+        static string ConvertTurkishToEnglish(string input)
+        {
+            StringBuilder result = new StringBuilder();
 
+            foreach (char c in input)
+            {
+                switch (c)
+                {
+                    case 'Ç':
+                        result.Append('C');
+                        break;
+                    case 'Ğ':
+                        result.Append('G');
+                        break;
+
+                    case 'İ':
+                        result.Append('I');
+                        break;
+                    case 'Ö':
+                        result.Append('O');
+                        break;
+                    case 'Ş':
+                        result.Append('S');
+                        break;
+                    case 'Ü':
+                        result.Append('U');
+                        break;
+                    default:
+                        result.Append(c);
+                        break;
+                }
+            }
+
+            return result.ToString();
+        }
         public async Task <IActionResult> Index(int sessionId)
         {
             ViewBag.sessionStatus = await _appSessionService.GetStatusFromSessionId(sessionId);
@@ -39,6 +84,14 @@ namespace AKDEM.OBYS.UI.Controllers
             string sessionName = await _appSessionService.ReturnSessionName(sessionId);
             ViewBag.sessionName = sessionName;
             ViewBag.sessionName2 = sessionName.Replace("/", "_");
+
+            string header = $"{sessionName}_Dönemi_Öğrenci_İhtarları";
+            string headerforPdf = ReplaceMultipleChars(header, charactersToReplace, replacementChar);
+            headerforPdf = headerforPdf.ToUpper();
+            headerforPdf = ConvertTurkishToEnglish(headerforPdf);
+            ViewBag.headerforPdf = headerforPdf;
+
+
             var warnings = await _appWarningService.AppWarningBySessionId(sessionId);
             return View(warnings);
         }
@@ -49,6 +102,13 @@ namespace AKDEM.OBYS.UI.Controllers
             string sessionName = await _appSessionService.ReturnSessionName(sessionId);
             ViewBag.sessionName = sessionName;
             ViewBag.sessionName2 = sessionName.Replace("/", "_");
+
+            string header = $"{sessionName}_Dönemi_Başarısız_Öğrenciler";
+            string headerforPdf = ReplaceMultipleChars(header, charactersToReplace, replacementChar);
+            headerforPdf = headerforPdf.ToUpper();
+            headerforPdf = ConvertTurkishToEnglish(headerforPdf);
+            ViewBag.headerforPdf = headerforPdf;
+
             var users = await _appStudentService.GetPassiveStudents(sessionId);
             return View(users);
         }
@@ -60,16 +120,26 @@ namespace AKDEM.OBYS.UI.Controllers
             ViewBag.sessionName2 = sessionName.Replace("/", "_");
             ViewBag.sessionId = sessionId;
             ViewBag.userId = userId;
-            ViewBag.userName = await _appUserService.GetUserNameById(userId);
+            string userName= await _appUserService.GetUserNameById(userId);
+            ViewBag.userName = userName;
             int userSessionId = await _appUserSessionService.UserSessionIdByUserIdAndSessionId(userId, sessionId);
             ViewBag.userSessionId = userSessionId;
             string departReason = await _appStudentService.ReturnDepartReasonOfStudent(userId);
             var status = await _appStudentService.ReturnStatusOfStudent(userId);
 
             var warningList = await _appWarningService.AppWarningByUserSessionId(userSessionId);
+
+
+            string header = $"{userName}_{sessionName}_Dönemi_İhtarları";
+            string headerforPdf = ReplaceMultipleChars(header, charactersToReplace, replacementChar);
+            headerforPdf = headerforPdf.ToUpper();
+            headerforPdf = ConvertTurkishToEnglish(headerforPdf);
+            ViewBag.headerforPdf = headerforPdf;
+
             return View(new StudentWarningsModel {AppWarnings=warningList,Status=status,DepartReason= departReason});
 
         }
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> RemoveWarning(int sessionId, int userId, int id)
         {
             int userSessionId = await _appUserSessionService.UserSessionIdByUserIdAndSessionId(userId, sessionId);

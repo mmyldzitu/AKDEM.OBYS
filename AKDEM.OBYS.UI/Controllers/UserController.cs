@@ -20,11 +20,12 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace AKDEM.OBYS.UI.Controllers
 {
-    [Authorize(Roles = "Admin")]
+    
     public class UserController : Controller
     {
         private readonly IAppUserService _appUserService;
@@ -41,9 +42,10 @@ namespace AKDEM.OBYS.UI.Controllers
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly IAppGraduatedService _appGraduatedService;
         private readonly IValidator<AppStudentCreateModel> _appStudentCreateModelValidator;
+        private readonly IValidator<AppTeacherCreateModel> _appTeacherCreateModelValidator;
 
 
-        public UserController(IAppUserService appUserService, IMapper mapper, IValidator<AppTeacherUpdateModel> teacherUpdateModelValidator, IAppBranchService appBranchService, IAppStudentService appStudentService, IAppSessionService appSessionService, IAppUserSessionService appUserSessionService, IAppUserSessionLessonService appUserSessionLessonService, IAppScheduleDetailService appScheduleDetailService, IAppWarningService appWarningService, IWebHostEnvironment webHostEnvironment, IAppGraduatedService appGraduatedService, IValidator<AppStudentCreateModel> appStudentCreateModelValidator)
+        public UserController(IAppUserService appUserService, IMapper mapper, IValidator<AppTeacherUpdateModel> teacherUpdateModelValidator, IAppBranchService appBranchService, IAppStudentService appStudentService, IAppSessionService appSessionService, IAppUserSessionService appUserSessionService, IAppUserSessionLessonService appUserSessionLessonService, IAppScheduleDetailService appScheduleDetailService, IAppWarningService appWarningService, IWebHostEnvironment webHostEnvironment, IAppGraduatedService appGraduatedService, IValidator<AppStudentCreateModel> appStudentCreateModelValidator, IValidator<AppTeacherCreateModel> appTeacherCreateModelValidator)
         {
             _appUserService = appUserService;
             _mapper = mapper;
@@ -58,67 +60,139 @@ namespace AKDEM.OBYS.UI.Controllers
             _webHostEnvironment = webHostEnvironment;
             _appGraduatedService = appGraduatedService;
             _appStudentCreateModelValidator = appStudentCreateModelValidator;
+            _appTeacherCreateModelValidator = appTeacherCreateModelValidator;
         }
+        char[] charactersToReplace = { '/', ' ', '\\', '?', ':', '.', ',' };
+        char replacementChar = '_';
+        static string ReplaceMultipleChars(string input, char[] charactersToReplace, char replacementChar)
+        {
+            foreach (char c in charactersToReplace)
+            {
+                input = input.Replace(c, replacementChar);
+            }
+            return input;
+        }
+        static string ConvertTurkishToEnglish(string input)
+        {
+            StringBuilder result = new StringBuilder();
 
+            foreach (char c in input)
+            {
+                switch (c)
+                {
+                    case 'Ç':
+                        result.Append('C');
+                        break;
+                    case 'Ğ':
+                        result.Append('G');
+                        break;
+
+                    case 'İ':
+                        result.Append('I');
+                        break;
+                    case 'Ö':
+                        result.Append('O');
+                        break;
+                    case 'Ş':
+                        result.Append('S');
+                        break;
+                    case 'Ü':
+                        result.Append('U');
+                        break;
+                    default:
+                        result.Append(c);
+                        break;
+                }
+            }
+
+            return result.ToString();
+        }
         public async Task<IActionResult> GetTeachers(bool status=true)
         {
             var response = await _appUserService.GetAllTeacherAsync((int)RoleType.Teacher,status);
+            string type = "";
             if (status)
             {
                 ViewBag.header = "Aktif";
+                type = "Aktif";
             }
             else
             {
                 ViewBag.header = "Pasif";
+                type = "Pasif";
             }
             ViewBag.status = status;
+
+            string header = $"{type}_Öğretmenler";
+            string headerforPdf = ReplaceMultipleChars(header, charactersToReplace, replacementChar);
+            headerforPdf = headerforPdf.ToUpper();
+            headerforPdf = ConvertTurkishToEnglish(headerforPdf);
+            ViewBag.headerforPdf = headerforPdf;
             return View(response.Data);
         }
+
+        [Authorize(Roles = "Admin")]
         public IActionResult CreateTeacher()
         {
             return View(new AppTeacherCreateModel());
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> CreateTeacher(AppTeacherCreateModel model)
         {
-            AppTeacherCreateDto newdto = new();
-
-            if (model.ImagePath != null)
+            var modelResult = await _appTeacherCreateModelValidator.ValidateAsync(model);
+            if (modelResult.IsValid)
             {
-                var fileName = Guid.NewGuid().ToString();
-                var extName = Path.GetExtension(model.ImagePath.FileName);
-                string path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "teacherImages", fileName + extName);
-                string pathforDb = Path.Combine("\\", "images", "teacherImages", fileName + extName);
-                var stream = new FileStream(path, FileMode.Create);
-                await model.ImagePath.CopyToAsync(stream);
-                newdto.ImagePath = pathforDb;
+                AppTeacherCreateDto newdto = new();
 
+                if (model.ImagePath != null)
+                {
+                    var fileName = Guid.NewGuid().ToString();
+                    var extName = Path.GetExtension(model.ImagePath.FileName);
+                    string path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "teacherImages", fileName + extName);
+                    string pathforDb = Path.Combine("\\", "images", "teacherImages", fileName + extName);
+                    var stream = new FileStream(path, FileMode.Create);
+                    await model.ImagePath.CopyToAsync(stream);
+                    newdto.ImagePath = pathforDb;
+
+
+                }
+                newdto.FirstName = model.FirstName;
+                newdto.SecondName = model.SecondName;
+                newdto.Status = model.Status;
+                newdto.PhoneNumber = model.PhoneNumber;
+                newdto.Email = model.Email;
+                newdto.DepartReason = model.DepartReason;
+                newdto.Password = model.Email;
+
+
+                var response = await _appUserService.CreateTeacherWithRoleAsync(newdto, (int)RoleType.Teacher);
+                if (response.ResponseType == ResponseType.ValidationError)
+                {
+                    foreach (var error in response.ValidationErrors)
+                    {
+                        ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
+
+                    }
+                    return View(model);
+                }
+
+                return RedirectToAction("GetTeachers");
 
             }
-            newdto.FirstName = model.FirstName;
-            newdto.SecondName = model.SecondName;
-            newdto.Status = model.Status;
-            newdto.PhoneNumber = model.PhoneNumber;
-            newdto.Email = model.Email;
-            newdto.DepartReason = model.DepartReason;
-            newdto.Password = model.Email;
-            
-
-            var response = await _appUserService.CreateTeacherWithRoleAsync(newdto, (int)RoleType.Teacher);
-            if (response.ResponseType == ResponseType.ValidationError)
+            else
             {
-                foreach (var error in response.ValidationErrors)
+                foreach(var error in modelResult.Errors)
                 {
                     ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
-
                 }
                 return View(model);
             }
-
-            return RedirectToAction("GetTeachers");
+            
         }
 
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdateTeacher(int id)
         {
             AppTeacherUpdateModel model = new();
@@ -141,6 +215,7 @@ namespace AKDEM.OBYS.UI.Controllers
             return View(model);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> UpdateTeacher(AppTeacherUpdateModel model)
         {
@@ -183,6 +258,7 @@ namespace AKDEM.OBYS.UI.Controllers
             return RedirectToAction("GetTeachers");
 
         }
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> RemoveTeacher(int id,bool status)
         {
             await _appUserService.ChangeTeacherStatus(id);
@@ -196,42 +272,48 @@ namespace AKDEM.OBYS.UI.Controllers
             var response = await _appUserService.GetAllStudentAsync(RoleType.Student, classType);
             ViewBag.classType = classType;
             ViewBag.classId = (int)classType;
-            string header = "";
+            string type = "";
             if (Enum.GetName(typeof(ClassType), classType) == "Tamamı")
             {
-                header = "Tüm Öğrenciler";
+                type = "Tüm Öğrenciler";
             }
             else if((Enum.GetName(typeof(ClassType), classType) == "Mezun"))
             {
-                header = "Mezun Öğrenciler";
+                type = "Mezun Öğrenciler";
             }
             else if ((Enum.GetName(typeof(ClassType), classType) == "Bir"))
             {
-                header = "1. Sınıf Öğrencileri";
+                type = "1. Sınıf Öğrencileri";
             }
             else if ((Enum.GetName(typeof(ClassType), classType) == "iki"))
             {
-                header = "2. Sınıf Öğrencileri";
+                type = "2. Sınıf Öğrencileri";
             }
             else if ((Enum.GetName(typeof(ClassType), classType) == "Üç"))
             {
-                header = "3. Sınıf Öğrencileri";
+                type = "3. Sınıf Öğrencileri";
             }
             else if ((Enum.GetName(typeof(ClassType), classType) == "Dört"))
             {
-                header = "4. Sınıf Öğrencileri";
+                type = "4. Sınıf Öğrencileri";
             }
             else if ((Enum.GetName(typeof(ClassType), classType) == "Pasif"))
             {
-                header = "Programdan Ayrılan Öğrenciler";
+                type = "Programdan Ayrılan Öğrenciler";
             }
             else
             {
-                header = "Hazırlık Öğrencileri";
+                type = "Hazırlık Öğrencileri";
 
             }
-            ViewBag.header = header;
-            ViewBag.header2 = header.Replace(" ", "_").Replace(".", "");
+            ViewBag.header = type;
+
+            string header = $"{type}";
+            string headerforPdf = ReplaceMultipleChars(header, charactersToReplace, replacementChar);
+            headerforPdf = headerforPdf.ToUpper();
+            headerforPdf = ConvertTurkishToEnglish(headerforPdf);
+            ViewBag.headerforPdf = headerforPdf;
+
             return View(response);
         }
         public async Task<IActionResult> GetStudentsByClass(int classId)
@@ -241,6 +323,7 @@ namespace AKDEM.OBYS.UI.Controllers
             return View(response);
         }
 
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> CreateStudent(int classId=1)
         {
             ViewBag.classId = classId;
@@ -277,6 +360,8 @@ namespace AKDEM.OBYS.UI.Controllers
 
             return View(new AppStudentCreateModel());
         }
+
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> CreateStudent(AppStudentCreateModel model, int classId=1)
         {
@@ -376,6 +461,7 @@ namespace AKDEM.OBYS.UI.Controllers
             }).ToList();
             return Json(branchList);
         }
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdateStudent(int id)
         {
             AppStudentUpdateModel model = new();
@@ -423,6 +509,7 @@ namespace AKDEM.OBYS.UI.Controllers
 
             return View(model);
         }
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> UpdateStudent(AppStudentUpdateModel model)
         {
@@ -504,6 +591,7 @@ namespace AKDEM.OBYS.UI.Controllers
             return RedirectToAction("GetStudents", new { classType = model.ClassId });
 
         }
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> RemoveStudent(int id, int classId=1)
         {
 

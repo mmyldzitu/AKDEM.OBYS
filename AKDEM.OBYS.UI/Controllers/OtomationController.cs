@@ -14,11 +14,12 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace AKDEM.OBYS.UI.Controllers
 {
-    [Authorize(Roles = "Admin")]
+    
     public class OtomationController : Controller
     {
         private readonly IAppBranchService _appBranchService;
@@ -46,7 +47,53 @@ namespace AKDEM.OBYS.UI.Controllers
             _appUserService = appUserService;
             _appUserSessionLessonupdateDtoValidator = appUserSessionLessonupdateDtoValidator;
         }
+        char[] charactersToReplace = { '/', ' ', '\\', '?', ':', '.', ',' };
+        char replacementChar = '_';
+        static string ReplaceMultipleChars(string input, char[] charactersToReplace, char replacementChar)
+        {
+            foreach (char c in charactersToReplace)
+            {
+                input = input.Replace(c, replacementChar);
+            }
+            return input;
+        }
+        static string ConvertTurkishToEnglish(string input)
+        {
+            StringBuilder result = new StringBuilder();
 
+            foreach (char c in input)
+            {
+                switch (c)
+                {
+                    case 'Ç':
+                        result.Append('C');
+                        break;
+                    case 'Ğ':
+                        result.Append('G');
+                        break;
+
+                    case 'İ':
+                        result.Append('I');
+                        break;
+                    case 'Ö':
+                        result.Append('O');
+                        break;
+                    case 'Ş':
+                        result.Append('S');
+                        break;
+                    case 'Ü':
+                        result.Append('U');
+                        break;
+                    default:
+                        result.Append(c);
+                        break;
+                }
+            }
+
+            return result.ToString();
+        }
+
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Index(int sessionId)
         {
             var list = new List<AppBranchListDto>();
@@ -137,6 +184,15 @@ namespace AKDEM.OBYS.UI.Controllers
                 double twc2 = await _appWarningService.TotalWarningCountByUserIdGeneral(student.Id);
                 await _appWarningService.ChangeStudentStatusBecasuseOfWarning(student.Id, swc2, awc2, twc2, userSessionId);
             }
+            string header = $"{sessionName}_{branchName}";
+
+
+
+            string headerforPdf = ReplaceMultipleChars(header, charactersToReplace, replacementChar);
+            headerforPdf = headerforPdf.ToUpper();
+
+            headerforPdf = ConvertTurkishToEnglish(headerforPdf);
+            ViewBag.headerforPdf = headerforPdf;
             return View(studentList);
         }
         [HttpGet]
@@ -206,10 +262,17 @@ namespace AKDEM.OBYS.UI.Controllers
                 
                 await _appWarningService.ChangeStudentStatusBecasuseOfWarning(student.Id, swc2,awc2, twc2, userSessionId);
             }
+
+            string header = $"{sessionName}_{branchName}";
+            string headerforPdf = ReplaceMultipleChars(header, charactersToReplace, replacementChar);
+            headerforPdf = headerforPdf.ToUpper();
+            headerforPdf = ConvertTurkishToEnglish(headerforPdf);
+            ViewBag.headerforPdf = headerforPdf;
+
             return View(studentList);
         }
 
-
+        [Authorize(Roles = "Admin")]
         [HttpGet]
         public async Task<IActionResult> Notes(int userSessionId)
         {
@@ -217,6 +280,7 @@ namespace AKDEM.OBYS.UI.Controllers
             var userSessionLessons = await _appUserSessionLessonService.GetAppUserSessionLessonsByUserSessionId(userSessionId);
             return this.View(userSessionLessons.Data);
         }
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> Notes(List<AppUserSessionLessonUpdateDto> dtos)
         {
@@ -410,6 +474,11 @@ namespace AKDEM.OBYS.UI.Controllers
                 TotalDegree = await _appUserSessionService.ReturnTotalOrderOfClass(student.Id, student.BranchId, sessionId),
                 AppStudentSession = studentDetailSessionListModel };
 
+            string header = $"{student.FirstName}_{student.SecondName}_{sessionName}";
+            string headerforPdf = ReplaceMultipleChars(header, charactersToReplace, replacementChar);
+            headerforPdf = headerforPdf.ToUpper();
+            headerforPdf = ConvertTurkishToEnglish(headerforPdf);
+            ViewBag.headerforPdf = headerforPdf;
             return View(model);
         }
         public async Task<IActionResult> WarningDetails(int sessionId, int userId)
@@ -421,15 +490,25 @@ namespace AKDEM.OBYS.UI.Controllers
             string sessionName = await _appSessionService.ReturnSessionName(sessionId);
             ViewBag.sessionName = sessionName;
             ViewBag.sessionName2 = sessionName.Replace("/", "_");
-            ViewBag.userName = await _appUserService.GetUserNameById(userId);
+            string userName= await _appUserService.GetUserNameById(userId);
+            ViewBag.userName = userName;
             int userSessionId = await _appUserSessionService.UserSessionIdByUserIdAndSessionId(userId, sessionId);
             ViewBag.userSessionId = userSessionId;
             var warningList = await _appWarningService.AppWarningByUserSessionId(userSessionId);
             var status = await _appStudentService.ReturnStatusOfStudent(userId);
             var departReason = await _appStudentService.ReturnDepartReasonOfStudent(userId);
+
+
+            string header = $"{userName}_{sessionName}_İhtarları";
+            string headerforPdf = ReplaceMultipleChars(header, charactersToReplace, replacementChar);
+            headerforPdf = headerforPdf.ToUpper();
+            headerforPdf = ConvertTurkishToEnglish(headerforPdf);
+            ViewBag.headerforPdf = headerforPdf;
+
             return View(new StudentWarningsModel { AppWarnings=warningList, Status=status, DepartReason=departReason});
 
         }
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> RemoveWarning(int sessionId, int userId, int id)
         {
             int userSessionId = await _appUserSessionService.UserSessionIdByUserIdAndSessionId(userId, sessionId);
@@ -437,6 +516,7 @@ namespace AKDEM.OBYS.UI.Controllers
 
             return RedirectToAction("WarningDetails", new { sessionId = sessionId, userId = userId });
         }
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> RemoveWarning2(int sessionId, int userId, int id)
         {
             int userSessionId = await _appUserSessionService.UserSessionIdByUserIdAndSessionId(userId, sessionId);
@@ -444,6 +524,7 @@ namespace AKDEM.OBYS.UI.Controllers
 
             return RedirectToAction("Index","Warning", new { sessionId = sessionId });
         }
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         
         public async Task<IActionResult> ChangeStudentStatusBecasuseOfWarning(int userId, double sessionWarningCount, double totalWarningCount)

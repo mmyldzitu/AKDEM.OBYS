@@ -10,12 +10,13 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Security.Claims;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace AKDEM.OBYS.UI.Controllers
 {
 
-    [Authorize(Roles = "Student")]
+    
     public class StudentController : Controller
     {
         private readonly IAppSessionService _appSessionService;
@@ -45,7 +46,51 @@ namespace AKDEM.OBYS.UI.Controllers
             _webHostEnvironment = webHostEnvironment;
             _appGraduatedService = appGraduatedService;
         }
+        char[] charactersToReplace = { '/', ' ', '\\', '?', ':', '.', ',' };
+        char replacementChar = '_';
+        static string ReplaceMultipleChars(string input, char[] charactersToReplace, char replacementChar)
+        {
+            foreach (char c in charactersToReplace)
+            {
+                input = input.Replace(c, replacementChar);
+            }
+            return input;
+        }
+        static string ConvertTurkishToEnglish(string input)
+        {
+            StringBuilder result = new StringBuilder();
 
+            foreach (char c in input)
+            {
+                switch (c)
+                {
+                    case 'Ç':
+                        result.Append('C');
+                        break;
+                    case 'Ğ':
+                        result.Append('G');
+                        break;
+
+                    case 'İ':
+                        result.Append('I');
+                        break;
+                    case 'Ö':
+                        result.Append('O');
+                        break;
+                    case 'Ş':
+                        result.Append('S');
+                        break;
+                    case 'Ü':
+                        result.Append('U');
+                        break;
+                    default:
+                        result.Append(c);
+                        break;
+                }
+            }
+
+            return result.ToString();
+        }
         public async Task<IActionResult> Index(int sessionId, int userId = 0)
         {
             int myUserId = 0;
@@ -82,11 +127,23 @@ namespace AKDEM.OBYS.UI.Controllers
                         ViewBag.name = "Ders Programınız Henüz Oluşturulmadı";
 
                     }
+
+                    string header = $"{name}";
+                    string headerforPdf = ReplaceMultipleChars(header, charactersToReplace, replacementChar);
+                    headerforPdf = headerforPdf.ToUpper();
+                    headerforPdf = ConvertTurkishToEnglish(headerforPdf);
+                    ViewBag.headerforPdf = headerforPdf;
+
                     ViewBag.status = 1;
                     return View();
                 }
                 else
                 {
+                    string header = $"Program";
+                    string headerforPdf = ReplaceMultipleChars(header, charactersToReplace, replacementChar);
+                    headerforPdf = headerforPdf.ToUpper();
+                    headerforPdf = ConvertTurkishToEnglish(headerforPdf);
+                    ViewBag.headerforPdf = headerforPdf;
                     ViewBag.status = 0;
                     return View();
                 }
@@ -97,6 +154,11 @@ namespace AKDEM.OBYS.UI.Controllers
             }
             else
             {
+                string header = $"Program";
+                string headerforPdf = ReplaceMultipleChars(header, charactersToReplace, replacementChar);
+                headerforPdf = headerforPdf.ToUpper();
+                headerforPdf = ConvertTurkishToEnglish(headerforPdf);
+                ViewBag.headerforPdf = headerforPdf;
 
                 ViewBag.name = "";
                 ViewBag.status = 0;
@@ -126,10 +188,22 @@ namespace AKDEM.OBYS.UI.Controllers
                     ViewBag.sessionName = sessionName;
                     ViewBag.sessionName2 = sessionName.Replace("/", "_");
                     ViewBag.sessionId = sessionId;
+
+                    string header = $"{sessionName}_Dönem_yönetmeliği";
+                    string headerforPdf = ReplaceMultipleChars(header, charactersToReplace, replacementChar);
+                    headerforPdf = headerforPdf.ToUpper();
+                    headerforPdf = ConvertTurkishToEnglish(headerforPdf);
+                    ViewBag.headerforPdf = headerforPdf;
+
                     return View(sessionCriterias);
                 }
                 else
                 {
+                    string header = $"Yönetmelik";
+                    string headerforPdf = ReplaceMultipleChars(header, charactersToReplace, replacementChar);
+                    headerforPdf = headerforPdf.ToUpper();
+                    headerforPdf = ConvertTurkishToEnglish(headerforPdf);
+                    ViewBag.headerforPdf = headerforPdf;
                     return View(new AppSessionListDto { Definition = "NotExists" });
 
                 }
@@ -137,6 +211,11 @@ namespace AKDEM.OBYS.UI.Controllers
             }
             else
             {
+                string header = $"Yönetmelik";
+                string headerforPdf = ReplaceMultipleChars(header, charactersToReplace, replacementChar);
+                headerforPdf = headerforPdf.ToUpper();
+                headerforPdf = ConvertTurkishToEnglish(headerforPdf);
+                ViewBag.headerforPdf = headerforPdf;
                 return View(new AppSessionListDto { Definition = "NotExists" });
             }
 
@@ -201,18 +280,37 @@ namespace AKDEM.OBYS.UI.Controllers
                         TotalDegree = await _appUserSessionService.ReturnTotalOrderOfClass(student.Id, student.BranchId, sessionId),
                         AppStudentSession = studentDetailSessionListModel
                     };
-
+                    string header = $"{student.FirstName}_{student.SecondName}_{sessionName}";
+                    string headerforPdf = ReplaceMultipleChars(header, charactersToReplace, replacementChar);
+                    headerforPdf = headerforPdf.ToUpper();
+                    headerforPdf = ConvertTurkishToEnglish(headerforPdf);
+                    ViewBag.headerforPdf = headerforPdf;
                     return View(model);
 
                 }
                 else
                 {
+                    var student = await _appStudentService.GetStudentById(userId);
+
+                    string header = $"{student.FirstName}_{student.SecondName}_dönem";
+                    string headerforPdf = ReplaceMultipleChars(header, charactersToReplace, replacementChar);
+                    headerforPdf = headerforPdf.ToUpper();
+                    headerforPdf = ConvertTurkishToEnglish(headerforPdf);
+                    ViewBag.headerforPdf = headerforPdf;
                     return View(new StudentDetailsModel { SessionName = "NotExists" });
                 }
 
             }
             else
             {
+                var student = await _appStudentService.GetStudentById(userId);
+
+                string header = $"{student.FirstName}_{student.SecondName}_dönem";
+                string headerforPdf = ReplaceMultipleChars(header, charactersToReplace, replacementChar);
+                headerforPdf = headerforPdf.ToUpper();
+                headerforPdf = ConvertTurkishToEnglish(headerforPdf);
+                ViewBag.headerforPdf = headerforPdf;
+
                 return View(new StudentDetailsModel { SessionName = "NotExists" });
             }
 
@@ -235,6 +333,12 @@ namespace AKDEM.OBYS.UI.Controllers
 
             var status = await _appStudentService.ReturnStatusOfStudent(userId);
             var departReason = await _appStudentService.ReturnDepartReasonOfStudent(userId);
+
+            string header = $"{sessionName}_{userName}_İhtarları";
+            string headerforPdf = ReplaceMultipleChars(header, charactersToReplace, replacementChar);
+            headerforPdf = headerforPdf.ToUpper();
+            headerforPdf = ConvertTurkishToEnglish(headerforPdf);
+            ViewBag.headerforPdf = headerforPdf;
             return View(new StudentWarningsModel { AppWarnings = warningList, Status = status, DepartReason = departReason });
 
 
@@ -263,6 +367,13 @@ namespace AKDEM.OBYS.UI.Controllers
         {
 
             var list = await _appGraduatedService.CertificaofUser(userId);
+
+            string header = $"{list.studentName}_Sertifika";
+            string headerforPdf = ReplaceMultipleChars(header, charactersToReplace, replacementChar);
+            headerforPdf = headerforPdf.ToUpper();
+            headerforPdf = ConvertTurkishToEnglish(headerforPdf);
+            ViewBag.headerforPdf = headerforPdf;
+
             return View(list);
         }
         public async Task<IActionResult> StudentTranscrypt(int userId)
@@ -330,7 +441,13 @@ namespace AKDEM.OBYS.UI.Controllers
             }
             TranscryptListModel transcryptListModel = new TranscryptListModel { AppStudent = user, StudentDetails = models };
 
+            var student2 = await _appStudentService.GetStudentById(userId);
 
+            string header = $"{student2.FirstName}_{student2.SecondName}_Transkript";
+            string headerforPdf = ReplaceMultipleChars(header, charactersToReplace, replacementChar);
+            headerforPdf = headerforPdf.ToUpper();
+            headerforPdf = ConvertTurkishToEnglish(headerforPdf);
+            ViewBag.headerforPdf = headerforPdf;
 
 
             return View(transcryptListModel);
@@ -340,13 +457,20 @@ namespace AKDEM.OBYS.UI.Controllers
         {
 
             ViewBag.userId = userId;
-            ViewBag.userName = await _appUserService.GetUserNameById(userId);
+            string userName= await _appUserService.GetUserNameById(userId);
+            ViewBag.userName = userName;
 
             var warningList = await _appWarningService.AppWarningByUserId(userId);
             
                 var status = await _appStudentService.ReturnStatusOfStudent(userId);
                 var departReason = await _appStudentService.ReturnDepartReasonOfStudent(userId);
-                return View(new StudentWarningsModel { AppWarnings = warningList, Status = status, DepartReason = departReason });
+
+            string header = $"{userName}_İhtarlar";
+            string headerforPdf = ReplaceMultipleChars(header, charactersToReplace, replacementChar);
+            headerforPdf = headerforPdf.ToUpper();
+            headerforPdf = ConvertTurkishToEnglish(headerforPdf);
+            ViewBag.headerforPdf = headerforPdf;
+            return View(new StudentWarningsModel { AppWarnings = warningList, Status = status, DepartReason = departReason });
             
             
 
@@ -631,17 +755,39 @@ namespace AKDEM.OBYS.UI.Controllers
                                 });
                             }");
 
+                    var divSelector = "div#mycont";
+                    var divContent = await page.EvaluateFunctionAsync<string>(@"(selector) => {
+                const element = document.querySelector(selector);
+                return element ? element.innerHTML : null;
+  
+                                
 
-                    // Razor sayfasının HTML içeriğini alın
-                    var htmlContent = await page.GetContentAsync();
+            }", divSelector);
 
-                    // HTML içeriğini PDF'ye çevir
-                    var pdfBuffer = await page.PdfDataAsync();
-                    var wwwrootPath = _webHostEnvironment.WebRootPath;
-                    var pdfPath = Path.Combine(wwwrootPath, "pdf", $"{myFileName}.pdf");
+                    if (divContent != null)
+                    {
+                        // PDF boyut ve diğer seçenekleri belirle
+                        var pdfOptions = new PdfOptions
+                        {
+                            Width = "1200px",
+                            Height = "832px",
+                            PrintBackground = true // Arka plan rengini ve resimleri dahil et
+                                                   // Diğer isteğe bağlı seçenekleri ekleyebilirsiniz
+                        };
 
-                    // PDF'yi kaydedin
-                    System.IO.File.WriteAllBytes(pdfPath, pdfBuffer);
+                        // Seçilen div içeriğini PDF'ye çevir
+                        var pdfBuffer = await page.PdfDataAsync(pdfOptions);
+
+                        // PDF'yi kaydedin
+                        var wwwrootPath = _webHostEnvironment.WebRootPath;
+                        var pdfPath = Path.Combine(wwwrootPath, "pdf", $"{myFileName}.pdf");
+                        System.IO.File.WriteAllBytes(pdfPath, pdfBuffer);
+                    }
+                    else
+                    {
+                        // Hata durumunu ele alabilirsiniz
+                        Console.WriteLine("Belirtilen div bulunamadı.");
+                    }
 
                 }
             }

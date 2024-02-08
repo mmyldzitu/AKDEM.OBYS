@@ -26,7 +26,7 @@ using System.Threading.Tasks;
 
 namespace AKDEM.OBYS.UI.Controllers
 {
-    [Authorize(Roles = "Admin")]
+    
     public class LessonController : Controller
     {
         private readonly IAppLessonService _appLessonService;
@@ -44,7 +44,7 @@ namespace AKDEM.OBYS.UI.Controllers
             _appLessonCreateDtoValidator = appLessonCreateDtoValidator;
             _appLessonUpdateDtoValidator = appLessonUpdateDtoValidator;
         }
-
+        
         public async Task<IActionResult> Index(bool status = true)
         {
             var response = await _appLessonService.GetLessonsByTeacher(status);
@@ -139,7 +139,7 @@ const hbutton = document.getElementById('branchButtons');
         }
 
 
-
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> CreateLesson()
         {
             var list = new List<AppLessonListModel>();
@@ -162,6 +162,7 @@ const hbutton = document.getElementById('branchButtons');
             return View(new AppLessonCreateDto());
 
         }
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> CreateLesson(AppLessonCreateDto dto)
         {
@@ -185,6 +186,7 @@ const hbutton = document.getElementById('branchButtons');
 
 
         }
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdateLesson(int id)
         {
 
@@ -207,11 +209,13 @@ const hbutton = document.getElementById('branchButtons');
             ViewBag.teachers = new SelectList(list, "Id", "TeacherName");
             return this.View(response.Data);
         }
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> RemoveLesson(int id, bool status)
         {
             await _appLessonService.ChangeLessonStatus(id);
             return RedirectToAction("Index", new { status = status });
         }
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> UpdateLesson(AppLessonUpdateDto dto)
         {

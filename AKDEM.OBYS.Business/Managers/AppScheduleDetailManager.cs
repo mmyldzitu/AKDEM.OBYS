@@ -28,7 +28,19 @@ namespace AKDEM.OBYS.Business.Managers
             List<string> hours = new();
             var query = _uow.GetRepositry<AppScheduleDetail>().GetQuery();
             var entities = await query.Where(x => x.ApScheduleId == scheduleId).ToListAsync();
-            foreach(var item in entities)
+            foreach (var item in entities)
+            {
+                hours.Add(item.Hours);
+            }
+            return hours;
+        }
+
+        public async Task<List<string>> GetHoursByScheduleIdAsync2(int sessionId, int userId)
+        {
+            List<string> hours = new();
+            var query = _uow.GetRepositry<AppScheduleDetail>().GetQuery();
+            var entities = await query.Where(x => x.AppSchedule.AppSessionBranch.SessionId == sessionId && x.AppLesson.AppUser.Id==userId).ToListAsync();
+            foreach (var item in entities)
             {
                 hours.Add(item.Hours);
             }
@@ -37,7 +49,7 @@ namespace AKDEM.OBYS.Business.Managers
         public async Task<List<AppScheduleDetailListDto>> GetScheduleDetailsForTeacher(int sessionId, int userId)
         {
             var query = _uow.GetRepositry<AppScheduleDetail>().GetQuery();
-            var entities = await query.Include(x => x.AppLesson).ThenInclude(x => x.AppUser).Include(x => x.AppSchedule).ThenInclude(x=>x.AppSessionBranch).ThenInclude(x=>x.AppBranch).Where(x => x.AppLesson.UserId == userId && x.AppSchedule.AppSessionBranch.SessionId == sessionId).ToListAsync();
+            var entities = await query.Include(x => x.AppLesson).ThenInclude(x => x.AppUser).Include(x => x.AppSchedule).ThenInclude(x => x.AppSessionBranch).ThenInclude(x => x.AppBranch).Where(x => x.AppLesson.UserId == userId && x.AppSchedule.AppSessionBranch.SessionId == sessionId).ToListAsync();
             if (entities.Count != 0)
             {
                 var mappedLists = _mapper.Map<List<AppScheduleDetailListDto>>(entities);
@@ -48,7 +60,7 @@ namespace AKDEM.OBYS.Business.Managers
         public async Task<List<AppScheduleDetailListDto>> GetScheduleDetailsByScheduleId(int scheduldeId)
         {
             var query = _uow.GetRepositry<AppScheduleDetail>().GetQuery();
-            var entities = await query.Include(x => x.AppLesson).ThenInclude(x=>x.AppUser).Where(x => x.ApScheduleId == scheduldeId).ToListAsync();
+            var entities = await query.Include(x => x.AppLesson).ThenInclude(x => x.AppUser).Where(x => x.ApScheduleId == scheduldeId).ToListAsync();
             if (entities.Count != 0)
             {
                 var mappedList = _mapper.Map<List<AppScheduleDetailListDto>>(entities);
@@ -57,10 +69,21 @@ namespace AKDEM.OBYS.Business.Managers
             return new List<AppScheduleDetailListDto>();
         }
 
-        public async Task<List<AppScheduleDetailListDto>> GetScheduleDetailsByScheduleIdForTeacher(int scheduldeId,int userId)
+        public async Task<List<AppScheduleDetailListDto>> GetScheduleDetailsByScheduleIdForTeacher(int scheduldeId, int userId)
         {
             var query = _uow.GetRepositry<AppScheduleDetail>().GetQuery();
-            var entities = await query.Include(x => x.AppLesson).ThenInclude(x => x.AppUser).Where(x => x.ApScheduleId == scheduldeId && x.AppLesson.AppUser.Id==userId).ToListAsync();
+            var entities = await query.Include(x => x.AppLesson).ThenInclude(x => x.AppUser).Include(x=>x.AppSchedule).ThenInclude(x=>x.AppSessionBranch).ThenInclude(x=>x.AppBranch).Where(x => x.ApScheduleId == scheduldeId && x.AppLesson.AppUser.Id == userId).ToListAsync();
+            if (entities.Count != 0)
+            {
+                var mappedList = _mapper.Map<List<AppScheduleDetailListDto>>(entities);
+                return mappedList;
+            }
+            return new List<AppScheduleDetailListDto>();
+        }
+        public async Task<List<AppScheduleDetailListDto>> GetScheduleDetailsByScheduleIdForTeacher2(int sessionId, int userId)
+        {
+            var query = _uow.GetRepositry<AppScheduleDetail>().GetQuery();
+            var entities = await query.Include(x => x.AppLesson).ThenInclude(x => x.AppUser).Include(x => x.AppSchedule).ThenInclude(x => x.AppSessionBranch).ThenInclude(x => x.AppBranch).Where(x => x.AppSchedule.AppSessionBranch.SessionId == sessionId && x.AppLesson.AppUser.Id == userId).ToListAsync();
             if (entities.Count != 0)
             {
                 var mappedList = _mapper.Map<List<AppScheduleDetailListDto>>(entities);
@@ -71,7 +94,7 @@ namespace AKDEM.OBYS.Business.Managers
         public async Task<List<AppScheduleDetailListDto>> GetScheduleDetailsByScheduleIdDistinct(int scheduldeId, int userId)
         {
             var query = _uow.GetRepositry<AppScheduleDetail>().GetQuery();
-            var entities = await query.Include(x => x.AppLesson).ThenInclude(x => x.AppUser).Where(x => x.ApScheduleId == scheduldeId && x.AppLesson.AppUser.Id==userId).ToListAsync();
+            var entities = await query.Include(x => x.AppLesson).ThenInclude(x => x.AppUser).Where(x => x.ApScheduleId == scheduldeId && x.AppLesson.AppUser.Id == userId).ToListAsync();
             if (entities.Count != 0)
             {
                 var distinctEntities = entities
@@ -83,21 +106,21 @@ namespace AKDEM.OBYS.Business.Managers
                 return mappedList;
             }
             return new List<AppScheduleDetailListDto>();
-            
+
         }
 
         public async Task RemoveByNameAsync(string name)
         {
             var query = _uow.GetRepositry<AppScheduleDetail>().GetQuery();
             var data = await query.Where(x => x.AppLesson.Definition == name).ToListAsync();
-            
+
             foreach (var item in data)
             {
-                 _uow.GetRepositry<AppScheduleDetail>().Remove(item);
+                _uow.GetRepositry<AppScheduleDetail>().Remove(item);
             }
             await _uow.SaveChangesAsync();
         }
-      public async Task<int> GetScheduleByIdScheduleDetailIdAsync(int scheduleDetailId)
+        public async Task<int> GetScheduleByIdScheduleDetailIdAsync(int scheduleDetailId)
         {
             var query = _uow.GetRepositry<AppScheduleDetail>().GetQuery();
             var entity = await query.Where(x => x.Id == scheduleDetailId).SingleOrDefaultAsync();
@@ -117,7 +140,7 @@ namespace AKDEM.OBYS.Business.Managers
             var query = _uow.GetRepositry<AppScheduleDetail>().GetQuery();
 
             var scheduleDetail = await query.Where(x => x.ApScheduleId == scheduleId && x.AppLesson.Definition == lessonName).ToListAsync();
-            foreach(var item in scheduleDetail)
+            foreach (var item in scheduleDetail)
             {
                 _uow.GetRepositry<AppScheduleDetail>().Remove(item);
 
@@ -127,10 +150,10 @@ namespace AKDEM.OBYS.Business.Managers
         }
         public async Task<List<int>> GetLessonsByScheduleIdAsync(int scheduleId)
         {
-            List<int> lessonIds = new ();
+            List<int> lessonIds = new();
             var query = _uow.GetRepositry<AppScheduleDetail>().GetQuery();
             var entities = await query.Include(x => x.AppLesson).Where(x => x.ApScheduleId == scheduleId).ToListAsync();
-            foreach( var entity in entities)
+            foreach (var entity in entities)
             {
                 lessonIds.Add(entity.AppLesson.Id);
             }
@@ -140,10 +163,10 @@ namespace AKDEM.OBYS.Business.Managers
         {
             var query = _uow.GetRepositry<AppScheduleDetail>().GetQuery();
             var entities = await query.Where(x => x.ApScheduleId == scheduleId).ToListAsync();
-            
+
             if (entities.Count != 0)
             {
-                foreach( var entity in entities)
+                foreach (var entity in entities)
                 {
                     _uow.GetRepositry<AppScheduleDetail>().Remove(entity);
                     await _uow.SaveChangesAsync();
@@ -154,10 +177,10 @@ namespace AKDEM.OBYS.Business.Managers
         {
             var query = _uow.GetRepositry<AppScheduleDetail>().GetQuery();
             var entities = await query.Where(x => x.AppSchedule.AppSessionBranch.SessionId == sessionId).ToListAsync();
-            
+
             if (entities.Count != 0)
             {
-                foreach( var item in entities)
+                foreach (var item in entities)
                 {
                     _uow.GetRepositry<AppScheduleDetail>().Remove(item);
                 }

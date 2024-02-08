@@ -37,6 +37,7 @@ namespace AKDEM.OBYS.UI
             services.AddTransient<IValidator<AppBranchCreateModel>, AppBranchCreateModelValidator>();
             services.AddTransient<IValidator<AppTeacherUpdateModel>, AppTeacherUpdateModelValidator>();
             services.AddTransient<IValidator<AppStudentCreateModel>, AppStudentCreateModelValidator>();
+            services.AddTransient<IValidator<AppTeacherCreateModel>, AppTeacherCreateModelValidator>();
             services.AddTransient<IValidator<AppSessionCreateModel>, AppSessionCreateModelValidator>();
             services.AddTransient<IValidator<UpdatePasswordModel>, UpdatePasswordModelValidator>();
             services.AddTransient<IValidator<AppScheduleCreateModel>, AppScheduleCreateModelValidator>();

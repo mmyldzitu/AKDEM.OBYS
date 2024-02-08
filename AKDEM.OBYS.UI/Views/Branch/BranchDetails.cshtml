@@ -5,7 +5,7 @@
 }
 <div class="container-fluid">
     <div class="text-right">
-        <a id="pdfButton" class="btn btn-success" asp-action="GenerateAndDownloadPdf" asp-controller="Branch" asp-route-myFileName="@ViewBag.branchName2" asp-route-branchId="@ViewBag.branchId">PDF</a>
+        <a id="pdfButton" class="btn btn-success" asp-action="GenerateAndDownloadPdf" asp-controller="Branch" asp-route-myFileName="@ViewBag.headerforPdf" asp-route-branchId="@ViewBag.branchId">PDF</a>
     </div>
     <div class="text-end">
         <h1>@ViewBag.branchName SINIFI ÖĞRENCİLERİ</h1>
@@ -29,7 +29,7 @@
                 <th>Sınıf Derecesi</th>
 
                 <th>Genel Ortalama </th>
-                <th>Toplam Baş. İhtar Sayısı </th>
+                <th>Toplam Baş. İhtar Sayısı</th>
 
 
 

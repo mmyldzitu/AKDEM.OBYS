@@ -4,7 +4,7 @@
     int count = 0;
 }
 <div class="text-right">
-    <a id="pdfButton" class="btn btn-success" asp-action="GenerateAndDownloadPdf2" asp-controller="Student" asp-route-myFileName="@($"{ViewBag.userName}_IHTARLAR")" asp-route-userId="@ViewBag.userId">PDF</a>
+    <a id="pdfButton" class="btn btn-success" asp-action="GenerateAndDownloadPdf2" asp-controller="Student" asp-route-myFileName="@ViewBag.headerforPdf" asp-route-userId="@ViewBag.userId">PDF</a>
 </div>
 <hr />
 @{ if (!Model.Status)

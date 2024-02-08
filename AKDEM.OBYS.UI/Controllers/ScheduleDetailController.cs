@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace AKDEM.OBYS.UI.Controllers
@@ -47,6 +48,51 @@ namespace AKDEM.OBYS.UI.Controllers
             _appScheduleDetailCreateModelValidator = appScheduleDetailCreateModelValidator;
             _webHostEnvironment = webHostEnvironment;
         }
+        char[] charactersToReplace = { '/', ' ', '\\', '?', ':', '.', ',' };
+        char replacementChar = '_';
+        static string ReplaceMultipleChars(string input, char[] charactersToReplace, char replacementChar)
+        {
+            foreach (char c in charactersToReplace)
+            {
+                input = input.Replace(c, replacementChar);
+            }
+            return input;
+        }
+        static string ConvertTurkishToEnglish(string input)
+        {
+            StringBuilder result = new StringBuilder();
+
+            foreach (char c in input)
+            {
+                switch (c)
+                {
+                    case 'Ç':
+                        result.Append('C');
+                        break;
+                    case 'Ğ':
+                        result.Append('G');
+                        break;
+
+                    case 'İ':
+                        result.Append('I');
+                        break;
+                    case 'Ö':
+                        result.Append('O');
+                        break;
+                    case 'Ş':
+                        result.Append('S');
+                        break;
+                    case 'Ü':
+                        result.Append('U');
+                        break;
+                    default:
+                        result.Append(c);
+                        break;
+                }
+            }
+
+            return result.ToString();
+        }
         public async Task<IActionResult> Index(int id)
         {
             string name = await _appScheduleService.GetNameByScheduleId(id);
@@ -59,49 +105,57 @@ namespace AKDEM.OBYS.UI.Controllers
             ViewBag.name = name;
             ViewBag.name2 = name.Replace("/", "_");
             ViewBag.sessionStatus2 = await _appSessionService.GetStatus2FromSessionId(sessionId);
+
+
+            string header = $"{sessionName}_{name}";
+            string headerforPdf = ReplaceMultipleChars(header, charactersToReplace, replacementChar);
+            headerforPdf = headerforPdf.ToUpper();
+            headerforPdf = ConvertTurkishToEnglish(headerforPdf);
+            ViewBag.headerforPdf = headerforPdf;
             return View();
         }
-         
-            public async Task<IActionResult> CreateScheduleDetail(int sessionBranchId)
-             {
+
+        public async Task<IActionResult> CreateScheduleDetail(int sessionBranchId)
+        {
             int sessionId = await _appScheduleService.GetSessionIdBySessionBranchId(sessionBranchId);
             int branchId = await _appScheduleService.GetBranchIdBySessionBranchId(sessionBranchId);
             int scheduleId = await _appScheduleService.GetAppScheduleIdBySessionBranchIdAsync(sessionBranchId);
 
-                var list = new List<AppScheduleDetailLessonModel>();
+            var list = new List<AppScheduleDetailLessonModel>();
             var items = await _appLessonService.GetLessonsByTeacher(true);
             foreach (var item in items)
             {
                 list.Add(new AppScheduleDetailLessonModel
                 {
-                    Id=item.Id,
-                    LessonDetail=$"{item.Definition}--{item.AppUser.FirstName} {item.AppUser.SecondName}"
+                    Id = item.Id,
+                    LessonDetail = $"{item.Definition}--{item.AppUser.FirstName} {item.AppUser.SecondName}"
 
                 });
-               
+
             }
             ViewBag.lessons = new SelectList(list, "Id", "LessonDetail");
 
             var list2 = new List<AppScheduleDetailWeekDaysModel>();
             var items2 = Enum.GetValues(typeof(WeekDaysType));
-            foreach(var item in items2)
+            foreach (var item in items2)
             {
-                list2.Add(new AppScheduleDetailWeekDaysModel {
-                Day= Enum.GetName(typeof(WeekDaysType), item),
-                DayVal =Enum.GetName(typeof(WeekDaysType),item)
-                
+                list2.Add(new AppScheduleDetailWeekDaysModel
+                {
+                    Day = Enum.GetName(typeof(WeekDaysType), item),
+                    DayVal = Enum.GetName(typeof(WeekDaysType), item)
+
                 });
             }
             ViewBag.days = new SelectList(list2, "Day", "DayVal");
             ViewBag.scheduleId = scheduleId;
             ViewBag.sessionId = sessionId;
             //ViewBag.branchId = branchId;
-            return View(new AppScheduleDetailCreateModel {SessionId=sessionId, BranchId=branchId, ApScheduleId=scheduleId});
+            return View(new AppScheduleDetailCreateModel { SessionId = sessionId, BranchId = branchId, ApScheduleId = scheduleId });
         }
         [HttpPost]
         public async Task<IActionResult> CreateScheduleDetail(AppScheduleDetailCreateModel model)
         {
-                    ViewBag.scheduleId = model.ApScheduleId;
+            ViewBag.scheduleId = model.ApScheduleId;
 
             //int sessionId = await _appScheduleService.GetSessionIdByScheduleId(model.ApScheduleId);
             //------------------SELECTBOXLAR-----------------
@@ -147,7 +201,7 @@ namespace AKDEM.OBYS.UI.Controllers
 
                 if (result.ResponseType == ResponseType.Success)
                 {
-                    
+
                     //ViewBag.sessionId = sessionId;
                     ViewBag.confirmMessage = 1;
                     ViewBag.alertMessage = "Ders Bilgisi Cizelgeye Basariyla Eklenmistir. Yeni Dersler Eklemeye Devam Edebilirsiniz";
@@ -156,7 +210,7 @@ namespace AKDEM.OBYS.UI.Controllers
                 else
                 {
 
-                   
+
 
                     foreach (var error in result.ValidationErrors)
                     {
@@ -166,14 +220,14 @@ namespace AKDEM.OBYS.UI.Controllers
 
                 }
             }
-            
+
             foreach (var error in modelResult.Errors)
             {
                 ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
             }
             return View(model);
 
-         
+
         }
 
         [HttpGet]
@@ -181,58 +235,6 @@ namespace AKDEM.OBYS.UI.Controllers
         {
             var hourList = await _appScheduleDetailService.GetHoursByScheduleIdAsync(scheduleId);
             var scheduleDetailList = await _appScheduleDetailService.GetScheduleDetailsByScheduleId(scheduleId);
-            var branchName = await _appScheduleService.GetBranchNameByScheduleId(scheduleId);
-            List<Models.AppScheduleDetailsTeacherModel> models = new();
-            foreach( var item in scheduleDetailList)
-            {
-                Models.AppScheduleDetailsTeacherModel schedulemodel = new Models.AppScheduleDetailsTeacherModel
-                {
-                    AppLesson = item.AppLesson,
-                    AppSchedule = item.AppSchedule,
-                    Day = item.Day,
-                    ıd = item.Id,
-                    Hours=item.Hours,
-                    LessonId=item.LessonId,
-                    BranchDefinition=branchName,
-                };
-                models.Add(schedulemodel);
-            }
-            static List<string> GetHoursOrdered(List<string> hourList)
-            {
-                
-                List<Tuple<DateTime, DateTime>> hoursTupList = new();
-                foreach (var item in hourList)
-                {
-                    string[] hourParts = item.Split("-");
-                    DateTime firstTime = DateTime.ParseExact(hourParts[0].Trim(), "HH:mm", null);
-                    DateTime lastTime = DateTime.ParseExact(hourParts[1].Trim(), "HH:mm", null);
-                    hoursTupList.Add(new Tuple<DateTime, DateTime>(firstTime, lastTime));
-                }
-                    hoursTupList.Sort((x, y) => x.Item1.CompareTo(y.Item1));
-                    List<string> hoursOrdered = new();
-                    foreach(var tup in hoursTupList)
-                    {
-                        string orderedHourPart = $"{tup.Item1:HH:mm}-{tup.Item2:HH:mm}";
-                        hoursOrdered.Add(orderedHourPart);
-                    }
-                    return hoursOrdered;
-
-                
-
-            }
-            List<string> hoursForSchedule = GetHoursOrdered(hourList);
-
-            var hoursForScheduleDistinct = hoursForSchedule.Distinct().ToList();
-            AppScheduleDetailsForJsonModel model = new(){ ScheduleHours = hoursForScheduleDistinct, AppScheduleDetails = models };
-
-            return Json(model);
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> GetScheduleDetailandHours2(int scheduleId, int userId)
-        {
-            var hourList = await _appScheduleDetailService.GetHoursByScheduleIdAsync(scheduleId);
-            var scheduleDetailList = await _appScheduleDetailService.GetScheduleDetailsByScheduleIdForTeacher(scheduleId, userId);
             var branchName = await _appScheduleService.GetBranchNameByScheduleId(scheduleId);
             List<Models.AppScheduleDetailsTeacherModel> models = new();
             foreach (var item in scheduleDetailList)
@@ -279,9 +281,62 @@ namespace AKDEM.OBYS.UI.Controllers
 
             return Json(model);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GetScheduleDetailandHours2(int sessionId, int userId)
+        {
+            var hourList = await _appScheduleDetailService.GetHoursByScheduleIdAsync2(sessionId,userId);
+            var scheduleDetailList = await _appScheduleDetailService.GetScheduleDetailsByScheduleIdForTeacher2(sessionId, userId);
+            
+            List<Models.AppScheduleDetailsTeacherModel> models = new();
+            foreach (var item in scheduleDetailList)
+            {
+                Models.AppScheduleDetailsTeacherModel schedulemodel = new Models.AppScheduleDetailsTeacherModel
+                {
+                    AppLesson = item.AppLesson,
+                    AppSchedule = item.AppSchedule,
+                    Day = item.Day,
+                    ıd = item.Id,
+                    Hours = item.Hours,
+                    LessonId = item.LessonId,
+                   
+                    BranchDefinition = item.AppSchedule.AppSessionBranch.AppBranch.Definition,
+                };
+                models.Add(schedulemodel);
+            }
+            static List<string> GetHoursOrdered(List<string> hourList)
+            {
+
+                List<Tuple<DateTime, DateTime>> hoursTupList = new();
+                foreach (var item in hourList)
+                {
+                    string[] hourParts = item.Split("-");
+                    DateTime firstTime = DateTime.ParseExact(hourParts[0].Trim(), "HH:mm", null);
+                    DateTime lastTime = DateTime.ParseExact(hourParts[1].Trim(), "HH:mm", null);
+                    hoursTupList.Add(new Tuple<DateTime, DateTime>(firstTime, lastTime));
+                }
+                hoursTupList.Sort((x, y) => x.Item1.CompareTo(y.Item1));
+                List<string> hoursOrdered = new();
+                foreach (var tup in hoursTupList)
+                {
+                    string orderedHourPart = $"{tup.Item1:HH:mm}-{tup.Item2:HH:mm}";
+                    hoursOrdered.Add(orderedHourPart);
+                }
+                return hoursOrdered;
+
+
+
+            }
+            List<string> hoursForSchedule = GetHoursOrdered(hourList);
+
+            var hoursForScheduleDistinct = hoursForSchedule.Distinct().ToList();
+            AppScheduleDetailsForJsonModel model = new() { ScheduleHours = hoursForScheduleDistinct, AppScheduleDetails = models };
+
+            return Json(model);
+        }
         public async Task<IActionResult> RemoveScheduleDetail(int id)
         {
-            
+
             int scheduleId = await _appScheduleDetailService.GetScheduleByIdScheduleDetailIdAsync(id);
             int sessionBranchId = await _appScheduleService.GetSessionBranchIdByAppScheduleId(scheduleId);
             int branchId = await _appScheduleService.GetBranchIdBySessionBranchId(sessionBranchId);
@@ -289,25 +344,25 @@ namespace AKDEM.OBYS.UI.Controllers
             var appUserSessionIdList = await _appUserSessionService.GetUserSessionsByBranchId(sessionId, branchId);
 
             String lessonName = await _appScheduleDetailService.GetLessonNameByScheduleDetailIdAsync(id);
-            foreach ( var userSession in appUserSessionIdList)
+            foreach (var userSession in appUserSessionIdList)
             {
                 await _appUserSessionLessonService.RemoveUserSessionLessonByLessonNameAsync(userSession, lessonName);
             }
             await _appScheduleDetailService.RemoveScheduleDetailByLessonNameScheduleId(scheduleId, lessonName);
-            foreach(var userSession in appUserSessionIdList)
+            foreach (var userSession in appUserSessionIdList)
             {
                 int bigwarningcount = await _appWarningService.FindWarningCountByString("70", userSession);
                 int userId = await _appUserSessionService.GetUserIdByUserSessionId(userSession);
                 await _appWarningService.RemoveWarningByString(lessonName, userId, userSession);
                 await _appUserSessionService.FindAverageOfSessionWithUserAndSession(userId, sessionId);
-                await _appUserSessionService.TotalAverageByUserId(userId,sessionId);
+                await _appUserSessionService.TotalAverageByUserId(userId, sessionId);
                 double sessionavr = await _appUserSessionService.ReturnSessionAverage(userSession);
-                if (bigwarningcount==1 && sessionavr>=70)
+                if (bigwarningcount == 1 && sessionavr >= 70)
                 {
                     await _appWarningService.RemoveWarningByString("70", userId, userSession);
                 }
             }
-            
+
             return RedirectToAction("CreateScheduleDetail", new { sessionBranchId = sessionBranchId });
         }
 
@@ -318,8 +373,8 @@ namespace AKDEM.OBYS.UI.Controllers
             //var sessionBranchId = await _appScheduleService.GetSessionBranchIdByAppScheduleId(scheduleId);
             var branchId = await _appScheduleService.GetBranchIdByScheduleId(scheduleId);
             var sessionId = await _appScheduleService.GetSessionIdByScheduleId(scheduleId);
-            
-            var appUserSessionIdList = await _appUserSessionService.GetUserSessionsByBranchId(sessionId,branchId);
+
+            var appUserSessionIdList = await _appUserSessionService.GetUserSessionsByBranchId(sessionId, branchId);
             foreach (var userSessionId in appUserSessionIdList)
             {
                 foreach (var lessonId in lessonIdList)

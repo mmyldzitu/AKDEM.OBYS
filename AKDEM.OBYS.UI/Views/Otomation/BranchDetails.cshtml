@@ -8,7 +8,7 @@
         <a class="btn btn-danger" asp-action="SessionDetails" asp-controller="Session" asp-route-id="@ViewBag.sessionId">Döneme Dön</a>
     </div>
     <div class="text-right">
-        <a id="pdfButton" class="btn btn-success" asp-action="GenerateAndDownloadPdf" asp-controller="Otomation" asp-route-myFileName="@($"{ViewBag.sessionName2}_{ViewBag.branchName2}")" asp-route-sessionId="@ViewBag.sessionId" asp-route-branchId="@ViewBag.branchId">PDF</a>
+        <a id="pdfButton" class="btn btn-success" asp-action="GenerateAndDownloadPdf" asp-controller="Otomation" asp-route-myFileName="@ViewBag.headerforPdf" asp-route-sessionId="@ViewBag.sessionId" asp-route-branchId="@ViewBag.branchId">PDF</a>
     </div>
     <div class="text-end">
         <h1><span>@($"{ViewBag.sessionName} DÖNEMİ {ViewBag.branchName} SINIFI ")</span></h1>

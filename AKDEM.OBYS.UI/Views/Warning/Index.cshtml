@@ -9,7 +9,7 @@
         <a id="turntoSession" class="btn btn-danger" asp-action="SessionDetails" asp-controller="Session" asp-route-id="@ViewBag.sessionId">Döneme Dön</a>
     </div>
     <div class="text-right">
-        <a id="pdfButton" class="btn btn-success" asp-action="GenerateAndDownloadPdf2" asp-controller="Warning" asp-route-myFileName="@($"{ViewBag.sessionName2} DÖNEMİ ÖĞRENCİ İHTARLARI")" asp-route-sessionId="@ViewBag.sessionId">PDF</a>
+        <a id="pdfButton" class="btn btn-success" asp-action="GenerateAndDownloadPdf2" asp-controller="Warning" asp-route-myFileName="@ViewBag.headerforPdf" asp-route-sessionId="@ViewBag.sessionId">PDF</a>
     </div>
 </div>
 <br />

@@ -14,12 +14,13 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Security.Claims;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace AKDEM.OBYS.UI.Controllers
 {
 
-    [Authorize(Roles = "Teacher")]
+    
     public class TeacherController : Controller
     {
         private readonly IAppSessionService _appSessionService;
@@ -49,7 +50,51 @@ namespace AKDEM.OBYS.UI.Controllers
             _webHostEnvironment = webHostEnvironment;
             _appUserSessionLessonUpdateDtoValidator = appUserSessionLessonUpdateDtoValidator;
         }
+        char[] charactersToReplace = { '/', ' ', '\\', '?', ':', '.', ',' };
+        char replacementChar = '_';
+        static string ReplaceMultipleChars(string input, char[] charactersToReplace, char replacementChar)
+        {
+            foreach (char c in charactersToReplace)
+            {
+                input = input.Replace(c, replacementChar);
+            }
+            return input;
+        }
+        static string ConvertTurkishToEnglish(string input)
+        {
+            StringBuilder result = new StringBuilder();
 
+            foreach (char c in input)
+            {
+                switch (c)
+                {
+                    case 'Ç':
+                        result.Append('C');
+                        break;
+                    case 'Ğ':
+                        result.Append('G');
+                        break;
+
+                    case 'İ':
+                        result.Append('I');
+                        break;
+                    case 'Ö':
+                        result.Append('O');
+                        break;
+                    case 'Ş':
+                        result.Append('S');
+                        break;
+                    case 'Ü':
+                        result.Append('U');
+                        break;
+                    default:
+                        result.Append(c);
+                        break;
+                }
+            }
+
+            return result.ToString();
+        }
         public async Task<IActionResult> Index(int sessionId,int userId)
         {
             int myUserId = 0;
@@ -74,17 +119,31 @@ namespace AKDEM.OBYS.UI.Controllers
                 string sessionName = await _appSessionService.ReturnSessionName(sessionId);
                 ViewBag.sessionName = sessionName;
                 ViewBag.sessionName2 = sessionName.Replace("/", "_");
+                
                 var mylist= await _appScheduleService.GetSCheduleIdsForTeacher(myUserId, sessionId);
+
+                string header = $"{sessionName}_Dönemi_Ders_Programı";
+                string headerforPdf = ReplaceMultipleChars(header, charactersToReplace, replacementChar);
+                headerforPdf = headerforPdf.ToUpper();
+                headerforPdf = ConvertTurkishToEnglish(headerforPdf);
+                ViewBag.headerforPdf = headerforPdf;
                 return View(mylist);
 
             }
             else
             {
+                string header = $"Ders_Programı";
+                string headerforPdf = ReplaceMultipleChars(header, charactersToReplace, replacementChar);
+                headerforPdf = headerforPdf.ToUpper();
+                headerforPdf = ConvertTurkishToEnglish(headerforPdf);
+                ViewBag.headerforPdf = headerforPdf;
+
                 ViewBag.sessionName = "Aktif Bir Dönem İçerisinde Bulunmamaktasınız";
                 return View(new List<int>());
             }
         }
-        
+
+        [Authorize(Roles = "Teacher")]
         public async Task<IActionResult> TeacherLessons(int sessionId,int userId)
         {
             ViewBag.sessionStatus = await _appSessionService.GetStatusFromSessionId(sessionId);
@@ -125,10 +184,23 @@ namespace AKDEM.OBYS.UI.Controllers
                 ViewBag.sessionName = sessionName;
                 ViewBag.sessionName2 = sessionName.Replace("/", "_");
                 ViewBag.sessionId = sessionId;
+
+                string header = $"{sessionName}_Dönem_yönetmeliği";
+                string headerforPdf = ReplaceMultipleChars(header, charactersToReplace, replacementChar);
+                headerforPdf = headerforPdf.ToUpper();
+                headerforPdf = ConvertTurkishToEnglish(headerforPdf);
+                ViewBag.headerforPdf = headerforPdf;
+
                 return View(sessionCriterias);
             }
             else
             {
+
+                string header = $"Yönetmelik";
+                string headerforPdf = ReplaceMultipleChars(header, charactersToReplace, replacementChar);
+                headerforPdf = headerforPdf.ToUpper();
+                headerforPdf = ConvertTurkishToEnglish(headerforPdf);
+                ViewBag.headerforPdf = headerforPdf;
                 return View(new AppSessionListDto { Definition = "NotExists" });
             }
            
@@ -205,11 +277,16 @@ namespace AKDEM.OBYS.UI.Controllers
                 double twc2 = await _appWarningService.TotalWarningCountByUserIdGeneral(student.Id);
                     await _appWarningService.ChangeStudentStatusBecasuseOfWarning(student.Id, swc2,awc2, twc2, userSessionId);
                 }
-                return View(studentList);
+            string header = $"{sessionName}_{branchName}_{lessonName}";
+            string headerforPdf = ReplaceMultipleChars(header, charactersToReplace, replacementChar);
+            headerforPdf = headerforPdf.ToUpper();
+            headerforPdf = ConvertTurkishToEnglish(headerforPdf);
+            ViewBag.headerforPdf = headerforPdf;
+            return View(studentList);
             
         }
 
-
+        [Authorize(Roles = "Teacher")]
         [HttpGet]
         
 
@@ -219,6 +296,7 @@ namespace AKDEM.OBYS.UI.Controllers
             var userSessionLessons = await _appUserSessionLessonService.GetAppUserSessionLessonsByUserSessionIdAndLessonId(userSessionId,lessonId);
             return this.View(userSessionLessons.Data);
         }
+        [Authorize(Roles = "Teacher")]
         [HttpPost]
         
 
@@ -430,18 +508,24 @@ namespace AKDEM.OBYS.UI.Controllers
                 AppStudentSession = studentDetailSessionListModel
             };
 
+            string header = $"{student.FirstName}_{student.SecondName}_{sessionName}";
+            string headerforPdf = ReplaceMultipleChars(header, charactersToReplace, replacementChar);
+            headerforPdf = headerforPdf.ToUpper();
+            headerforPdf = ConvertTurkishToEnglish(headerforPdf);
+            ViewBag.headerforPdf = headerforPdf;
+
             return View(model);
         }
-        
 
+        [Authorize(Roles = "Teacher")]
         public async Task<IActionResult> TeacherExSessions(int userId)
         {
             var sessions = await _appSessionService.TeacherExSessionsAsync(userId);
             ViewBag.userId = userId;
             return View(sessions);
         }
-       
 
+        [Authorize(Roles = "Teacher")]
         public async Task<IActionResult> TeacherExSessionDetails(int userId,int sessionId)
         {
             ViewBag.sessionStatus = await _appSessionService.GetStatusFromSessionId(sessionId);
