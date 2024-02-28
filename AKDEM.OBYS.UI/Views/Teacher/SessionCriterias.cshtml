@@ -4,7 +4,7 @@
 }
 <div class="container-fluid">
     <div class="text-right">
-        <a id="pdfButton" class="btn btn-success" asp-action="GenerateAndDownloadPdfTeacherSessionCriterias" asp-controller="Teacher" asp-route-myFileName="@($"{ViewBag.sessionName2}_Dönem_Yönetmeliği")" asp-route-sessionId="@ViewBag.sessionId">PDF</a>
+        <a id="pdfButton" class="btn btn-success" asp-action="GenerateAndDownloadPdfTeacherSessionCriterias" asp-controller="Teacher" asp-route-myFileName="@ViewBag.headerforPdf" asp-route-sessionId="@ViewBag.sessionId">PDF</a>
     </div>
     @{if (Model.Definition != "NotExists")
         {

@@ -15,6 +15,7 @@ namespace AKDEM.OBYS.UI.Models
         public int LessonId { get; set; }
         public AppLessonListDto AppLesson { get; set; }
         public string BranchDefinition { get; set; }
+
         public AppScheduleListDto AppSchedule { get; set; }
     }
 }

@@ -13,14 +13,14 @@
 
     .container {
         position: relative;
-        width: 1200px;
-        height: 1000px;
+        width: 1121px;
+        height: 792px;
         margin: 20px auto 0;
     }
 
     .overlay {
         position: absolute;
-        top: 36%;
+        top: 41%;
         left: 62%;
         transform: translate(-50%, -50%);
         text-align: center;
@@ -30,7 +30,7 @@
     .overlay2 {
         position: absolute;
         font-family: Lato, sans-serif;
-        top: 78%;
+        top: 91%;
         left: 18%;
         transform: translate(-50%, -50%);
         text-align: center;
@@ -40,7 +40,7 @@
     .overlay3 {
         position: absolute;
         font-family: Lato, sans-serif;
-        top: 80%;
+        top: 94%;
         left: 18%;
         transform: translate(-50%, -50%);
         text-align: center;
@@ -49,7 +49,7 @@
 
     .overlay4 {
         position: absolute;
-        top: 70%;
+        top: 76%;
         left: 44%;
         transform: translate(-50%, -50%);
         text-align: center;
@@ -58,8 +58,8 @@
 
     .overlay5 {
         position: absolute;
-        top: 80%;
-        left: 48%;
+        top: 93%;
+        left: 50%;
         transform: translate(-50%, -50%);
         text-align: center;
         color: navy;
@@ -155,13 +155,13 @@
 <body>
     <div id="buttons" class="top-links">
         <a class="left-link" asp-action="StudentTranscrypt" asp-controller="Student" asp-route-userId="@Model.UserId">Programa Dön</a>
-        <a class="right-link" asp-action="GenerateAndDownloadPdfCertificate" asp-controller="Student" asp-route-myFileName="@($"{Model.studentName}_Sertifika")" asp-route-userId="@Model.UserId">PDF Olarak İndir</a>
+        <a class="right-link" asp-action="GenerateAndDownloadPdfCertificate" asp-controller="Student" asp-route-myFileName="@ViewBag.headerforPdf" asp-route-userId="@Model.UserId">PDF Olarak İndir</a>
     </div>
     @{if (Model.studentName != "NotExists")
         {
 
 
-            <div class="container">
+            <div id="mycont" class="container">
                 <img src="/images/mytemplate3.png" alt="Your Photo">
                 <div class="overlay">
                     <div class="name">

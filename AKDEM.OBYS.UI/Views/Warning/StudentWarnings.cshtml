@@ -6,7 +6,7 @@
 
 <div class="mt-2">
     <div class="text-right">
-        <a id="pdfButton" class="btn btn-success" asp-action="GenerateAndDownloadPdf4" asp-controller="Warning" asp-route-myFileName="@($"{ViewBag.userName}_{ViewBag.sessionName2} DÖNEMİ İHTARLARI")" asp-route-sessionId="@ViewBag.sessionId"  asp-route-userId="@ViewBag.userId">PDF</a>
+        <a id="pdfButton" class="btn btn-success" asp-action="GenerateAndDownloadPdf4" asp-controller="Warning" asp-route-myFileName="@ViewBag.headerforPdf" asp-route-sessionId="@ViewBag.sessionId"  asp-route-userId="@ViewBag.userId">PDF</a>
     </div>
     <h1>@ViewBag.userName @ViewBag.sessionName DÖNEMİ İHTARLARI</h1>
 </div>

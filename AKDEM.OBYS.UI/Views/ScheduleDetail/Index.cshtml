@@ -19,7 +19,7 @@
 }
 <h2>@ViewBag.name</h2>
 <div class="text-right">
-    <a id="pdfButton" class="btn btn-success" asp-action="GenerateAndDownloadPdf" asp-controller="ScheduleDetail" asp-route-myFileName="@($"{ViewBag.sessionName2}_{ViewBag.name2}")" asp-route-scheduleId="@ViewBag.scheduleId" asp-route-userId="@ViewBag.userId">PDF</a>
+    <a id="pdfButton" class="btn btn-success" asp-action="GenerateAndDownloadPdf" asp-controller="ScheduleDetail" asp-route-myFileName="@ViewBag.headerforPdf" asp-route-scheduleId="@ViewBag.scheduleId" asp-route-userId="@ViewBag.userId">PDF</a>
 </div>
 <br />
 @{ if (ViewBag.sessionStatus2)

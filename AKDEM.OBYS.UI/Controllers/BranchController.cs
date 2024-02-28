@@ -12,16 +12,18 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using PuppeteerSharp;
+using PuppeteerSharp.Media;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace AKDEM.OBYS.UI.Controllers
 {
-    [Authorize(Roles = "Admin")]
+    
     public class BranchController : Controller
     {
         private readonly IAppBranchService _appBranchService;
@@ -54,6 +56,8 @@ namespace AKDEM.OBYS.UI.Controllers
             _mergeBranchModelValidator = mergeBranchModelValidator;
             _appGraduatedService = appGraduatedService;
         }
+        char[] charactersToReplace = { '/', ' ', '\\', '?', ':', '.', ',' };
+        char replacementChar = '_';
 
         public IActionResult Index()
         {
@@ -74,13 +78,14 @@ namespace AKDEM.OBYS.UI.Controllers
 
         }
 
-
+        [Authorize(Roles = "Admin")]
         public IActionResult CreateBranch(int id)
         {
 
             return View(new AppBranchCreateModel { ClassId = id });
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> CreateBranch(AppBranchCreateModel model)
         {
@@ -165,7 +170,13 @@ namespace AKDEM.OBYS.UI.Controllers
                 }
                 ViewBag.totalStock = stock;
                 ViewBag.header = header;
-                ViewBag.header2 = header.Replace(" ", "_").Replace(".", "");
+                
+
+                string headerforPdf = ReplaceMultipleChars(header, charactersToReplace, replacementChar);
+                headerforPdf = headerforPdf.ToUpper();
+
+                headerforPdf = ConvertTurkishToEnglish(headerforPdf);
+                ViewBag.headerforPdf = headerforPdf;
                 var Class = await _appBranchService.GetClassById((int)classType);
                 model.BranchListWithCountModels = list;
                 model.AppClass = Class;
@@ -196,7 +207,13 @@ namespace AKDEM.OBYS.UI.Controllers
                 }
                 
                 ViewBag.header = header;
-                ViewBag.header2 = header.Replace(" ", "_").Replace(".", "");
+                
+
+                string headerforPdf = ReplaceMultipleChars(header, charactersToReplace, replacementChar);
+                headerforPdf = headerforPdf.ToUpper();
+
+                headerforPdf = ConvertTurkishToEnglish(headerforPdf);
+                ViewBag.headerforPdf = headerforPdf;
 
 
 
@@ -240,7 +257,16 @@ namespace AKDEM.OBYS.UI.Controllers
             string branchName= await _appBranchService.BranchNameByByBranchId(id);
             ViewBag.branchName = branchName;
             ViewBag.branchId = id;
-            ViewBag.branchName2 = branchName.Replace("ı", "i").Replace("/", "_");
+            
+
+            
+            
+            string headerforPdf = ReplaceMultipleChars(branchName, charactersToReplace, replacementChar);
+            headerforPdf = headerforPdf.ToUpper();
+           
+            headerforPdf = ConvertTurkishToEnglish(headerforPdf);
+            ViewBag.headerforPdf = headerforPdf;
+
 
             foreach (var student in students)
             {
@@ -271,10 +297,64 @@ namespace AKDEM.OBYS.UI.Controllers
             }
             return View(studentList);
         }
+        static string ReplaceMultipleChars(string input, char[] charactersToReplace, char replacementChar)
+        {
+            foreach (char c in charactersToReplace)
+            {
+                input = input.Replace(c, replacementChar);
+            }
+            return input;
+        }
+        static string ConvertTurkishToEnglish(string input)
+        {
+            StringBuilder result = new StringBuilder();
+
+            foreach (char c in input)
+            {
+                switch (c)
+                {
+                    case 'Ç':
+                        result.Append('C');
+                        break;
+                    case 'Ğ':
+                        result.Append('G');
+                        break;
+
+                    case 'İ':
+                        result.Append('I');
+                        break;
+                    case 'Ö':
+                        result.Append('O');
+                        break;
+                    case 'Ş':
+                        result.Append('S');
+                        break;
+                    case 'Ü':
+                        result.Append('U');
+                        break;
+                    default:
+                        result.Append(c);
+                        break;
+                }
+            }
+
+            return result.ToString();
+        }
         public async Task<IActionResult> Certificate(int userId)
         {
             
             var list = await _appGraduatedService.CertificaofUser(userId);
+            string userName = list.studentName;
+            string header = $"{userName}/Sertifika";
+
+            
+
+            string headerforPdf = ReplaceMultipleChars(header, charactersToReplace, replacementChar);
+            headerforPdf = headerforPdf.ToUpper();
+
+            headerforPdf = ConvertTurkishToEnglish(headerforPdf);
+            ViewBag.headerforPdf = headerforPdf;
+
             return View(list);
         }
         public async Task<IActionResult> UserDetails(int userId)
@@ -332,7 +412,13 @@ namespace AKDEM.OBYS.UI.Controllers
                 TotalSessionDegree = await _appUserSessionService.ReturnSessionOrderOfClass(student.Id, student.BranchId, sessionId),
                 TotalDegree = await _appUserSessionService.ReturnTotalOrderOfClass(student.Id, student.BranchId, sessionId),
                 AppStudentSession = studentDetailSessionListModel };
+            string header = $"{student.FirstName} {student.SecondName}_{sessionName}";
 
+            string headerforPdf = ReplaceMultipleChars(header, charactersToReplace, replacementChar);
+            headerforPdf = headerforPdf.ToUpper();
+
+            headerforPdf = ConvertTurkishToEnglish(headerforPdf);
+            ViewBag.headerforPdf = headerforPdf;
 
 
             return View(model);
@@ -359,9 +445,12 @@ namespace AKDEM.OBYS.UI.Controllers
                 ViewBag.sessionId = sessionId;
                 ViewBag.branchId = branchId;
                 var student = await _appStudentService.GetStudentById(userId);
-                ViewBag.firstName = student.FirstName;
-                ViewBag.secondName = student.SecondName;
-                ViewBag.ImagePath = student.ImagePath;
+                string firstName = student.FirstName;
+                string secondName  = student.SecondName;
+                string ımagePath = student.ImagePath;
+                ViewBag.firstName = firstName;
+                ViewBag.secondName = secondName;
+                ViewBag.ImagePath = ımagePath;
                 
                 var userSessionlessons = await _appUserSessionLessonService.GetAppUserSessionLessonsByUserSessionId(userSessionId);
                 StudentDetailSessionListModel studentDetailSessionListModel = new StudentDetailSessionListModel
@@ -398,11 +487,19 @@ namespace AKDEM.OBYS.UI.Controllers
                     AppStudentSession = studentDetailSessionListModel
                 };
                 models.Add(model);
+                string header = $"{student.FirstName} {student.SecondName}_Transkript";
+                string headerforPdf = ReplaceMultipleChars(header, charactersToReplace, replacementChar);
+                headerforPdf = headerforPdf.ToUpper();
+
+                headerforPdf = ConvertTurkishToEnglish(headerforPdf);
+                ViewBag.headerforPdf = headerforPdf;
 
             }
             TranscryptListModel transcryptListModel= new TranscryptListModel{ AppStudent=user, StudentDetails=models};
 
+
             
+
             
 
             return View(transcryptListModel);
@@ -454,7 +551,7 @@ namespace AKDEM.OBYS.UI.Controllers
                                 }
 
                                 // Seçilecek kolon başlıkları
-                                const selectedColumns = ['İsim', 'Sıra No', 'Şube', 'Email', 'Telefon', 'Görsel', 'Şube Derecesi', 'Sınıf Derecesi', 'Genel Ortalama', 'İhtar Sayısı'];
+                                const selectedColumns = ['#','İsim', 'Sıra No', 'Şube', 'Email', 'Telefon', 'Görsel', 'Şube Derecesi', 'Sınıf Derecesi', 'Genel Ortalama', 'Toplam Baş. İhtar Sayısı'];
 
                                 // Diğer elementleri gizle (isteğe bağlı)
                                 document.querySelectorAll('th, td').forEach(element => {
@@ -864,16 +961,39 @@ const mergeButton = document.getElementById('mergeBranches');
                             }");
 
 
-                    // Razor sayfasının HTML içeriğini alın
-                    var htmlContent = await page.GetContentAsync();
+                    var divSelector = "div#mycont";
+                    var divContent = await page.EvaluateFunctionAsync<string>(@"(selector) => {
+                const element = document.querySelector(selector);
+                return element ? element.innerHTML : null;
+  
+                                
 
-                    // HTML içeriğini PDF'ye çevir
-                    var pdfBuffer = await page.PdfDataAsync();
-                    var wwwrootPath = _webHostEnvironment.WebRootPath;
-                    var pdfPath = Path.Combine(wwwrootPath, "pdf", $"{myFileName}.pdf");
+            }", divSelector);
 
-                    // PDF'yi kaydedin
-                    System.IO.File.WriteAllBytes(pdfPath, pdfBuffer);
+                    if (divContent != null)
+                    {
+                        // PDF boyut ve diğer seçenekleri belirle
+                        var pdfOptions = new PdfOptions
+                        {
+                            Width = "1200px",
+                            Height = "832px",
+                            PrintBackground = true // Arka plan rengini ve resimleri dahil et
+                                                   // Diğer isteğe bağlı seçenekleri ekleyebilirsiniz
+                        };
+
+                        // Seçilen div içeriğini PDF'ye çevir
+                        var pdfBuffer = await page.PdfDataAsync(pdfOptions);
+
+                        // PDF'yi kaydedin
+                        var wwwrootPath = _webHostEnvironment.WebRootPath;
+                        var pdfPath = Path.Combine(wwwrootPath, "pdf", $"{myFileName}.pdf");
+                        System.IO.File.WriteAllBytes(pdfPath, pdfBuffer);
+                    }
+                    else
+                    {
+                        // Hata durumunu ele alabilirsiniz
+                        Console.WriteLine("Belirtilen div bulunamadı.");
+                    }
 
                 }
             }

@@ -17,11 +17,12 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace AKDEM.OBYS.UI.Controllers
 {
-    [Authorize(Roles = "Admin")]
+    
     public class SessionController : Controller
     {
         private readonly IAppSessionService _appSessionService;
@@ -58,8 +59,53 @@ namespace AKDEM.OBYS.UI.Controllers
             _appGraduatedService = appGraduatedService;
         }
 
-        
+        char[] charactersToReplace = { '/', ' ', '\\', '?', ':', '.', ',' };
+        char replacementChar = '_';
+        static string ReplaceMultipleChars(string input, char[] charactersToReplace, char replacementChar)
+        {
+            foreach (char c in charactersToReplace)
+            {
+                input = input.Replace(c, replacementChar);
+            }
+            return input;
+        }
+        static string ConvertTurkishToEnglish(string input)
+        {
+            StringBuilder result = new StringBuilder();
 
+            foreach (char c in input)
+            {
+                switch (c)
+                {
+                    case 'Ç':
+                        result.Append('C');
+                        break;
+                    case 'Ğ':
+                        result.Append('G');
+                        break;
+
+                    case 'İ':
+                        result.Append('I');
+                        break;
+                    case 'Ö':
+                        result.Append('O');
+                        break;
+                    case 'Ş':
+                        result.Append('S');
+                        break;
+                    case 'Ü':
+                        result.Append('U');
+                        break;
+                    default:
+                        result.Append(c);
+                        break;
+                }
+            }
+
+            return result.ToString();
+        }
+
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Index()
         {
             
@@ -81,15 +127,15 @@ namespace AKDEM.OBYS.UI.Controllers
 
 
         }
-        
 
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> ChangeStatus(int id)
         {
             await _appSessionService.SetStatusAsync(id);
             return RedirectToAction("Index", "Session");
         }
-        
 
+        [Authorize(Roles = "Admin")]
         public async Task< IActionResult> CreateSession()
         {
             var items = Enum.GetValues(typeof(SessionType));
@@ -120,6 +166,7 @@ namespace AKDEM.OBYS.UI.Controllers
             ViewBag.teachers = new SelectList(list2, "Definition", "Val");
             return View(new AppSessionCreateModel());
         }
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         
 
@@ -205,7 +252,7 @@ namespace AKDEM.OBYS.UI.Controllers
             
             
         }
-
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> SessionDetails(int id)
         {
             ViewBag.id = id;
@@ -242,12 +289,13 @@ namespace AKDEM.OBYS.UI.Controllers
             return RedirectToAction("Index");
 
         }
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> ActiveSession(int sessionId)
         {
             await _appSessionService.ChangeStatus2BySessionId(sessionId);
             return RedirectToAction("Index");
         }
-
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> SessionEnding(int sessionId)
         {
             
@@ -383,6 +431,13 @@ namespace AKDEM.OBYS.UI.Controllers
             ViewBag.sessionName = sessionName;
             ViewBag.sessionName2 = sessionName.Replace("/", "_");
             ViewBag.sessionId = sessionId;
+
+            string header = $"{sessionName}_Dönemi_Girilmemiş_Notları";
+            string headerforPdf = ReplaceMultipleChars(header, charactersToReplace, replacementChar);
+            headerforPdf = headerforPdf.ToUpper();
+            headerforPdf = ConvertTurkishToEnglish(headerforPdf);
+            ViewBag.headerforPdf = headerforPdf;
+
             return View(missingNotes);
         }
         public async Task<IActionResult> SessionCriteria(int sessionId)
@@ -392,8 +447,15 @@ namespace AKDEM.OBYS.UI.Controllers
             ViewBag.sessionName = sessionName;
             ViewBag.sessionName2 = sessionName.Replace("/", "_");
             ViewBag.sessionId = sessionId;
+
+            string header = $"{sessionName}_Dönem_Yönetmeliği";
+            string headerforPdf = ReplaceMultipleChars(header, charactersToReplace, replacementChar);
+            headerforPdf = headerforPdf.ToUpper();
+            headerforPdf = ConvertTurkishToEnglish(headerforPdf);
+            ViewBag.headerforPdf = headerforPdf;
             return View(sessionCriterias);
         }
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdateSessionCriteria(int sessionId)
         {
             var sessionCriterias = await _appSessionService.UpdateSessionCriterias(sessionId);
@@ -415,6 +477,7 @@ namespace AKDEM.OBYS.UI.Controllers
 
             return View(sessionCriterias);
         }
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> UpdateSessionCriteria(AppSessionUpdateDto dto)
         {
@@ -467,12 +530,27 @@ namespace AKDEM.OBYS.UI.Controllers
             };
                 models.Add(model);
             }
+            string header = $"{sessionName}_Dönemi_Mezunları";
+            string headerforPdf = ReplaceMultipleChars(header, charactersToReplace, replacementChar);
+            headerforPdf = headerforPdf.ToUpper();
+            headerforPdf = ConvertTurkishToEnglish(headerforPdf);
+            ViewBag.headerforPdf = headerforPdf;
             return View(models);
         }
         public async Task<IActionResult> Certificate(int userId,int sessionId)
         {
             ViewBag.sessionId = sessionId;
             var list = await _appGraduatedService.CertificaofUser(userId);
+            string userName = list.studentName;
+            string header = $"{userName}/Sertifika";
+
+
+
+            string headerforPdf = ReplaceMultipleChars(header, charactersToReplace, replacementChar);
+            headerforPdf = headerforPdf.ToUpper();
+
+            headerforPdf = ConvertTurkishToEnglish(headerforPdf);
+            ViewBag.headerforPdf = headerforPdf;
             return View(list);
         }
 
@@ -678,17 +756,39 @@ namespace AKDEM.OBYS.UI.Controllers
                                 });
                             }");
 
+                    var divSelector = "div#mycont";
+                    var divContent = await page.EvaluateFunctionAsync<string>(@"(selector) => {
+                const element = document.querySelector(selector);
+                return element ? element.innerHTML : null;
+  
+                                
 
-                    // Razor sayfasının HTML içeriğini alın
-                    var htmlContent = await page.GetContentAsync();
+            }", divSelector);
 
-                    // HTML içeriğini PDF'ye çevir
-                    var pdfBuffer = await page.PdfDataAsync();
-                    var wwwrootPath = _webHostEnvironment.WebRootPath;
-                    var pdfPath = Path.Combine(wwwrootPath, "pdf", $"{myFileName}.pdf");
+                    if (divContent != null)
+                    {
+                        // PDF boyut ve diğer seçenekleri belirle
+                        var pdfOptions = new PdfOptions
+                        {
+                            Width = "1200px",
+                            Height = "832px",
+                            PrintBackground = true // Arka plan rengini ve resimleri dahil et
+                                                   // Diğer isteğe bağlı seçenekleri ekleyebilirsiniz
+                        };
 
-                    // PDF'yi kaydedin
-                    System.IO.File.WriteAllBytes(pdfPath, pdfBuffer);
+                        // Seçilen div içeriğini PDF'ye çevir
+                        var pdfBuffer = await page.PdfDataAsync(pdfOptions);
+
+                        // PDF'yi kaydedin
+                        var wwwrootPath = _webHostEnvironment.WebRootPath;
+                        var pdfPath = Path.Combine(wwwrootPath, "pdf", $"{myFileName}.pdf");
+                        System.IO.File.WriteAllBytes(pdfPath, pdfBuffer);
+                    }
+                    else
+                    {
+                        // Hata durumunu ele alabilirsiniz
+                        Console.WriteLine("Belirtilen div bulunamadı.");
+                    }
 
                 }
             }
