@@ -5,72 +5,105 @@
 
     @{ if (Model.Count != 0)
         {
-            <input id="modelCount" type="hidden" value="@Model.Count" />
-            <div class="container-fluid">
-                <form asp-action="Notes" asp-controller="Otomation" method="post">
+                        <input id="modelCount" type="hidden" value="@Model.Count" />
+                        <div class="container-fluid">
+                            <form asp-action="Notes" asp-controller="Otomation" method="post">
 
-                    @for (int i = 0; i < Model.Count; i++)
+                                @for (int i = 0; i < Model.Count; i++)
                     {
-                        <input type="hidden" asp-for="@Model[i].Id" />
-                        <input type="hidden" asp-for="@Model[i].LessonId" />
-                        <input type="hidden" asp-for="@Model[i].AppLesson.Definition" />
-                        <input type="hidden" asp-for="@Model[i].AppLesson.AppUser.FirstName" />
-                        <input type="hidden" asp-for="@Model[i].AppLesson.AppUser.SecondName" />
+                                    <input type="hidden" asp-for="@Model[i].Id" />
+                                    <input type="hidden" asp-for="@Model[i].LessonId" />
+                                    <input type="hidden" asp-for="@Model[i].AppLesson.Definition" />
+                                    <input type="hidden" asp-for="@Model[i].AppLesson.AppUser.FirstName" />
+                                    <input type="hidden" asp-for="@Model[i].AppLesson.AppUser.SecondName" />
 
-                        <input type="hidden" asp-for="@Model[i].UserSessionId" />
+                                    <input type="hidden" asp-for="@Model[i].UserSessionId" />
 
-                        <label class="font-italic font-weight-bold">@Model[i].AppLesson.Definition --> ( @Model[i].AppLesson.AppUser.FirstName @Model[i].AppLesson.AppUser.SecondName )</label>
+                                    <label class="font-italic font-weight-bold">@Model[i].AppLesson.Definition --> ( @Model[i].AppLesson.AppUser.FirstName @Model[i].AppLesson.AppUser.SecondName )</label>
 
-                        <div class="row">
+                                    <div class="row">
 
-                            <div class="col-md-6">
-                                <label class="font-weight-bold">NOT</label>
-
-
-                                <input id="visibleInputNot_@i" value="" type="text" class="form-control" placeholder="GİRİLMEDİ" />
-                                <input id="hiddenInputNot_@i"  type="hidden" asp-for="@Model[i].Not" />
-                            </div>
-
-                            <div class="col-md-6">
-                                <label class="font-weight-bold">Devamsızlık</label>
-
-                                <input id="visibleInput_@i" value="" type="text" class="form-control" placeholder="GİRİLMEDİ" />
-                                <input id="hiddenInput_@i"  type="hidden" asp-for="@Model[i].Devamsızlık" />
-                            </div>
+                                        <div class="col-md-4">
+                                            <label >NOT</label>
 
 
+                                            <input id="visibleInputNot_@i" value="" type="text" class="form-control" placeholder="GİRİLMEDİ" />
+                                            <input id="hiddenInputNot_@i"  type="hidden" asp-for="@Model[i].Not" />
+                                        </div>
+                                        <div class="col-md-4">
+                                        <label >DEĞERLENDİRME</label>
 
-                        </div>
-                        <hr />
+                                        <select asp-for="@Model[i].Status" class="form form-control-sm" id="selectbox_@i">
+                                            <option value="0">Not Yerine Yalnızca Sonuç Seçebilirsiniz</option>
+                                            <option value="1">BAŞARILI</option>
+                                            <option value="2">BAŞARISIZ</option>
+                                        </select>
+                                        </div>
+                                    
+
+
+                                        <div class="col-md-4">
+                                            <label >DEVAMSIZLIK</label>
+
+                                            <input id="visibleInput_@i" value="" type="text" class="form-control" placeholder="GİRİLMEDİ" />
+                                            <input id="hiddenInput_@i"  type="hidden" asp-for="@Model[i].Devamsızlık" />
+                                        </div>
+
+
+
+                                    </div>
+                                    <hr />
                     }
-                    <br />
+                                <br />
 
 
-                    <div class="mb-3">
-                        <button class="btn btn-primary" type="submit">Kaydet</button>
-                    </div>
-                    <div class="mb-3 text-bg-danger" asp-validation-summary="All">
+                                <div class="mb-3">
+                                    <button class="btn btn-primary" type="submit">Kaydet</button>
+                                </div>
+                                <div class="mb-3 text-bg-danger" asp-validation-summary="All">
 
-                    </div>
-                </form>
-            </div>
+                                </div>
+                            </form>
+                        </div>
         }
     }
     @{else
         {
 
-            <p class="font-weight-bold">ÖĞRENCİYE/SINIFA AİT BİR DERS PROGRAMI BİLGİSİ BULUNAMADI</p>
+                        <p class="font-weight-bold">ÖĞRENCİYE/SINIFA AİT BİR DERS PROGRAMI BİLGİSİ BULUNAMADI</p>
         }
     }
 
-    @section script{
+    @section script
+    {
 
         <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
         <script>
+
+        function handleStatusChange(index) {
+            
+            var element = document.getElementById("selectbox_" + index);
+            var selectedValue = element.options[element.selectedIndex].value;
+            console.log(selectedValue);
+            if (selectedValue == "1" || selectedValue == "2") {
+
+                
+                $('#visibleInputNot_' + index).attr('placeholder', 'GİRİLMEDİ');
+            } else {
+                // Eğer "1" veya "2" seçili değilse, normal işlemi devam ettir
+                var notValue = /* Burada not değeri alınmalı, notValue değişkenine atanmalı */
+                $('#visibleInputNot_' + index).val(notValue);
+            }
+        }
+
+
             $(document).ready(function () {
+            
+
                 var modelCount = $('#modelCount').val();
 
-                for (var i = 0; i < modelCount; i++) {
+                for (var i = 0; i < modelCount; i++)
+                {
                     // Görünür input alanında bir değer girildiğinde
                     $('#visibleInputNot_' + i).on('input', function () {
                         var id = $(this).attr('id').split('_')[1];
@@ -103,8 +136,21 @@
                     } else {
                         $('#visibleInput_' + i).val(devamValue);
                     }
+
+                $('#selectbox_' + i).on('change', (function (index) {
+                    return function () {
+                        
+                        console.log(index);
+                        handleStatusChange(index);
+                    };
+                })(i));
+
+               
+               
                 }
             });
+
+       
         </script>
 
 
