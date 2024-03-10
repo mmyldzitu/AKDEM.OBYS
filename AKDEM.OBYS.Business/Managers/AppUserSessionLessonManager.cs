@@ -179,16 +179,42 @@ namespace AKDEM.OBYS.Business.Managers
             }
             return new List<AppUserSessionLessonUpdateDto>();
         }
-        public async Task<IResponse<List<AppUserSessionLessonUpdateDto>>> GetAppUserSessionLessonsByUserSessionIdAndLessonId(int userSessionId,int lessonId)
+        public async Task<List<AppUserSessionLessonUpdateDto>> GetAppUserSessionLessonsByUserSessionIdAndLessonId(int userSessionId,int lessonId)
         {
             var query = _uow.GetRepositry<AppUserSessionLesson>().GetQuery();
             var entities = await query.Include(x => x.AppLesson).ThenInclude(x => x.AppUser).Where(x => x.UserSessionId == userSessionId && x.LessonId==lessonId).ToListAsync();
+            var lessonquery = _uow.GetRepositry<AppLesson>().GetQuery();
+
+            List<AppUserSessionLessonUpdateDto> dtoList = new List<AppUserSessionLessonUpdateDto>();
             if (entities != null)
             {
-                var dto = _mapper.Map<List<AppUserSessionLessonUpdateDto>>(entities);
-                return new Response<List<AppUserSessionLessonUpdateDto>>(ResponseType.Success, dto);
+                foreach (var item in entities)
+                {
+                    string mystatus = "0";
+                    if (item.Not == -5)
+                    {
+                        mystatus = "1";
+                    }
+                    else if (item.Not == -6)
+                    {
+                        mystatus = "2";
+                    }
+                    else
+                    {
+                        mystatus = "0";
+                    }
+
+                    var appLessonEntity = await lessonquery.Include(x => x.AppUser).Where(x => x.Id == item.LessonId).SingleOrDefaultAsync();
+                    var appLesson = _mapper.Map<AppLessonListDto>(appLessonEntity);
+
+                    dtoList.Add(new AppUserSessionLessonUpdateDto { Id = item.Id, LessonId = item.LessonId, AppLesson = appLesson, UserSessionId = item.UserSessionId, Not = item.Not, Devamsızlık = item.Devamsızlık, Status = mystatus });
+
+
+                }
+
+                return dtoList;
             }
-            return new Response<List<AppUserSessionLessonUpdateDto>>(ResponseType.NotFound, "Ders Bilgisi Bulunamadı");
+            return  new List<AppUserSessionLessonUpdateDto>();
         }
         public async Task UpdateUserSessionLessonsAsync(List<AppUserSessionLessonUpdateDto> dtos)
         {

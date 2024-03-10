@@ -33,7 +33,7 @@
                         <div class="col-md-4">
                             <label>Herhangi Bir Sınav Notu Olmadığı Durumlarda</label>
                             <br />
-                            <select  class="form form-control-sm" id="selectbox_@i">
+                            <select asp-for="@Model[i].Status"  class="form form-control-sm" id="selectbox_@i">
                                 <option value="0">Not Girmek Yerine; Yalnızca Sonuç </option>
                                 <option value="1">BAŞARILI</option>
                                 <option value="2">BAŞARISIZ</option>

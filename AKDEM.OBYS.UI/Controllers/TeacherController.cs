@@ -294,7 +294,7 @@ namespace AKDEM.OBYS.UI.Controllers
         {
 
             var userSessionLessons = await _appUserSessionLessonService.GetAppUserSessionLessonsByUserSessionIdAndLessonId(userSessionId,lessonId);
-            return this.View(userSessionLessons.Data);
+            return this.View(userSessionLessons);
         }
         [Authorize(Roles = "Teacher")]
         [HttpPost]
@@ -341,7 +341,7 @@ namespace AKDEM.OBYS.UI.Controllers
                 await _appUserSessionLessonService.UpdateUserSessionLessonsAsync(dtos);
                 foreach (var dto in dtos)
                 {
-                    if (dto.Not != -1 && dto.Not!=-5 && dto.Not !=-6)
+                    if (dto.Not != -1 )
                     {
                         await _appUserSessionService.FindAverageOfSessionWithUserAndSession(userId, sessionId);
                         await _appUserSessionService.TotalAverageByUserId(userId, sessionId);
