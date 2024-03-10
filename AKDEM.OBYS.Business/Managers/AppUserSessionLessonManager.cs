@@ -1,6 +1,7 @@
 ﻿using AKDEM.OBYS.Business.Services;
 using AKDEM.OBYS.Common;
 using AKDEM.OBYS.DataAccess.UnitOfWork;
+using AKDEM.OBYS.Dto.AppLessonDtos;
 using AKDEM.OBYS.Dto.AppUserSessionDtos;
 using AKDEM.OBYS.Dto.AppUserSessionLessonDtos;
 using AKDEM.OBYS.Entities;
@@ -19,10 +20,12 @@ namespace AKDEM.OBYS.Business.Managers
     {
         private readonly IUow _uow;
         private readonly IMapper _mapper;
+        
         public AppUserSessionLessonManager(IMapper mapper, IValidator<AppUserSessionLessonCreateDto> createDtoValidator, IValidator<AppUserSessionLessonUpdateDto> updateDtoValidator, IUow uow) : base(mapper, createDtoValidator, updateDtoValidator, uow)
         {
             _uow = uow;
             _mapper = mapper;
+           
         }
 
         public async Task CreateUserSessionLessonAsync(List<AppUserSessionLessonCreateDto> dtos)
@@ -139,16 +142,42 @@ namespace AKDEM.OBYS.Business.Managers
             }
            
         }
-        public async Task<IResponse<List<AppUserSessionLessonUpdateDto>>> GetAppUserSessionLessonsByUserSessionId(int userSessionId)
+        public async Task<List<AppUserSessionLessonUpdateDto>> GetAppUserSessionLessonsByUserSessionId(int userSessionId)
         {
             var query = _uow.GetRepositry<AppUserSessionLesson>().GetQuery();
             var entities = await query.Include(x => x.AppLesson).ThenInclude(x=>x.AppUser).Where(x => x.UserSessionId == userSessionId).ToListAsync();
+             var lessonquery = _uow.GetRepositry<AppLesson>().GetQuery();
+
+            List<AppUserSessionLessonUpdateDto> dtoList = new List<AppUserSessionLessonUpdateDto>();
             if (entities != null)
             {
-                var dto = _mapper.Map<List<AppUserSessionLessonUpdateDto>>(entities);
-                return new Response<List<AppUserSessionLessonUpdateDto>>(ResponseType.Success, dto);
+                foreach (var item in entities)
+                {
+                    string mystatus = "0";
+                    if (item.Not == -5)
+                    {
+                        mystatus = "1";
+                    }
+                    else if(item.Not == -6)
+                    {
+                        mystatus = "2";
+                    }
+                    else
+                    {
+                        mystatus= "0";
+                    }
+
+                    var appLessonEntity = await lessonquery.Include(x=>x.AppUser).Where(x=>x.Id==item.LessonId).SingleOrDefaultAsync();
+                    var appLesson = _mapper.Map<AppLessonListDto>(appLessonEntity);
+                    
+                    dtoList.Add(new AppUserSessionLessonUpdateDto { Id = item.Id, LessonId = item.LessonId, AppLesson = appLesson, UserSessionId = item.UserSessionId, Not = item.Not, Devamsızlık = item.Devamsızlık, Status = mystatus });
+
+
+                }
+
+                return dtoList;
             }
-            return new Response<List<AppUserSessionLessonUpdateDto>>(ResponseType.NotFound, "Ders Bilgisi Bulunamadı");
+            return new List<AppUserSessionLessonUpdateDto>();
         }
         public async Task<IResponse<List<AppUserSessionLessonUpdateDto>>> GetAppUserSessionLessonsByUserSessionIdAndLessonId(int userSessionId,int lessonId)
         {
@@ -170,6 +199,7 @@ namespace AKDEM.OBYS.Business.Managers
                 {
                     entity.Not = dto.Not;
                     entity.Devamsızlık = dto.Devamsızlık;
+                    
                     await _uow.SaveChangesAsync();
                 }
             }

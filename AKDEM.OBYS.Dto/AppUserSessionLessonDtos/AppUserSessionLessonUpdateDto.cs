@@ -17,6 +17,7 @@ namespace AKDEM.OBYS.Dto.AppUserSessionLessonDtos
 
         public int Not { get; set; }
         public int Devamsızlık { get; set; }
-        public bool Status { get; set; }
+        public string Status { get; set; }
+
     }
 }

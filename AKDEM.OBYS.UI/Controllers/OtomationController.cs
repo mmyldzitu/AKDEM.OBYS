@@ -278,7 +278,7 @@ namespace AKDEM.OBYS.UI.Controllers
         {
 
             var userSessionLessons = await _appUserSessionLessonService.GetAppUserSessionLessonsByUserSessionId(userSessionId);
-            return this.View(userSessionLessons.Data);
+            return View(userSessionLessons);
         }
         [Authorize(Roles = "Admin")]
         [HttpPost]
@@ -314,7 +314,7 @@ namespace AKDEM.OBYS.UI.Controllers
                 await _appUserSessionLessonService.UpdateUserSessionLessonsAsync(dtos);
                 foreach (var dto in dtos)
                 {
-                    if (dto.Not != -1)
+                    if (dto.Not!=1 )
                     {
                         await _appUserSessionService.FindAverageOfSessionWithUserAndSession(userId, sessionId);
                         await _appUserSessionService.TotalAverageByUserId(userId, sessionId);
@@ -326,9 +326,10 @@ namespace AKDEM.OBYS.UI.Controllers
                 int notminuscount = 0;
                 foreach (var dto in dtos)
                 {
-                    string lesson = await _appLessonService.GetLessonNameByLessonId(dto.LessonId);
+                    string lesson1 = await _appLessonService.GetLessonNameByLessonId(dto.LessonId);
+                    string lesson = lesson1.Replace(" ", "_");
 
-                    if (dto.Not != -1 &&  dto.Not < sessionMinLessonNote)
+                    if ( dto.Not>=0 && dto.Not < sessionMinLessonNote)
                     {
                         var newdto = new AppWarningCreateDto
                         {
@@ -339,6 +340,18 @@ namespace AKDEM.OBYS.UI.Controllers
                         };
                         await _appWarningService.CreateWarningByDtoandString(newdto, lesson, userId, userSessionId);
                         
+
+                    }
+                    else if(dto.Not== -6 )
+                    {
+                        var newdto = new AppWarningCreateDto
+                        {
+                            UserSessionId = userSessionId,
+                            WarningCount = 1,
+                            WarningReason = $"{userName} ismindeki öğrenci {lesson} isimli dersten  DERS BAŞARI İHTARI almıştır",
+                            WarningTime = DateTime.Now
+                        };
+                        await _appWarningService.CreateWarningByDtoandString(newdto, lesson, userId, userSessionId);
 
                     }
                     else
@@ -370,7 +383,7 @@ namespace AKDEM.OBYS.UI.Controllers
 
 
 
-                    if (dto.Not != -1)
+                    if (dto.Not != -1 || dto.Not!= -5 || dto.Not!=-6)
                     {
                         notminuscount += 1;
                     }
@@ -378,7 +391,10 @@ namespace AKDEM.OBYS.UI.Controllers
 
                 }
                 var slwc = await _appWarningService.SessionLessonWarningCountByUserSessionId(userSessionId);
-                if (slwc >= 2 && average >= sessionMinAverageNote)
+                
+                
+
+                if (dtos.Count!= notminuscount && slwc>=2)
                 {
                     var newdto = new AppWarningCreateDto
                     {
@@ -394,9 +410,10 @@ namespace AKDEM.OBYS.UI.Controllers
                     await _appWarningService.RemoveWarningByString("iki veya daha fazla dersten", userId, userSessionId);
 
                 }
+
                 if (dtos.Count == notminuscount)
                 {
-                    if (average < sessionMinAverageNote)
+                    if (average>=0 && average < sessionMinAverageNote)
                     {
                         var newdto = new AppWarningCreateDto
                         {
@@ -408,11 +425,32 @@ namespace AKDEM.OBYS.UI.Controllers
                         await _appWarningService.CreateWarningByDtoandString(newdto, "DÖNEM BAŞARISIZLIĞI İHTARI", userId, userSessionId);
                        
                     }
+                    
+
                     else
                     {
                         await _appWarningService.RemoveWarningByString("sebebiyle DÖNEM BAŞARISIZLIĞI İHTARI", userId, userSessionId);
                     }
+
+                    if (average >= sessionMinAverageNote && slwc>=2)
+                    {
+                        var newdto = new AppWarningCreateDto
+                        {
+                            UserSessionId = userSessionId,
+                            WarningCount = 1,
+                            WarningReason = $"{userName} ismindeki öğrenci iki veya daha fazla dersten ihtar aldığı için  DÖNEM BAŞARISIZLIĞI İHTARI almıştır",
+                            WarningTime = DateTime.Now
+                        };
+                        await _appWarningService.CreateWarningByDtoandString(newdto, "DÖNEM BAŞARISIZLIĞI İHTARI", userId, userSessionId);
+                    }
+                    else
+                    {
+                        await _appWarningService.RemoveWarningByString("iki veya daha fazla dersten", userId, userSessionId);
+
+                    }
+
                 }
+                
 
                 
 
@@ -467,7 +505,7 @@ namespace AKDEM.OBYS.UI.Controllers
 
 
             StudentDetailsModel model = new StudentDetailsModel { AppStudent = student,
-                AppUserSessionLessons = userSessionlessons.Data,
+                AppUserSessionLessons = userSessionlessons,
                 BranchSessionDegree = await _appUserSessionService.ReturnSessionOrderOfBranch(student.Id, student.BranchId, sessionId),
                 BranchDegree = await _appUserSessionService.ReturnTotalOrderOfBranch(student.Id, student.BranchId, sessionId),
                 TotalSessionDegree = await _appUserSessionService.ReturnSessionOrderOfClass(student.Id, student.BranchId, sessionId),

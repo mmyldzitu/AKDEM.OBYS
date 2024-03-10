@@ -273,7 +273,7 @@ namespace AKDEM.OBYS.UI.Controllers
                     StudentDetailsModel model = new StudentDetailsModel
                     {
                         AppStudent = student,
-                        AppUserSessionLessons = userSessionlessons.Data,
+                        AppUserSessionLessons = userSessionlessons,
                         BranchSessionDegree = await _appUserSessionService.ReturnSessionOrderOfBranch(student.Id, student.BranchId, sessionId),
                         BranchDegree = await _appUserSessionService.ReturnTotalOrderOfBranch(student.Id, student.BranchId, sessionId),
                         TotalSessionDegree = await _appUserSessionService.ReturnSessionOrderOfClass(student.Id, student.BranchId, sessionId),
@@ -427,7 +427,7 @@ namespace AKDEM.OBYS.UI.Controllers
                     AppStudent = student,
 
                     SessionName = await _appSessionService.ReturnSessionName(sessionId),
-                    AppUserSessionLessons = userSessionlessons.Data,
+                    AppUserSessionLessons = userSessionlessons,
                     //BURASI
                     BranchSessionDegree = await _appUserSessionService.ReturnSessionOrderOfBranch(student.Id, student.BranchId, sessionId),
                     //BURASI

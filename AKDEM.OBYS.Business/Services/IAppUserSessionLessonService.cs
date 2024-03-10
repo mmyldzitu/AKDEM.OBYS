@@ -18,7 +18,7 @@ namespace AKDEM.OBYS.Business.Services
         Task<int> GetScheduleIdForThisUser(int branchId);
         Task CreateUserSessionLessonAsyncByUserSessions(List<AppUserSessionLessonCreateDto> dtos);
         Task RemoveUserSessionLessonsByUserSessionListAsync(List<int> dtos);
-        Task<IResponse<List<AppUserSessionLessonUpdateDto>>> GetAppUserSessionLessonsByUserSessionId(int userSessionId);
+        Task<List<AppUserSessionLessonUpdateDto>> GetAppUserSessionLessonsByUserSessionId(int userSessionId);
         Task UpdateUserSessionLessonsAsync(List<AppUserSessionLessonUpdateDto> dtos);
         Task RemoveUserSessionLessonBySessionId(int sessionId);
         Task<List<AppUserSessionLessonListDto>> UserSessionLessonDetailsBySessionId(int sessionId);

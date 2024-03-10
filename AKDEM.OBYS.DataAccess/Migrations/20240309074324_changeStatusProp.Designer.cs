@@ -4,14 +4,16 @@ using AKDEM.OBYS.DataAccess.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace AKDEM.OBYS.DataAccess.Migrations
 {
     [DbContext(typeof(AkdemContext))]
-    partial class AkdemContextModelSnapshot : ModelSnapshot
+    [Migration("20240309074324_changeStatusProp")]
+    partial class changeStatusProp
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -390,6 +392,9 @@ namespace AKDEM.OBYS.DataAccess.Migrations
 
                     b.Property<int>("Not")
                         .HasColumnType("int");
+
+                    b.Property<string>("Status")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("UserSessionId")
                         .HasColumnType("int");

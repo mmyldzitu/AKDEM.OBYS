@@ -72,6 +72,7 @@
                         <td>@count</td>
                         <td>@item.FirstName</td>
                         <td>@item.SecondName</td>
+                        
                         @{if (item.Status)
                             {
 
@@ -86,7 +87,28 @@
                         
                         <td>@item.SıraNo</td>
 
-                        <td>@(item.LessonNote==-1 ? "GİRİLMEDİ" :item.LessonNote)</td>
+                            @{
+                                if (item.LessonNote == -1)
+                                {
+                                    <td>GİRİLMEDİ</td>
+                                }
+                                else if (item.LessonNote == -5)
+                                {
+                                    <td>BAŞARILI</td>
+
+                                }
+                                else if (item.LessonNote == -6)
+                                {
+                                    <td>BAŞARISIZ</td>
+
+                                }
+                                else
+                                {
+                                    <td>@item.LessonNote</td>
+                                }
+
+                            }
+                           
                         <td>@(item.Devamsızlık==-1 ? "GİRİLMEDİ" :item.Devamsızlık)</td>
 
 

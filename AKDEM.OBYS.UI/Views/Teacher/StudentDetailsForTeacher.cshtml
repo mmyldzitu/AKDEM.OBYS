@@ -74,12 +74,24 @@
                             <td>GİRİLMEDİ</td>
                         }
 
-                    }
-                    @{ else
+                        else if (item.Not == -5)
+                        {
+                            <td>BAŞARILI</td>
+
+                        }
+                        else if (item.Not == -6)
+                        {
+                            <td>BAŞARISIZ</td>
+
+                        }
+                        else
                         {
                             <td>@item.Not</td>
                         }
+
+
                     }
+                   
 
                     @{if (item.Devamsızlık == -1)
                         {

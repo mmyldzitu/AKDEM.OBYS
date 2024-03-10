@@ -18,5 +18,6 @@ namespace AKDEM.OBYS.Dto.AppUserSessionLessonDtos
         public AppUserSessionListDto AppUserSession { get; set; }
         public int Not { get; set; }
         public int Devamsızlık { get; set; }
+        
     }
 }

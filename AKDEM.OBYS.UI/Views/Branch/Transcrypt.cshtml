@@ -10,7 +10,7 @@
 
 }
 
-@section style{
+@section style {
     <style>
         .no-page-break {
             page-break-inside: avoid;
@@ -19,248 +19,267 @@
 
 }
 
-@{if (modelCount != 0)
+@{
+    if (modelCount != 0)
     {
 
-    <div class="container-fluid">
-        <div class="text-right">
-            <a id="pdfButton" class="btn btn-success" asp-action="GenerateAndDownloadPdf4" asp-controller="Branch" asp-route-myFileName="@ViewBag.headerforPdf" asp-route-userId="@ViewBag.userId">PDF</a>
-        </div>
-        <h2>@Model.AppStudent.FirstName @Model.AppStudent.SecondName TRANSKRİPT</h2>
-        <hr />
-        <div class="row">
-            <div class="col-md-2">
-                <img src="@Model.AppStudent.ImagePath" height="250" width="200" />
+        <div class="container-fluid">
+            <div class="text-right">
+                <a id="pdfButton" class="btn btn-success" asp-action="GenerateAndDownloadPdf4" asp-controller="Branch" asp-route-myFileName="@ViewBag.headerforPdf" asp-route-userId="@ViewBag.userId">PDF</a>
+            </div>
+            <h2>@Model.AppStudent.FirstName @Model.AppStudent.SecondName TRANSKRİPT</h2>
+            <hr />
+            <div class="row">
+                <div class="col-md-2">
+                    <img src="@Model.AppStudent.ImagePath" height="250" width="200" />
+
+                </div>
+
+
+                <div class="col-md-9">
+                    <ul class="list-group">
+
+                        @{
+                            if (Model.AppStudent.Status && Model.AppStudent.AppClass.Definition != "Mezun")
+                            {
+                                <li class="list-group-item"><strong> Güncel Sınıf:</strong>     @Model.AppStudent.AppClass.Definition</li>
+                                <li class="list-group-item"><strong> Güncel Şube:</strong>     @Model.AppStudent.AppBranch.Definition</li>
+                                <li class="list-group-item"><strong>Sıra No:</strong>       @Model.AppStudent.SıraNo</li>
+                                <li class="list-group-item"><strong>Email:</strong>     @Model.AppStudent.Email</li>
+                            }
+                            else if (!Model.AppStudent.Status && Model.AppStudent.AppClass.Definition != "Mezun")
+                            {
+                                <li class="list-group-item"><strong> Ayrılık Dönemi:</strong>     <getPassiveStudentInfo user-id="@Model.AppStudent.Id"></getPassiveStudentInfo></li>
+                                <li class="list-group-item"><strong> Ayrılık Sebebi:</strong>  @Model.AppStudent.DepartReason   </li>
+                                <li class="list-group-item"><strong> Ayrıldığı Şube:</strong>     @Model.AppStudent.AppBranch.Definition</li>
+                            }
+                            else
+                            {
+                                string[] parcalar = Model.AppStudent.AppBranch.Definition.Split(new char[] { '/' });
+                                string date = parcalar[1] + "/" + parcalar[2];
+
+
+
+                                <li class="list-group-item"><strong> Mezuniyet Dönemi:</strong>  @date</li>
+
+                                <li class="list-group-item"><strong> Mezuniyet Ortalaması:</strong>   @(@String.Format("{0:0.00}", Model.AppStudent.TotalAverage)) </li>
+                                <li class="list-group-item"><strong> Mezuniyet Derecesi(Sınıf):</strong>      @Model.StudentDetails[modelCount - 1].TotalDegree</li>
+                                <li class="list-group-item"><strong> Mezuniyet Derecesi(Şube):</strong>     @Model.StudentDetails[modelCount - 1].BranchDegree</li>
+
+                            }
+                        }
+
+
+
+                        @{
+                            if (Model.AppStudent.Status && @Model.AppStudent.AppClass.Definition != "Mezun")
+                            {
+                                <li class="list-group-item">
+                                    <strong>Durum:</strong> <span style="font-weight: bold; color: lightseagreen;">AKTİF</span>
+                                </li>
+                            }
+                            else if (!Model.AppStudent.Status && @Model.AppStudent.AppClass.Definition != "Mezun")
+                            {
+                                <li class="list-group-item">
+
+                                    <strong>Durum:</strong> <span style="font-weight: bold; color: red;">PASİF</span>
+                                </li>
+                            }
+                            else
+                            {
+                                <li class="list-group-item">
+
+                                    <strong>Durum:</strong> <span style="font-weight: bold; color: orangered;">MEZUN</span>
+                                </li>
+                            }
+                        }
+
+                    </ul>
+                </div>
+
 
             </div>
+            <hr />
+            <br />
+            @*<br />
+    <h4>Dönem Notları</h4>*@
 
+            @foreach (var item in Model.StudentDetails)
+            {
+                <div class="no-page-break">
+                    <br />
+                    <h4><span style="font-weight: bold; background-color: cadetblue;">@item.SessionName DÖNEMİ</span></h4>
 
-            <div class="col-md-9">
-                <ul class="list-group">
+                    <hr />
+                    <table class="mt-3 table table-sm table-hover table-striped">
 
-                    @{ if (Model.AppStudent.Status && Model.AppStudent.AppClass.Definition != "Mezun")
-                        {
-                            <li class="list-group-item"><strong> Güncel Sınıf:</strong>     @Model.AppStudent.AppClass.Definition</li>
-                            <li class="list-group-item"><strong> Güncel Şube:</strong>     @Model.AppStudent.AppBranch.Definition</li>
-                            <li class="list-group-item"><strong>Sıra No:</strong>       @Model.AppStudent.SıraNo</li>
-                            <li class="list-group-item"><strong>Email:</strong>     @Model.AppStudent.Email</li>
-                        }
-                        else if (!Model.AppStudent.Status && Model.AppStudent.AppClass.Definition != "Mezun")
-                        {
-                            <li class="list-group-item"><strong> Ayrılık Dönemi:</strong>     <getPassiveStudentInfo user-id="@Model.AppStudent.Id"></getPassiveStudentInfo></li>
-                            <li class="list-group-item"><strong> Ayrılık Sebebi:</strong>  @Model.AppStudent.DepartReason   </li>
-                            <li class="list-group-item"><strong> Ayrıldığı Şube:</strong>     @Model.AppStudent.AppBranch.Definition</li>
-                        }
-                        else
-                        {
-                            string[] parcalar = Model.AppStudent.AppBranch.Definition.Split(new char[] { '/' });
-                            string date = parcalar[1] + "/" + parcalar[2];
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Ders</th>
+                                <th>Not</th>
+                                <th>Devamsızlık</th>
 
-
-
-                            <li class="list-group-item"><strong> Mezuniyet Dönemi:</strong>  @date</li>
-
-                            <li class="list-group-item"><strong> Mezuniyet Ortalaması:</strong>   @(@String.Format("{0:0.00}", Model.AppStudent.TotalAverage)) </li>
-                            <li class="list-group-item"><strong> Mezuniyet Derecesi(Sınıf):</strong>      @Model.StudentDetails[modelCount - 1].TotalDegree</li>
-                            <li class="list-group-item"><strong> Mezuniyet Derecesi(Şube):</strong>     @Model.StudentDetails[modelCount - 1].BranchDegree</li>
-
-                        }
-                    }
-
-
-
-                    @{ if (Model.AppStudent.Status && @Model.AppStudent.AppClass.Definition != "Mezun")
-                        {
-                            <li class="list-group-item">
-                                <strong>Durum:</strong> <span style="font-weight: bold; color: lightseagreen;">AKTİF</span>
-                            </li>
-                        }
-                        else if (!Model.AppStudent.Status && @Model.AppStudent.AppClass.Definition != "Mezun")
-                        {
-                            <li class="list-group-item">
-
-                                <strong>Durum:</strong> <span style="font-weight: bold; color: red;">PASİF</span>
-                            </li>
-                        }
-                        else
-                        {
-                            <li class="list-group-item">
-
-                                <strong>Durum:</strong> <span style="font-weight: bold; color: orangered;">MEZUN</span>
-                            </li>
-                        }
-                    }
-
-                </ul>
-            </div>
-
-
-        </div>
-        <hr />
-        <br />
-        @*<br />
-        <h4>Dönem Notları</h4>*@
-
-        @foreach (var item in Model.StudentDetails)
-        {
-    <div class="no-page-break">
-        <br />
-        <h4><span style="font-weight: bold; background-color: cadetblue;">@item.SessionName DÖNEMİ</span></h4>
-
-        <hr />
-        <table class="mt-3 table table-sm table-hover table-striped">
-
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Ders</th>
-                    <th>Not</th>
-                    <th>Devamsızlık</th>
-
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var item2 in item.AppUserSessionLessons)
-                {
-                    count = count + 1;
-                    <tr style="page-break-inside: avoid;">
-                        <td>@count</td>
-                        <td>@item2.AppLesson.Definition (@item2.AppLesson.AppUser.FirstName @item2.AppLesson.AppUser.SecondName )</td>
-
-                        @{if (item2.Not == -1)
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item2 in item.AppUserSessionLessons)
                             {
-                                <td>GİRİLMEDİ</td>
+                                count = count + 1;
+                                <tr style="page-break-inside: avoid;">
+                                    <td>@count</td>
+                                    <td>@item2.AppLesson.Definition (@item2.AppLesson.AppUser.FirstName @item2.AppLesson.AppUser.SecondName )</td>
+
+                                    @{
+                                        if (item2.Not == -1)
+                                        {
+                                            <td>GİRİLMEDİ</td>
+                                        }
+                                        else if (item2.Not == -5)
+                                        {
+                                            <td>BAŞARILI</td>
+
+                                        }
+                                        else if (item2.Not == -6)
+                                        {
+                                            <td>BAŞARISIZ</td>
+
+                                        }
+                                        else
+                                        {
+                                            <td>@item2.Not</td>
+                                        }
+
+                                    }
+                                   
+
+                                    @{
+                                        if (item2.Devamsızlık == -1)
+                                        {
+                                            <td>GİRİLMEDİ</td>
+                                        }
+
+                                    }
+                                    @{
+                                        else
+                                        {
+                                            <td>@item2.Devamsızlık</td>
+                                        }
+                                    }
+
+
+
+                                </tr>
                             }
+                        </tbody>
 
-                        }
-                        @{ else
-                            {
-                                <td>@item2.Not</td>
-                            }
-                        }
-
-                        @{if (item2.Devamsızlık == -1)
-                            {
-                                <td>GİRİLMEDİ</td>
-                            }
-
-                        }
-                        @{ else
-                            {
-                                <td>@item2.Devamsızlık</td>
-                            }
-                        }
-
-
-
-                    </tr>
-                }
-            </tbody>
-
-        </table>
-        @*<br />
+                    </table>
+                    @*<br />
         <h4>Dönem Sonu</h4>*@
-        <div class="row">
-            <div class="col-md-6">
-                <ul class="list-group">
-                    <li class="list-group-item"><strong>Dönem Ortalaması:</strong> @(item.AppStudentSession.Average < 0 ? "---": @String.Format("{0:0.00}", item.AppStudentSession.Average)) </li>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <ul class="list-group">
+                                <li class="list-group-item"><strong>Dönem Ortalaması:</strong> @(item.AppStudentSession.Average < 0 ? "---" : @String.Format("{0:0.00}", item.AppStudentSession.Average)) </li>
 
-                    <li class="list-group-item"><strong>Genel Ortalama:</strong>  @(item.AppStudentSession.TotalAverage < 0 ? "---": @String.Format("{0:0.00}", item.AppStudentSession.TotalAverage))</li>
-
-
-                    <li class="list-group-item" style="display: flex; justify-content: space-between;">
-                        <span><strong>Dönem Ders İhtar Sayısı:</strong> @item.AppStudentSession.LessonWarningCount</span>
-                        <span><strong>Dönem Devamsızlık İhtar Sayısı:</strong>   @item.AppStudentSession.AbsenteismWarningCount</span>
-                    </li>
-                    <li class="list-group-item" style="display: flex; justify-content: space-between;">
-                        <span><strong>Dönem Başarı İhtar Sayısı:</strong> @item.AppStudentSession.SessionWarningCount</span>
-                        <span><strong>Genel Başarı İhtar Sayısı:</strong> @item.AppStudentSession.TotalWarningCount</span>
-
-                    </li>
+                                <li class="list-group-item"><strong>Genel Ortalama:</strong>  @(item.AppStudentSession.TotalAverage < 0 ? "---" : @String.Format("{0:0.00}", item.AppStudentSession.TotalAverage))</li>
 
 
-                </ul>
-            </div>
-            <div class="col-md-6">
-                @{if (item.AppStudentSession.Status)
-                    {
+                                <li class="list-group-item" style="display: flex; justify-content: space-between;">
+                                    <span><strong>Dönem Ders İhtar Sayısı:</strong> @item.AppStudentSession.LessonWarningCount</span>
+                                    <span><strong>Dönem Devamsızlık İhtar Sayısı:</strong>   @item.AppStudentSession.AbsenteismWarningCount</span>
+                                </li>
+                                <li class="list-group-item" style="display: flex; justify-content: space-between;">
+                                    <span><strong>Dönem Başarı İhtar Sayısı:</strong> @item.AppStudentSession.SessionWarningCount</span>
+                                    <span><strong>Genel Başarı İhtar Sayısı:</strong> @item.AppStudentSession.TotalWarningCount</span>
 
-                        <ul class="list-group">
-                            <li class="list-group-item">
-
-                                <strong>Şube Sıralaması(Dönem):</strong> @(item.BranchSessionDegree ==0 ? "--":
- item.BranchSessionDegree)
-                            </li>
-
-                            <li class="list-group-item">
-                                <strong>Şube Sıralaması(Genel):</strong>  @(item.BranchDegree ==0 ? "--":
- item.BranchDegree)
-                            </li>
-                            <li class="list-group-item">
-                                <strong>Sınıf Sıralaması(Dönem):</strong> @(item.TotalSessionDegree ==0 ? "--":
- item.TotalSessionDegree)
-                            </li>
-                            <li class="list-group-item">
-                                <strong>Sınıf Sıralaması(Genel):</strong>   @(item.TotalDegree ==0 ? "--":
- item.TotalDegree)
-                            </li>
-                            <li class="list-group-item"><strong>Dönem Şubesi:</strong>   @item.AppStudentSession.AppBranch.Definition</li>
+                                </li>
 
 
-                        </ul>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            @{
+                                if (item.AppStudentSession.Status)
+                                {
+
+                                    <ul class="list-group">
+                                        <li class="list-group-item">
+
+                                            <strong>Şube Sıralaması(Dönem):</strong> @(item.BranchSessionDegree == 0 ? "--" :
+                        item.BranchSessionDegree)
+                                        </li>
+
+                                        <li class="list-group-item">
+                                            <strong>Şube Sıralaması(Genel):</strong>  @(item.BranchDegree == 0 ? "--" :
+                        item.BranchDegree)
+                                        </li>
+                                        <li class="list-group-item">
+                                            <strong>Sınıf Sıralaması(Dönem):</strong> @(item.TotalSessionDegree == 0 ? "--" :
+                        item.TotalSessionDegree)
+                                        </li>
+                                        <li class="list-group-item">
+                                            <strong>Sınıf Sıralaması(Genel):</strong>   @(item.TotalDegree == 0 ? "--" :
+                        item.TotalDegree)
+                                        </li>
+                                        <li class="list-group-item"><strong>Dönem Şubesi:</strong>   @item.AppStudentSession.AppBranch.Definition</li>
 
 
-                    }
-                    else
-                    {
-
-                        <ul class="list-group">
-                            <li class="list-group-item">
-
-                                <strong>Şube Sıralaması(Dönem):</strong> PASİF
-                            </li>
-
-                            <li class="list-group-item">
-                                <strong>Şube Sıralaması(Genel):</strong>  PASİF
-                            </li>
-                            <li class="list-group-item">
-                                <strong>Sınıf Sıralaması(Dönem):</strong> PASİF
-                            </li>
-                            <li class="list-group-item">
-                                <strong>Sınıf Sıralaması(Genel):</strong>  PASİF
-                            </li>
-                            <li class="list-group-item"><strong>Dönem Şubesi:</strong>   @item.AppStudentSession.AppBranch.Definition</li>
+                                    </ul>
 
 
-                        </ul>
+                                }
+                                else
+                                {
 
-                    }
+                                    <ul class="list-group">
+                                        <li class="list-group-item">
+
+                                            <strong>Şube Sıralaması(Dönem):</strong> PASİF
+                                        </li>
+
+                                        <li class="list-group-item">
+                                            <strong>Şube Sıralaması(Genel):</strong>  PASİF
+                                        </li>
+                                        <li class="list-group-item">
+                                            <strong>Sınıf Sıralaması(Dönem):</strong> PASİF
+                                        </li>
+                                        <li class="list-group-item">
+                                            <strong>Sınıf Sıralaması(Genel):</strong>  PASİF
+                                        </li>
+                                        <li class="list-group-item"><strong>Dönem Şubesi:</strong>   @item.AppStudentSession.AppBranch.Definition</li>
 
 
-                }
+                                    </ul>
 
-            </div>
+                                }
+
+
+                            }
+
+                        </div>
+                    </div>
+                    <br />
+
+                </div>
+
+
+
+
+
+            }
+
+
+
+
+
+
+
         </div>
-        <br />
-
-    </div>
-
-            
-
-
-
-        }
-
-
-
-
-
-
-
-    </div>
     }
     else
-    { <h4><strong>GÖRÜNTÜLENECEK TRANSKRİPT BİLGİSİ BULUNAMADI</strong> </h4>}
+    {
+        <h4><strong>GÖRÜNTÜLENECEK TRANSKRİPT BİLGİSİ BULUNAMADI</strong> </h4>
+    }
 }
 
 

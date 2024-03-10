@@ -14,6 +14,6 @@ namespace AKDEM.OBYS.Entities
         public AppUserSession AppUserSession { get; set; }
         public int Not { get; set; }
         public int Devamsızlık { get; set; }
-        public bool Status { get; set; }
+        
     }
 }

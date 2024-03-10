@@ -125,6 +125,7 @@ namespace AKDEM.OBYS.Business.Managers
         {
             double not = 0;
             int count = 0;
+            int count2 = 0;
             var entity = await _uow.GetRepositry<AppUserSession>().FindByFilterAsync(x => x.UserId == userId && x.SessionId == sessionId);
 
 
@@ -135,11 +136,16 @@ namespace AKDEM.OBYS.Business.Managers
                 {
                     foreach (var item in entities)
                     {
-                        if (item.Not != -1)
+                        if (item.Not != -1 && item.Not != -5 && item.Not!= -6)
                         {
                             not = not + item.Not;
                             count = count + 1;
 
+                        }
+                        else
+                        {
+                            count2 = count2 + 1;
+                            
                         }
                     }
                     if (count != 0)
@@ -149,16 +155,15 @@ namespace AKDEM.OBYS.Business.Managers
                         await _uow.SaveChangesAsync();
 
                     }
-                    else
+                    if(count2 == entities.Count)
                     {
+                        entity.Average = -1;
 
+                        await _uow.SaveChangesAsync();
                     }
+                    
                 }
-                else
-                {
-
-
-                }
+                
 
             }
 

@@ -23,17 +23,26 @@
 
                     <div class="row">
 
-                        <div class="col-md-6">
-                            <label class="font-weight-bold">NOT</label>
+                        <div class="col-md-4">
+                            <label>NOT</label>
 
-
+                            <br />
                             <input id="visibleInputNot_@i" value="" type="text" class="form-control" placeholder="GİRİLMEDİ" />
                             <input id="hiddenInputNot_@i" type="hidden" asp-for="@Model[i].Not" />
                         </div>
+                        <div class="col-md-4">
+                            <label>Herhangi Bir Sınav Notu Olmadığı Durumlarda</label>
+                            <br />
+                            <select  class="form form-control-sm" id="selectbox_@i">
+                                <option value="0">Not Girmek Yerine; Yalnızca Sonuç </option>
+                                <option value="1">BAŞARILI</option>
+                                <option value="2">BAŞARISIZ</option>
+                            </select>
+                        </div>
 
-                        <div class="col-md-6">
-                            <label class="font-weight-bold">Devamsızlık</label>
-
+                        <div class="col-md-4">
+                            <label>DEVAMSIZLIK</label>
+                            <br />
                             <input id="visibleInput_@i" value="" type="text" class="form-control" placeholder="GİRİLMEDİ" />
                             <input id="hiddenInput_@i" type="hidden" asp-for="@Model[i].Devamsızlık" />
                         </div>
@@ -67,6 +76,40 @@
 
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <script>
+        function handleStatusChange(index) {
+            $('#selectbox_' + index).on('click', function () {
+                var selectedValue = $(this).val();
+                console.log(selectedValue);
+
+                if (selectedValue == "1") {
+                    $('#visibleInputNot_' + index).val('').attr('placeholder', 'BAŞARILI');
+                    $('#hiddenInputNot_' + index).val(-5);
+                }
+                else if (selectedValue = "2") {
+
+                    $('#visibleInputNot_' + index).val('').attr('placeholder', 'BAŞARISIZ');
+                    $('#hiddenInputNot_' + index).val(-6);
+                }
+                else {
+                    // Eğer "1" veya "2" seçili değilse, normal işlemi devam ettir
+                    var notValue = -1;
+                    $('#hiddenInputNot_' + index).val(notValue);
+                }
+            });
+
+        }
+
+
+        function handleStatusChange2(index) {
+
+            console.log("Buradayım");
+            $('#selectbox_' + index).val(0);
+
+
+
+        }
+
+
             $(document).ready(function () {
                 var modelCount = $('#modelCount').val();
 
@@ -94,7 +137,14 @@
 
                     if (notValue == -1) {
                         $('#visibleInputNot_' + i).attr('placeholder', 'GİRİLMEDİ');
-                    } else {
+                    }
+                else if (notValue == -5) {
+                    $('#visibleInputNot_' + i).attr('placeholder', 'BAŞARILI');
+                }
+                else if (notValue == -6) {
+                    $('#visibleInputNot_' + i).attr('placeholder', 'BAŞARISIZ');
+                }
+                    else {
                         $('#visibleInputNot_' + i).val(notValue);
                     }
 
@@ -103,6 +153,22 @@
                     } else {
                         $('#visibleInput_' + i).val(devamValue);
                     }
+
+                $('#selectbox_' + i).on('change', (function (index) {
+                    return function () {
+
+                        console.log(index);
+                        handleStatusChange(index);
+                    };
+                })(i));
+                $('#visibleInputNot_' + i).on('keydown', (function (index) {
+                    return function () {
+
+
+                        handleStatusChange2(index);
+                    };
+                })(i));
+
                 }
             });
     </script>

@@ -18,9 +18,11 @@
                 <li class="list-group-item">Dönem ortalaması <strong>@Model.MinAverageNote</strong> altında olan öğrenciler <strong>DÖNEM BAŞARISIZLIĞI İHTARI</strong> alırlar</li>
                 <li class="list-group-item">Dönem İçerisinde herhangi bir dersten <strong>@Model.MinLessonNote</strong> altında not alan öğrenciler <strong>DERS BAŞARISIZLIĞI İHTARI</strong> alırlar</li>
                 <li class="list-group-item">Dönem İçerisinde iki veya daha fazla dersten <strong>DERS BAŞARISIZLIĞI İHTARI</strong> alan   öğrenciler <strong>DÖNEM BAŞARISIZLIĞI İHTARI</strong> alırlar</li>
-                <li class="list-group-item">Dönem İçerisinde herhangi bir derste <strong>@Model.MinAbsenteeism</strong> günden fazla devamsızlık yapan öğrenciler <strong>DEVAMSIZLIK İHTARI </strong>alırlar
-                <li class="list-group-item">Üstüste 2 dönem boyunca <strong>DÖNEM BAŞARISIZLIĞI İHTARI</strong> alan öğrenciler veya toplamda 3 dönem <strong> DÖNEM BAŞARISIZLIĞI İHTARI</strong> alan öğrenciler programdan uzaklaştırılır.
-                <li class="list-group-item">Bir dönem içerisinde 2 veya daha fazla dersten <strong>DEVAMSIZLIK İHTARI</strong> alan öğrenciler programdan uzaklaştırılır.
+                <li class="list-group-item">Bir ders için not girmek yerine yalnızca <strong>BAŞARILI/BAŞARISIZ</strong> şeklinde bir değerlendirme yapılabilir.</li>
+                <li class="list-group-item"><strong>BAŞARILI/BAŞARISIZ</strong> şeklinde yapılan değerlendirmeler; ortalamayı etkilemez fakat <strong>DERS BAŞARISIZLIĞI İHTARI</strong> verilmesine yol açabilir. </li>
+                <li class="list-group-item">Dönem İçerisinde herhangi bir derste <strong>@Model.MinAbsenteeism</strong> günden fazla devamsızlık yapan öğrenciler <strong>DEVAMSIZLIK İHTARI </strong>alırlar</li>
+                <li class="list-group-item">Üstüste 2 dönem boyunca <strong>DÖNEM BAŞARISIZLIĞI İHTARI</strong> alan öğrenciler veya toplamda 3 dönem <strong> DÖNEM BAŞARISIZLIĞI İHTARI</strong> alan öğrenciler programdan uzaklaştırılır.</li>
+                <li class="list-group-item">Bir dönem içerisinde 2 veya daha fazla dersten <strong>DEVAMSIZLIK İHTARI</strong> alan öğrenciler programdan uzaklaştırılır. </li>
 
 
 

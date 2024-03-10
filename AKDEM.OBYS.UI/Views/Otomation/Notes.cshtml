@@ -1,158 +1,197 @@
 ﻿@model List<AppUserSessionLessonUpdateDto>
-    @{
-        Layout = "_Layout";
-    }
+@{
+    Layout = "_Layout";
+}
 
-    @{ if (Model.Count != 0)
-        {
-                        <input id="modelCount" type="hidden" value="@Model.Count" />
-                        <div class="container-fluid">
-                            <form asp-action="Notes" asp-controller="Otomation" method="post">
+@{
+    if (Model.Count != 0)
+    {
+            <input id="modelCount" type="hidden" value="@Model.Count" />
+            <div class="container-fluid">
+                <form asp-action="Notes" asp-controller="Otomation" method="post">
 
-                                @for (int i = 0; i < Model.Count; i++)
-                    {
-                                    <input type="hidden" asp-for="@Model[i].Id" />
-                                    <input type="hidden" asp-for="@Model[i].LessonId" />
-                                    <input type="hidden" asp-for="@Model[i].AppLesson.Definition" />
-                                    <input type="hidden" asp-for="@Model[i].AppLesson.AppUser.FirstName" />
-                                    <input type="hidden" asp-for="@Model[i].AppLesson.AppUser.SecondName" />
+                    @for (int i = 0; i < Model.Count; i++)
+                {
+                        <input type="hidden" asp-for="@Model[i].Id" />
+                        <input type="hidden" asp-for="@Model[i].LessonId" />
+                        <input type="hidden" asp-for="@Model[i].AppLesson.Definition" />
+                        <input type="hidden" asp-for="@Model[i].AppLesson.AppUser.FirstName" />
+                        <input type="hidden" asp-for="@Model[i].AppLesson.AppUser.SecondName" />
 
-                                    <input type="hidden" asp-for="@Model[i].UserSessionId" />
+                        <input type="hidden" asp-for="@Model[i].UserSessionId" />
 
-                                    <label class="font-italic font-weight-bold">@Model[i].AppLesson.Definition --> ( @Model[i].AppLesson.AppUser.FirstName @Model[i].AppLesson.AppUser.SecondName )</label>
+                        <label class="font-italic font-weight-bold">@Model[i].AppLesson.Definition --> ( @Model[i].AppLesson.AppUser.FirstName @Model[i].AppLesson.AppUser.SecondName )</label>
 
-                                    <div class="row">
+                        <div class="row">
 
-                                        <div class="col-md-4">
-                                            <label >NOT</label>
-
-
-                                            <input id="visibleInputNot_@i" value="" type="text" class="form-control" placeholder="GİRİLMEDİ" />
-                                            <input id="hiddenInputNot_@i"  type="hidden" asp-for="@Model[i].Not" />
-                                        </div>
-                                        <div class="col-md-4">
-                                        <label >DEĞERLENDİRME</label>
-
-                                        <select asp-for="@Model[i].Status" class="form form-control-sm" id="selectbox_@i">
-                                            <option value="0">Not Yerine Yalnızca Sonuç Seçebilirsiniz</option>
-                                            <option value="1">BAŞARILI</option>
-                                            <option value="2">BAŞARISIZ</option>
-                                        </select>
-                                        </div>
-                                    
-
-
-                                        <div class="col-md-4">
-                                            <label >DEVAMSIZLIK</label>
-
-                                            <input id="visibleInput_@i" value="" type="text" class="form-control" placeholder="GİRİLMEDİ" />
-                                            <input id="hiddenInput_@i"  type="hidden" asp-for="@Model[i].Devamsızlık" />
-                                        </div>
-
-
-
-                                    </div>
-                                    <hr />
-                    }
+                            <div class="col-md-4">
+                                <label>NOT</label>
                                 <br />
 
+                                <input id="visibleInputNot_@i" value="" type="text" class="form-control" placeholder="GİRİLMEDİ" />
+                                <input id="hiddenInputNot_@i" type="hidden" asp-for="@Model[i].Not" />
+                            </div>
+                            <div class="col-md-4">
+                                <label>Herhangi Bir Sınav Notu Olmadığı Durumlarda</label>
+                                <br />
+                                <select asp-for="@Model[i].Status" class="form form-control-sm" id="selectbox_@i">
+                                    <option value="0">Not Girmek Yerine; Yalnızca Sonuç </option>
+                                    <option value="1">BAŞARILI</option>
+                                    <option value="2">BAŞARISIZ</option>
+                                </select>
+                            </div>
 
-                                <div class="mb-3">
-                                    <button class="btn btn-primary" type="submit">Kaydet</button>
-                                </div>
-                                <div class="mb-3 text-bg-danger" asp-validation-summary="All">
 
-                                </div>
-                            </form>
+
+                            <div class="col-md-4">
+                                <label>DEVAMSIZLIK</label>
+                                <br />
+                                <input id="visibleInput_@i" value="" type="text" class="form-control" placeholder="GİRİLMEDİ" />
+                                <input id="hiddenInput_@i" type="hidden" asp-for="@Model[i].Devamsızlık" />
+                            </div>
+
+
+
                         </div>
-        }
-    }
-    @{else
-        {
+                        <hr />
+                }
+                    <br />
 
-                        <p class="font-weight-bold">ÖĞRENCİYE/SINIFA AİT BİR DERS PROGRAMI BİLGİSİ BULUNAMADI</p>
-        }
-    }
 
-    @section script
+                    <div class="mb-3">
+                        <button class="btn btn-primary" type="submit">Kaydet</button>
+                    </div>
+                    <div class="mb-3 text-bg-danger" asp-validation-summary="All">
+                    </div>
+                </form>
+            </div>
+    }
+}
+@{
+    else
     {
 
-        <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-        <script>
+            <p class="font-weight-bold">ÖĞRENCİYE/SINIFA AİT BİR DERS PROGRAMI BİLGİSİ BULUNAMADI</p>
+    }
+}
+
+@section script
+    {
+
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script>
 
         function handleStatusChange(index) {
-            
-            var element = document.getElementById("selectbox_" + index);
-            var selectedValue = element.options[element.selectedIndex].value;
-            console.log(selectedValue);
-            if (selectedValue == "1" || selectedValue == "2") {
+            $('#selectbox_' + index).on('click', function () {
+                var selectedValue = $(this).val();
+                console.log(selectedValue);
 
-                
-                $('#visibleInputNot_' + index).attr('placeholder', 'GİRİLMEDİ');
-            } else {
-                // Eğer "1" veya "2" seçili değilse, normal işlemi devam ettir
-                var notValue = /* Burada not değeri alınmalı, notValue değişkenine atanmalı */
-                $('#visibleInputNot_' + index).val(notValue);
-            }
+                if (selectedValue == "1") {
+                    $('#visibleInputNot_' + index).val('').attr('placeholder', 'BAŞARILI');
+                    $('#hiddenInputNot_' + index).val(-5);
+                }
+                else if (selectedValue = "2") {
+
+                    $('#visibleInputNot_' + index).val('').attr('placeholder', 'BAŞARISIZ');
+                    $('#hiddenInputNot_' + index).val(-6);
+                }
+                else {
+                    // Eğer "1" veya "2" seçili değilse, normal işlemi devam ettir
+                    var notValue = -1;
+                    $('#hiddenInputNot_' + index).val(notValue);
+                }
+            });
+
         }
 
 
-            $(document).ready(function () {
+        function handleStatusChange2(index) {
+            
+            console.log("Buradayım");
+                    $('#selectbox_' + index).val(0);
+                
             
 
-                var modelCount = $('#modelCount').val();
+        }
 
-                for (var i = 0; i < modelCount; i++)
-                {
-                    // Görünür input alanında bir değer girildiğinde
-                    $('#visibleInputNot_' + i).on('input', function () {
-                        var id = $(this).attr('id').split('_')[1];
-                        var enteredValue = $(this).val();
 
-                        // Gizli input alanına girilen değeri aktar
-                        $('#hiddenInputNot_' + id).val(enteredValue);
-                    });
+        $(document).ready(function () {
 
-                    $('#visibleInput_' + i).on('input', function () {
-                        var id = $(this).attr('id').split('_')[1];
-                        var enteredValue = $(this).val();
 
-                        // Gizli input alanına girilen değeri aktar
-                        $('#hiddenInput_' + id).val(enteredValue);
-                    });
+            var modelCount = $('#modelCount').val();
 
-                    // Sayfa yüklendiğinde, eğer Not değeri -1 ise "GİRİLMEDİ ALTERNATİF" yazısını görünür input alanına ekle
-                    var notValue = $('#hiddenInputNot_' + i).val();
-                    var devamValue = $('#hiddenInput_' + i).val();
+            for (var i = 0; i < modelCount; i++) {
+                // Görünür input alanında bir değer girildiğinde
+                $('#visibleInputNot_' + i).on('input', function () {
+                    var id = $(this).attr('id').split('_')[1];
+                    var enteredValue = $(this).val();
 
-                    if (notValue == -1) {
-                        $('#visibleInputNot_' + i).attr('placeholder', 'GİRİLMEDİ');
-                    } else {
-                        $('#visibleInputNot_' + i).val(notValue);
-                    }
+                    // Gizli input alanına girilen değeri aktar
+                    $('#hiddenInputNot_' + id).val(enteredValue);
+                });
 
-                    if (devamValue == -1) {
-                        $('#visibleInput_' + i).attr('placeholder', 'GİRİLMEDİ');
-                    } else {
-                        $('#visibleInput_' + i).val(devamValue);
-                    }
+                $('#visibleInput_' + i).on('input', function () {
+                    var id = $(this).attr('id').split('_')[1];
+                    var enteredValue = $(this).val();
+
+                    // Gizli input alanına girilen değeri aktar
+                    $('#hiddenInput_' + id).val(enteredValue);
+                });
+
+                // Sayfa yüklendiğinde, eğer Not değeri -1 ise "GİRİLMEDİ ALTERNATİF" yazısını görünür input alanına ekle
+                var notValue = $('#hiddenInputNot_' + i).val();
+                var devamValue = $('#hiddenInput_' + i).val();
+                // var statusValue =  = $('#selectbox_' + i).val();
+
+                //     if (statusValue === "1") {
+                //         $('#visibleInputNot_' + i).attr('placeholder', 'BAŞARILI');
+                //     }
+                //     else if (statusValue === "2") {
+                //         $('#visibleInput_' + i).attr('placeholder', 'BAŞARISIZ');
+                //     }
+                console.log(notValue);
+                if (notValue == -1) {
+                    $('#visibleInputNot_' + i).attr('placeholder', 'GİRİLMEDİ');
+                } else if (notValue == -5) {
+                    $('#visibleInputNot_' + i).attr('placeholder', 'BAŞARILI');
+                }
+                else if (notValue == -6) {
+                    $('#visibleInputNot_' + i).attr('placeholder', 'BAŞARISIZ');
+                }
+                else {
+                    $('#visibleInputNot_' + i).val(notValue)
+
+                }
+
+                if (devamValue == -1) {
+                    $('#visibleInput_' + i).attr('placeholder', 'GİRİLMEDİ');
+                } else {
+                    $('#visibleInput_' + i).val(devamValue);
+                }
 
                 $('#selectbox_' + i).on('change', (function (index) {
                     return function () {
-                        
+
                         console.log(index);
                         handleStatusChange(index);
                     };
                 })(i));
+                $('#visibleInputNot_' + i).on('keydown', (function (index) {
+                    return function () {
 
-               
-               
-                }
-            });
-
-       
-        </script>
-
+                        
+                        handleStatusChange2(index);
+                    };
+                })(i));
 
 
-    }
+
+            }
+        });
+
+
+    </script>
+
+
+
+}
