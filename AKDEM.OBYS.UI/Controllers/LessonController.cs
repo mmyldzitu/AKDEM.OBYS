@@ -175,6 +175,24 @@ const hbutton = document.getElementById('branchButtons');
             }
             else
             {
+                var list = new List<AppLessonListModel>();
+
+                var items = await _appUserService.GetAllTeacherAsync((int)RoleType.Teacher, true);
+
+                foreach (var item in items.Data)
+                {
+                    list.Add(new AppLessonListModel
+                    {
+                        Id = item.Id,
+                        TeacherName = $"{item.FirstName} {item.SecondName}"
+
+
+
+                    });
+                }
+                ViewBag.teachers = new SelectList(list, "Id", "TeacherName");
+
+
                 foreach (var error in result.Errors)
                 {
                     ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
