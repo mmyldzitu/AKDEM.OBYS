@@ -102,13 +102,13 @@ namespace AKDEM.OBYS.Business.Managers
 
             }
         }
-        public async Task CreateWarningByDtoandString(AppWarningCreateDto dto,string name,int userId, int userSessionId)
+        public async Task CreateWarningByDtoandString(AppWarningCreateDto dto,string name,int userId, int userSessionId, string name2="")
         {
             int sessionId = await _appUserSessionService.GetSessionIdByUserSessionId(userSessionId);
             
             
 
-            var control = await ControlIfLessonWarningAlreadyExists(name, userSessionId);
+            var control = await ControlIfLessonWarningAlreadyExists(name, userSessionId,name2);
 
             if (!control)
             {
@@ -236,9 +236,13 @@ namespace AKDEM.OBYS.Business.Managers
             return 0;
         }
 
-        public async Task<bool> ControlIfLessonWarningAlreadyExists(string name,int userSessionId)
+        public async Task<bool> ControlIfLessonWarningAlreadyExists(string name,int userSessionId,string name2="")
         {
-            if(name.Contains("DÖNEM BAŞARISIZLIĞI İHTARI"))
+            int sessionId= await _appUserSessionService.GetSessionIdByUserSessionId(userSessionId);
+            double sessionMinLessonNote = await _appSessionService.MinLessonNoteOfSession(sessionId);
+            string sessionMinLessonNoteStr = sessionMinLessonNote.ToString();
+
+            if (name.Contains("DÖNEM BAŞARISIZLIĞI İHTARI"))
             {
 
                 var control2 = await _uow.GetRepositry<AppWarning>().FindByFilterAsync(x => x.UserSessionId == userSessionId && x.WarningReason.Contains(name));
@@ -252,10 +256,43 @@ namespace AKDEM.OBYS.Business.Managers
                 }
 
             }
+            else if (name2.Contains(sessionMinLessonNoteStr))
+            {
+                var control = await _uow.GetRepositry<AppWarning>().GetAllAsync(x => x.UserSessionId == userSessionId && x.WarningReason.Contains($"{sessionMinLessonNote}'nin altında not aldığı için DERS BAŞARI İHTARI"));
+                if (control.Count != 0)
+                {
+                    int sayac = 0;
+                    foreach (var item in control)
+                    {
+                        string[] words = item.WarningReason.Split(' ');
+                        for (int i = 0; i < words.Length; i++)
+                        {
+                            if (words[i] == "isimli" && i > 0)
+                            {
+                                string previousWord = words[i - 1];
+
+                                if (previousWord == name)
+                                {
+                                    sayac += 1;
+                                }
+
+                            }
+
+                        }
+
+                    }
+                    if (sayac == 0)
+                    {
+                        return false;
+                    }
+                    else { return true; };
+                }
+                return false;
+            }
             else
             {
 
-                var control = await _uow.GetRepositry<AppWarning>().GetAllAsync(x => x.UserSessionId == userSessionId && x.WarningReason.Contains("DERS BAŞARI İHTARI"));
+                var control = await _uow.GetRepositry<AppWarning>().GetAllAsync(x => x.UserSessionId == userSessionId && x.WarningReason.Contains("isimli dersten  DERS BAŞARI İHTARI"));
                 if (control.Count != 0)
                 {
                     int sayac = 0;

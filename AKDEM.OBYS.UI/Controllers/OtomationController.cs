@@ -306,6 +306,7 @@ namespace AKDEM.OBYS.UI.Controllers
                 int sessionId = await _appUserSessionService.GetSessionIdByUserSessionId(userSessionId);
                 //BURASI
                 double sessionMinLessonNote = await _appSessionService.MinLessonNoteOfSession(sessionId);
+                string sessionMinLessonNoteStr = sessionMinLessonNote.ToString();
                 double sessionMinAverageNote = await _appSessionService.MinAverageNoteOfSession(sessionId);
                 int sessionMinAbsenteism = await _appSessionService.MinAbsenteismOfSession(sessionId);
                 int branchId = await _appUserSessionService.GetBranchIdByUserSessionId(userSessionId);
@@ -338,11 +339,16 @@ namespace AKDEM.OBYS.UI.Controllers
                             WarningReason = $"{userName} ismindeki öğrenci {lesson} isimli dersten {sessionMinLessonNote}'nin altında not aldığı için DERS BAŞARI İHTARI almıştır",
                             WarningTime = DateTime.Now
                         };
-                        await _appWarningService.CreateWarningByDtoandString(newdto, lesson, userId, userSessionId);
+                        await _appWarningService.CreateWarningByDtoandString(newdto, lesson, userId, userSessionId, sessionMinLessonNoteStr);
                         
 
                     }
-                    else if(dto.Not== -6 )
+                    else
+                    {
+                        await _appWarningService.RemoveWarningByString($"{lesson} isimli dersten {sessionMinLessonNote}'nin altında not aldığı için DERS BAŞARI İHTARI", userId, userSessionId);
+
+                    }
+                     if(dto.Not== -6 )
                     {
                         var newdto = new AppWarningCreateDto
                         {
@@ -356,7 +362,7 @@ namespace AKDEM.OBYS.UI.Controllers
                     }
                     else
                     {
-                        await _appWarningService.RemoveWarningByString(lesson, userId, userSessionId);
+                        await _appWarningService.RemoveWarningByString($"{lesson} isimli dersten  DERS BAŞARI İHTARI", userId, userSessionId);
 
                     }
                     if (dto.Devamsızlık != -1 &&  dto.Devamsızlık >sessionMinAbsenteism)

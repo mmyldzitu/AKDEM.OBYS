@@ -11,7 +11,7 @@ namespace AKDEM.OBYS.Business.Services
     public interface IAppWarningService : IGenericService<AppWarningCreateDto, AppWarningUpdateDto, AppWarningListDto, AppWarning>
     {
         Task RemoveWarningByUserId(int userId);
-        Task CreateWarningByDtoandString(AppWarningCreateDto dto, string name, int userId, int userSessionId);
+        Task CreateWarningByDtoandString(AppWarningCreateDto dto, string name, int userId, int userSessionId, string name2="");
         Task  RemoveWarningByString(string lessonName, int userId, int usersessionId);
         Task<double> SessionWarningCountByUserSessionId(int userSessionId,double slwc);
         Task<double> TotalWarningCountByUserId(int userId,int sessionId);
