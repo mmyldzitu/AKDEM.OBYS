@@ -77,7 +77,7 @@ namespace AKDEM.OBYS.Business.Managers
             var list = await query.Include(x => x.AppClass).Where(x => x.AppUserSessions.Any(x => x.SessionId == sessionId)).ToListAsync();
             if (list.Count != 0)
             {
-                var descList = list.OrderByDescending(x => (int)Enum.Parse(typeof(ClassType), x.AppClass.Definition));
+                var descList = list.OrderByDescending(x => x.ClassId);
                 return _mapper.Map<List<AppBranchListDto>>(descList);
 
             }
