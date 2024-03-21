@@ -1,0 +1,24 @@
+﻿@model AppUserPPUpdateModel
+@{
+    Layout = "_layout";
+}
+<form method="post" asp-action="ChangePP" asp-controller="Account" enctype="multipart/form-data">
+    <input asp-for="ImagePath2" type="hidden" />
+    <input type="hidden" asp-for="Id" />
+    <div class="mb-3">
+        <label>Görsel :</label>
+        <div class="mb-2">
+            <img src="@Model.ImagePath2" height="150" width="150" />
+
+        </div>
+        <input type="file" asp-for="ImagePath" class="form-control" />
+        <br />
+
+        <div class="mb-3">
+            <button class="btn btn-primary" type="submit">Güncelle</button>
+        </div>
+        <br />
+
+
+    </div>
+</form>

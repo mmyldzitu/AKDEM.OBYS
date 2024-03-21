@@ -33,7 +33,7 @@
 
 <nav id="sidebar">
             <div class="p-4 pt-5">
-                <a href="#" class="img logo rounded-circle mb-5" style="background-image: url(@ImageUrl);"></a>
+                <a asp-action="ChangePP" asp-controller="Account" asp-route-id="@userId" class="img logo rounded-circle mb-5" style="background-image: url(@ImageUrl);"></a>
                 <div class="text-center">
                     <span class="mx-auto" style="font-weight:bold"> <em>@userName</em> </span>
                 </div>
@@ -119,7 +119,7 @@
         </li>*@
 
                     <li>
-                        <a asp-action="UpdatePassword" asp-controller="Account" asp-route-userId="@userId">Şifre Güncelleme</a>
+                        <a asp-action="UpdatePassword" asp-controller="Account" asp-route-userId="@userId">Şifre & Profil Fotoğrafı </a>
                     </li>
 
                     <li>

@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -112,6 +113,46 @@ namespace AKDEM.OBYS.UI.Controllers
                 ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
             }
             return View(model);
+        }
+        public async Task<IActionResult> ChangePP(int id)
+        {
+            var ImagePath = await _appUserService.ReturnImagePathofUser(id);
+
+            return View(new AppUserPPUpdateModel { ImagePath2=ImagePath, Id=id});
+        }
+        [HttpPost]
+        public async Task<IActionResult> ChangePP(AppUserPPUpdateModel model)
+        {
+            string newImage = "";
+            if (model.ImagePath != null)
+            {
+                string path = "";
+                string pathforDb = "";
+                var fileName = Guid.NewGuid().ToString();
+                var extName = Path.GetExtension(model.ImagePath.FileName);
+                var roleResponse = await _appUserService.GetRolesByUserIdAsync(model.Id);
+                if (roleResponse.Data[0].Definition=="Admin" && roleResponse.Data[0].Definition == "Teacher")
+                {
+                     path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "teacherImages", fileName + extName);
+                     pathforDb = Path.Combine("\\", "images", "teacherImages", fileName + extName);
+                }
+                else
+                {
+                     path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "studentImages", fileName + extName);
+                     pathforDb = Path.Combine("\\", "images", "studentImages", fileName + extName);
+                }
+                var stream = new FileStream(path, FileMode.Create);
+                await model.ImagePath.CopyToAsync(stream);
+                newImage = pathforDb;
+
+            }
+            else
+            {
+                newImage = model.ImagePath2;
+            }
+
+            await _appUserService.UpdatePPUser(newImage, model.Id);
+            return RedirectToAction("ChangePP", new {id=model.Id });
         }
         
     }

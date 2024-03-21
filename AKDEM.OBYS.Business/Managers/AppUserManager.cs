@@ -296,6 +296,26 @@ namespace AKDEM.OBYS.Business.Managers
 
 
         }
+        public async Task<string> ReturnImagePathofUser(int userId)
+        {
+            var query = _uow.GetRepositry<AppUser>().GetQuery();
+            var user = await query.Where(x => x.Id == userId).SingleOrDefaultAsync();
+            if(user!=null)
+            {
+                return user.ImagePath;
+            }
+            return null;
+        }
+        public async Task UpdatePPUser(string path, int userId)
+        {
+            var query = _uow.GetRepositry<AppUser>().GetQuery();
+            var user = await query.Where(x=>x.Id==userId).SingleOrDefaultAsync();
+            if(user!=null)
+            {
+                user.ImagePath = path;
+                await _uow.SaveChangesAsync();
+            }
+        }
         public async Task<AppUserListDtoDeveloper> GetAppUserDeveloper(int id)
         {
             var query = _uow.GetRepositry<AppUser>().GetQuery();

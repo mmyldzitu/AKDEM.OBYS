@@ -31,6 +31,8 @@ namespace AKDEM.OBYS.Business.Services
         Task<List<AppUserListDtoDeveloper>> GetAppUsersDeveloper();
         Task<AppUserListDtoDeveloper> GetAppUserDeveloper(int id);
         Task UpdateUserDeveloper(AppUserUpdateDtoDeveloper dto);
+        Task<string> ReturnImagePathofUser(int userId);
+        Task UpdatePPUser(string path, int userId);
 
 
 
