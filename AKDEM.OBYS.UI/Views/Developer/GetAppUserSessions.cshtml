@@ -1,0 +1,62 @@
+﻿@model List<AppUserSessionListDtoDeveloper>
+
+@{
+    Layout = "_Layout";
+}
+<div class="col-md-2 align-items-center">
+    <a asp-action="CreateAppUserSession" asp-controller="Developer" class="mt-2 btn btn-success ">Yeni  Ekle</a>
+
+</div>
+<br />
+<table class="mt-3 table table-sm table-hover table-striped">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Average</th>
+            <th>SessionWarningCount</th>
+            <th>SessionLessonWarningCount</th>
+            <th>SessionAbsentWarningCount</th>
+            <th>UserId</th>
+            <th>SessionId</th>
+
+            <th>BranchId</th>
+            <th>ClassId</th>
+            <th>Status</th>
+            
+
+
+
+            <th>Git</th>
+
+
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+
+            <tr>
+                <td>@item.Id</td>
+                <td>@item.Average</td>
+                <td>@item.SessionWarningCount</td>
+                <td>@item.SessionLessonWarningCount</td>
+                <td>@item.SessionAbsentWarningCount</td>
+                <td>@item.UserId</td>
+                <td>@item.SessionId</td>
+                <td>@item.BranchId</td>
+                <td>@item.ClassId</td>
+                <td>@item.Status</td>
+
+
+
+                <td><a asp-action="UpdateAppUserSession" asp-controller="Developer" asp-route-id="@item.Id">Git</a></td>
+
+
+
+
+
+            </tr>
+        }
+    </tbody>
+
+</table>

@@ -22,6 +22,17 @@ namespace AKDEM.OBYS.Business.Managers
             _uow = uow;
             _mapper = mapper;
         }
+        public async Task<List<AppLessonListDtoDeveloper>> GetLessonsDeveloper()
+        {
+            var query = _uow.GetRepositry<AppLesson>().GetQuery();
+            var lessons = await query.ToListAsync();
+            if (lessons.Count != 0)
+            {
+                var lists= _mapper.Map<List<AppLessonListDtoDeveloper>>(lessons);
+                return  lists;
+            }
+            return new List<AppLessonListDtoDeveloper>();
+        }
         public async Task<List<AppLessonListDto>> GetLessonsByTeacher(bool status)
         {
             var query = _uow.GetRepositry<AppLesson>().GetQuery();

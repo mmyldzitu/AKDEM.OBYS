@@ -12,5 +12,10 @@ namespace AKDEM.OBYS.Business.Services
     {
         Task CreateSessionBranchAsync(List<AppSessionBranchCreateDto> dtos);
         Task RemoveSessionBranchesBySessionId(int sessionId);
+        Task<List<AppSessionBranchListDtoDeveloper>> GetAppSessionBranchesDeveloper();
+        Task CreateSessionBranchDeveloper(AppSessionBranchCreateDto dto);
+        Task UpdateSessionBranchDeveloper(AppSessionBranchUpdateDtoDeveloper dto);
+        Task<AppSessionBranchListDtoDeveloper> GetAppSessionBranchDeveloper(int id);
+        Task RemoveAppSessionBranchDeveloper(int id);
     }
 }

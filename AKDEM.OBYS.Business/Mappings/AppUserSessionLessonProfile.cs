@@ -16,6 +16,9 @@ public    class AppUserSessionLessonProfile:Profile
             CreateMap<AppUserSessionLessonListDto, AppUserSessionLesson>().ReverseMap();
             CreateMap<AppUserSessionLessonCreateDto, AppUserSessionLesson>().ReverseMap();
             CreateMap<AppUserSessionLessonUpdateDto, AppUserSessionLesson>().ReverseMap();
+
+            CreateMap<AppUserSessionLessonListDtoDeveloper, AppUserSessionLesson>().ReverseMap();
+
         }
     }
 }

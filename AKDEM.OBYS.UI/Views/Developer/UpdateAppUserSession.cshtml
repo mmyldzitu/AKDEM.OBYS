@@ -1,0 +1,50 @@
+﻿@model AppUserSessionUpdateDtoDeveloper
+
+@{
+    Layout = "_layout";
+}
+<div class="container-fluid">
+    <form asp-action="UpdateAppUserSession" asp-controller="Developer" method="post">
+
+        <input type="hidden" asp-for="Id" />
+        <label>Average :</label>
+        <input asp-for="Average" class="form-control" />
+        <br />
+        <label>SessionWarningCount :</label>
+        <input asp-for="SessionWarningCount" class="form-control" />
+        <br />
+        <label>SessionLessonWarningCount :</label>
+        <input asp-for="SessionLessonWarningCount" class="form-control" />
+        <br />
+        <label>SessionAbsentWarningCount :</label>
+        <input asp-for="SessionAbsentWarningCount" class="form-control" />
+        <br />
+        <label>UserId :</label>
+        <input asp-for="UserId" class="form-control" />
+        <br />
+        <label>SessionId :</label>
+        <input asp-for="SessionId" class="form-control" />
+        <br />
+        <label>BranchId :</label>
+        <input asp-for="BranchId" class="form-control" />
+        <br />
+        <label>ClassId :</label>
+        <input asp-for="ClassId" class="form-control" />
+        <br />
+        <label>Status :</label>
+        <input asp-for="Status" class="form-control" />
+        <br />
+
+
+
+        <div class="mb-3">
+            <button class="btn btn-primary" type="submit">Güncelle</button>
+        </div>
+        <br />
+        <div class="mb-3">
+            <a class="btn btn-danger" asp-action="RemoveAppUserSession" asp-route-id="@Model.Id" asp-controller="Developer">Sil</a>
+        </div>
+        <div class="mb-3 text-bg-danger" asp-validation-summary="All">
+        </div>
+    </form>
+</div>

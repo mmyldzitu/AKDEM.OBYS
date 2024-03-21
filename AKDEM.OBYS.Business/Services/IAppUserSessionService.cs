@@ -43,5 +43,10 @@ namespace AKDEM.OBYS.Business.Services
         Task<string> ReturnPassiveDateByUserId(int userId);
         Task<string> LastBranchNameByUserAndSessionId(int sessionId, int userId);
         Task RemoveUserSessionsAndLessons(int sessionId, int userId);
+        Task<List<AppUserSessionListDtoDeveloper>> GetAppUserSessionsDeveloper();
+        Task UpdateUserSessionDeveloper(AppUserSessionUpdateDtoDeveloper dto);
+        Task<AppUserSessionListDtoDeveloper> GetAppUserSessionDeveloper(int id);
+        Task RemoveAppUserSessionDeveloper(int id);
+        Task CreateUserSessionDeveloper(AppUserSessionCreateDtoDeveloper dto);
     }
 }

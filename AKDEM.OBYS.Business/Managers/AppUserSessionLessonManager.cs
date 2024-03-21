@@ -2,6 +2,8 @@
 using AKDEM.OBYS.Common;
 using AKDEM.OBYS.DataAccess.UnitOfWork;
 using AKDEM.OBYS.Dto.AppLessonDtos;
+using AKDEM.OBYS.Dto.AppSessionBranchDtos;
+using AKDEM.OBYS.Dto.AppSessionDtos;
 using AKDEM.OBYS.Dto.AppUserSessionDtos;
 using AKDEM.OBYS.Dto.AppUserSessionLessonDtos;
 using AKDEM.OBYS.Entities;
@@ -27,7 +29,17 @@ namespace AKDEM.OBYS.Business.Managers
             _mapper = mapper;
            
         }
-
+        public async Task<List<AppUserSessionLessonListDtoDeveloper>> GetAppUserSessionLessonsDeveloper()
+        {
+            var query = _uow.GetRepositry<AppUserSessionLesson>().GetQuery();
+            var entities = await query.ToListAsync();
+            if (entities.Count != 0)
+            {
+                var lists = _mapper.Map<List<AppUserSessionLessonListDtoDeveloper>>(entities);
+                return lists;
+            }
+            return new List<AppUserSessionLessonListDtoDeveloper>();
+        }
         public async Task CreateUserSessionLessonAsync(List<AppUserSessionLessonCreateDto> dtos)
         {
             foreach (var dto in dtos)
@@ -42,6 +54,20 @@ namespace AKDEM.OBYS.Business.Managers
                 }
                
             }
+        }
+        public async Task CreateUserSessionLessonDeveloper(AppUserSessionLessonCreateDto dto)
+        {
+            
+                var control = await _uow.GetRepositry<AppUserSessionLesson>().FindByFilterAsync(x => x.UserSessionId == dto.UserSessionId && x.LessonId == dto.LessonId);
+                if (control == null)
+                {
+                    var entity = _mapper.Map<AppUserSessionLesson>(dto);
+                    await _uow.GetRepositry<AppUserSessionLesson>().CreateAsync(entity);
+                    await _uow.SaveChangesAsync();
+
+                }
+
+            
         }
         public async Task RemoveUserSessionLessonByLessonNameAsync(int userSessionId, string lessonName)
         {
@@ -274,6 +300,50 @@ namespace AKDEM.OBYS.Business.Managers
                 return entity.Devamsızlık;
             }
             return -1;
+        }
+
+
+
+
+        public async Task UpdateUserSessionLessonDeveloper(AppUserSessionLessonUpdateDtoDeveloper dto)
+        {
+            var entity = await _uow.GetRepositry<AppUserSessionLesson>().FindAsync(dto.Id);
+
+            if (entity != null)
+            {
+                entity.UserSessionId = dto.UserSessionId;
+                entity.Devamsızlık = dto.Devamsızlık;
+                entity.Not = dto.Not;
+                entity.LessonId = dto.LessonId;
+                
+                await _uow.SaveChangesAsync();
+            }
+
+
+
+        }
+        public async Task<AppUserSessionLessonListDtoDeveloper> GetAppUserSessionLessonDeveloper(int id)
+        {
+            var query = _uow.GetRepositry<AppUserSessionLesson>().GetQuery();
+            var entity = await query.Where(x => x.Id == id).SingleOrDefaultAsync();
+            if (entity != null)
+            {
+                var mapped = _mapper.Map<AppUserSessionLessonListDtoDeveloper>(entity);
+                return mapped;
+            }
+            return new AppUserSessionLessonListDtoDeveloper();
+        }
+        public async Task RemoveAppUserSessionLessonDeveloper(int id)
+        {
+            var query = _uow.GetRepositry<AppUserSessionLesson>().GetQuery();
+            var entity = await query.Where(x => x.Id == id).SingleOrDefaultAsync();
+            if (entity != null)
+            {
+                _uow.GetRepositry<AppUserSessionLesson>().Remove(entity);
+                await _uow.SaveChangesAsync();
+
+            }
+
         }
     }
 }

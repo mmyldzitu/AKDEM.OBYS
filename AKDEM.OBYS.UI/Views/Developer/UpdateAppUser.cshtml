@@ -1,0 +1,61 @@
+﻿@model AppUserUpdateDtoDeveloper
+
+@{
+    Layout = "_layout";
+}
+<div class="container-fluid">
+    <form asp-action="UpdateAppUser" asp-controller="Developer" method="post">
+
+        <input type="hidden" asp-for="Id" />
+        <label>FirstName :</label>
+        <input asp-for="FirstName" class="form-control" />
+        <br />
+        <label>SecondName :</label>
+        <input asp-for="SecondName" class="form-control" />
+        <br />
+        <label>Email :</label>
+        <input asp-for="Email" class="form-control" />
+        <br />
+        <label>Password :</label>
+        <input asp-for="Password" class="form-control" />
+        <br />
+        <label>PhoneNumber :</label>
+        <input asp-for="PhoneNumber" class="form-control" />
+        <br />
+        
+        <label>BranchId :</label>
+        <input asp-for="BranchId" class="form-control" />
+        <br />
+        <label>ClassId :</label>
+        <input asp-for="ClassId" class="form-control" />
+        <br />
+        <label>ImagePath :</label>
+        <input asp-for="ImagePath" class="form-control" />
+        <br />
+        <label>TotalAverage :</label>
+        <input asp-for="TotalAverage" class="form-control" />
+        <br />
+        <label>SıraNo :</label>
+        <input asp-for="SıraNo" class="form-control" />
+        <br />
+        <label>DepartReason :</label>
+        <input asp-for="DepartReason" class="form-control" />
+        <br />
+        <label>TotalWarningCount :</label>
+        <input asp-for="TotalWarningCount" class="form-control" />
+        <br />
+        <label>Status :</label>
+        <input asp-for="Status" class="form-control" />
+        <br />
+
+
+
+        <div class="mb-3">
+            <button class="btn btn-primary" type="submit">Güncelle</button>
+        </div>
+        <br />
+       
+        <div class="mb-3 text-bg-danger" asp-validation-summary="All">
+        </div>
+    </form>
+</div>

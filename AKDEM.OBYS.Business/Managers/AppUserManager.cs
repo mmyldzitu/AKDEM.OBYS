@@ -7,7 +7,9 @@ using AKDEM.OBYS.Common.Enums;
 using AKDEM.OBYS.DataAccess.UnitOfWork;
 using AKDEM.OBYS.Dto.AppAccountDtos;
 using AKDEM.OBYS.Dto.AppRoleDtos;
+using AKDEM.OBYS.Dto.AppSessionDtos;
 using AKDEM.OBYS.Dto.AppUserDtos;
+using AKDEM.OBYS.Dto.AppUserSessionDtos;
 using AKDEM.OBYS.Entities;
 using AutoMapper;
 using FluentValidation;
@@ -20,14 +22,14 @@ using System.Threading.Tasks;
 
 namespace AKDEM.OBYS.Business.Managers
 {
-   
-   public class AppUserManager:GenericManager<AppTeacherCreateDto,AppTeacherUpdateDto,AppTeacherListDto,AppUser>,IAppUserService
+
+    public class AppUserManager : GenericManager<AppTeacherCreateDto, AppTeacherUpdateDto, AppTeacherListDto, AppUser>, IAppUserService
     {
         private readonly IMapper _mapper;
         private readonly IValidator<AppTeacherCreateDto> _createDtoValidator;
         private readonly IValidator<AppStudentUpdateDto> _createStudentDtoValidator;
         private readonly IValidator<AppUserLoginDto> _loginDtoValidator;
-        
+
         private readonly IUow _uow;
 
         public AppUserManager(IMapper mapper, IValidator<AppTeacherCreateDto> createDtoValidator, IValidator<AppTeacherUpdateDto> updateDtoValidator, IUow uow, IValidator<AppStudentUpdateDto> createStudentDtoValidator, IValidator<AppUserLoginDto> loginDtoValidator) : base(mapper, createDtoValidator, updateDtoValidator, uow)
@@ -37,6 +39,18 @@ namespace AKDEM.OBYS.Business.Managers
             _uow = uow;
             _createStudentDtoValidator = createStudentDtoValidator;
             _loginDtoValidator = loginDtoValidator;
+        }
+
+        public async Task<List<AppUserListDtoDeveloper>> GetAppUsersDeveloper()
+        {
+            var query = _uow.GetRepositry<AppUser>().GetQuery();
+            var entities = await query.ToListAsync();
+            if (entities.Count != 0)
+            {
+                var lists = _mapper.Map<List<AppUserListDtoDeveloper>>(entities);
+                return lists;
+            }
+            return new List<AppUserListDtoDeveloper>();
         }
         public async Task<bool> IfEmailAlreadyExists(string definition)
         {
@@ -92,7 +106,7 @@ namespace AKDEM.OBYS.Business.Managers
         }
         public async Task<IResponse<List<AppTeacherListDto>>> GetAllTeacherAsync(int roleId, bool status)
         {
-            var teacherList = await _uow.GetRepositry<AppUser>().GetAllAsync(x => x.AppUserRoles.Any(x => x.RoleId == roleId  ) && x.Status==status);
+            var teacherList = await _uow.GetRepositry<AppUser>().GetAllAsync(x => x.AppUserRoles.Any(x => x.RoleId == roleId) && x.Status == status);
             if (teacherList == null)
             {
                 return new Response<List<AppTeacherListDto>>(ResponseType.NotFound, "Görüntülenecek Öğretmen Bilgisi Bulunamadı");
@@ -122,11 +136,11 @@ namespace AKDEM.OBYS.Business.Managers
         public async Task<List<AppStudentListDto>> GetAllStudentAsync(RoleType type, ClassType classType)
         {
             var query = _uow.GetRepositry<AppUser>().GetQuery();
-            
 
-            if (Enum.GetName(typeof(ClassType),classType) == "Tamamı")
+
+            if (Enum.GetName(typeof(ClassType), classType) == "Tamamı")
             {
-                var list = await query.Include(x => x.AppBranch).ThenInclude(x => x.AppClass).Where(x => x.AppUserRoles.Any(x => x.RoleId == (int)type) && x.Status==true && x.ClassId != (int)ClassType.Mezun).ToListAsync();
+                var list = await query.Include(x => x.AppBranch).ThenInclude(x => x.AppClass).Where(x => x.AppUserRoles.Any(x => x.RoleId == (int)type) && x.Status == true && x.ClassId != (int)ClassType.Mezun).ToListAsync();
                 if (list.Count != 0)
                 {
                     return _mapper.Map<List<AppStudentListDto>>(list);
@@ -139,9 +153,9 @@ namespace AKDEM.OBYS.Business.Managers
                 }
 
             }
-            else if(Enum.GetName(typeof(ClassType), classType) == "Pasif")
+            else if (Enum.GetName(typeof(ClassType), classType) == "Pasif")
             {
-                var list = await query.Include(x => x.AppBranch).ThenInclude(x => x.AppClass).Where(x => x.Status==false).ToListAsync();
+                var list = await query.Include(x => x.AppBranch).ThenInclude(x => x.AppClass).Where(x => x.Status == false).ToListAsync();
                 if (list.Count != 0)
                 {
                     return _mapper.Map<List<AppStudentListDto>>(list);
@@ -155,7 +169,7 @@ namespace AKDEM.OBYS.Business.Managers
             }
             else
             {
-                var list = await query.Include(x => x.AppBranch).ThenInclude(x => x.AppClass).Where(x => x.Status==true && x.AppUserRoles.Any(x => x.RoleId == (int)type) && x.ClassId == (int)classType ).ToListAsync();
+                var list = await query.Include(x => x.AppBranch).ThenInclude(x => x.AppClass).Where(x => x.Status == true && x.AppUserRoles.Any(x => x.RoleId == (int)type) && x.ClassId == (int)classType).ToListAsync();
                 if (list.Count != 0)
                 {
                     return _mapper.Map<List<AppStudentListDto>>(list);
@@ -187,7 +201,7 @@ namespace AKDEM.OBYS.Business.Managers
             }
             return new Response<AppStudentUpdateDto>(dto, validationResult.ConvertToCustomValidationError());
         }
-        public async Task<int> GetUserIdByNameSecondNameandEmail(string name,string secondName,string mail)
+        public async Task<int> GetUserIdByNameSecondNameandEmail(string name, string secondName, string mail)
         {
             var entity = await _uow.GetRepositry<AppUser>().FindByFilterAsync(x => x.FirstName == name && x.SecondName == secondName && x.Email == mail);
             return entity.Id;
@@ -198,7 +212,7 @@ namespace AKDEM.OBYS.Business.Managers
             if (validationResult.IsValid)
             {
                 var query = _uow.GetRepositry<AppUser>().GetQuery();
-                
+
                 var user = await _uow.GetRepositry<AppUser>().FindByFilterAsync(x => x.Email == dto.Email && x.Password == dto.Password);
                 if (user != null)
                 {
@@ -211,7 +225,7 @@ namespace AKDEM.OBYS.Business.Managers
         }
         public async Task<IResponse<List<AppRoleListDto>>> GetRolesByUserIdAsync(int userId)
         {
-            var roles = await _uow.GetRepositry<AppRole>().GetAllAsync(x => x.AppUserRoles.Any(x => x.UserId== userId));
+            var roles = await _uow.GetRepositry<AppRole>().GetAllAsync(x => x.AppUserRoles.Any(x => x.UserId == userId));
             if (roles == null)
             {
                 return new Response<List<AppRoleListDto>>(ResponseType.NotFound, "Rol Bulunamadı");
@@ -224,7 +238,7 @@ namespace AKDEM.OBYS.Business.Managers
             string firstName = "";
             string secondName = "";
             var query = _uow.GetRepositry<AppUser>().GetQuery();
-            
+
             var entity = await query.Where(x => x.Id == userId).SingleOrDefaultAsync();
             if (entity != null)
             {
@@ -237,7 +251,7 @@ namespace AKDEM.OBYS.Business.Managers
                     secondName = entity.SecondName;
                 }
             }
-            return firstName +" "+ secondName;
+            return firstName + " " + secondName;
         }
         public async Task<List<string>> GetTeacherNameForPresident()
         {
@@ -247,7 +261,7 @@ namespace AKDEM.OBYS.Business.Managers
             var teachers = await query.Where(x => x.AppUserRoles.Any(x => x.RoleId == 2) && x.Status == true).ToListAsync();
             if (teachers.Count != 0)
             {
-                foreach( var teacher in teachers)
+                foreach (var teacher in teachers)
                 {
                     definition = teacher.DepartReason + " " + teacher.FirstName + " " + teacher.SecondName;
                     teacherDefinitions.Add(definition);
@@ -255,6 +269,44 @@ namespace AKDEM.OBYS.Business.Managers
             }
             return teacherDefinitions;
         }
+        public async Task UpdateUserDeveloper(AppUserUpdateDtoDeveloper dto)
+        {
+            var entity = await _uow.GetRepositry<AppUser>().FindAsync(dto.Id);
 
+            if (entity != null)
+            {
+                entity.FirstName = dto.FirstName;
+                entity.SecondName = dto.SecondName;
+                entity.Email = dto.Email;
+                entity.Password = dto.Password;
+                entity.PhoneNumber = dto.PhoneNumber;
+                entity.Status = dto.Status;
+                entity.ImagePath = dto.ImagePath;
+                entity.TotalAverage = dto.TotalAverage;
+                entity.SıraNo = dto.SıraNo;
+                entity.DepartReason = dto.DepartReason;
+                entity.TotalWarningCount = dto.TotalWarningCount;
+                entity.BranchId = dto.BranchId;
+                entity.ClassId = dto.ClassId;
+                
+
+                await _uow.SaveChangesAsync();
+            }
+
+
+
+        }
+        public async Task<AppUserListDtoDeveloper> GetAppUserDeveloper(int id)
+        {
+            var query = _uow.GetRepositry<AppUser>().GetQuery();
+            var entity = await query.Where(x => x.Id == id).SingleOrDefaultAsync();
+            if (entity != null)
+            {
+                var mapped = _mapper.Map<AppUserListDtoDeveloper>(entity);
+                return mapped;
+            }
+            return new AppUserListDtoDeveloper();
+
+        }
     }
 }

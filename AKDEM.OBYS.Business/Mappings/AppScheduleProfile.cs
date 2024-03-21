@@ -16,6 +16,8 @@ namespace AKDEM.OBYS.Business.Mappings
             CreateMap<AppScheduleListDto, AppSchedule>().ReverseMap();
             CreateMap<AppScheduleCreateDto, AppSchedule>().ReverseMap();
             CreateMap<AppScheduleUpdateDto, AppSchedule>().ReverseMap();
+
+            CreateMap<AppScheduleListDtoDeveloper, AppSchedule>().ReverseMap();
         }
     }
 }

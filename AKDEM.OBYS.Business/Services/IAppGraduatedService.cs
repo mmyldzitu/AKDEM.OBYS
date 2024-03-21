@@ -13,5 +13,6 @@ namespace AKDEM.OBYS.Business.Services
         Task GraduateStudents(int userId, int sessionId, int order);
         Task<AppGraduatedListDto> CertificaofUser(int userId);
         Task RemoveCertificateByUserId(int userId);
+        Task<List<AppGraduatedListDto>> GetGradutedStudentsDeveloper();
     }
 }

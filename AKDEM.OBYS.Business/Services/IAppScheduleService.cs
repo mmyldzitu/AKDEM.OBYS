@@ -31,6 +31,7 @@ namespace AKDEM.OBYS.Business.Services
         Task<List<int>> GetSCheduleIdsForTeacher(int userId, int sessionId);
         Task<string> GetBranchNameByScheduleId(int scheduleId);
         Task<int> GetScheduleIdByUserAndSessionId(int sessionId, int userId);
+        Task<List<AppScheduleListDtoDeveloper>> GetAppSchedulesDeveloper();
 
 
 

@@ -1,6 +1,7 @@
 ﻿using AKDEM.OBYS.Business.Services;
 using AKDEM.OBYS.Common;
 using AKDEM.OBYS.DataAccess.UnitOfWork;
+using AKDEM.OBYS.Dto.AppSessionBranchDtos;
 using AKDEM.OBYS.Dto.AppSessionDtos;
 using AKDEM.OBYS.Entities;
 using AutoMapper;
@@ -26,6 +27,17 @@ namespace AKDEM.OBYS.Business.Managers
             _uow = uow;
             _mapper = mapper;
             _appUserSessionService = appUserSessionService;
+        }
+        public async Task<List<AppSessionListDto>> GetAppSessionsDeveloper()
+        {
+            var query = _uow.GetRepositry<AppSession>().GetQuery();
+            var entities = await query.ToListAsync();
+            if (entities.Count != 0)
+            {
+                var lists = _mapper.Map<List<AppSessionListDto>>(entities);
+                return lists;
+            }
+            return new List<AppSessionListDto>();
         }
         public async Task<int> GetActiveSessionId()
         {

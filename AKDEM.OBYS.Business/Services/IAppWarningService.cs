@@ -34,7 +34,9 @@ namespace AKDEM.OBYS.Business.Services
         Task RemoveAbsenteismWarningByString(string lessonName, int userId, int userSessionId);
         Task<double> ReturnAwc(int userSessionId);
         Task<double> AbsenteismWarningCountByUserSessionId(int userSessionId);
-       
+        Task<List<AppWarningListDtoDeveloper>> GetAppWarningsDeveloper();
+
+
 
 
 

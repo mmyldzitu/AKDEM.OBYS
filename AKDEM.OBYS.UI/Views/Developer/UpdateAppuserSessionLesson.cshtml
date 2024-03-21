@@ -1,0 +1,35 @@
+﻿@model AppUserSessionLessonUpdateDtoDeveloper
+
+@{
+    Layout = "_layout";
+}
+<div class="container-fluid">
+    <form asp-action="UpdateAppUserSessionLesson" asp-controller="Developer" method="post">
+
+        <input type="hidden" asp-for="Id" />
+        <label>LessonId :</label>
+        <input asp-for="LessonId" class="form-control" />
+        <br />
+        <label>UserSessionId :</label>
+        <input asp-for="UserSessionId" class="form-control" />
+        <br />
+        <label>Not :</label>
+        <input asp-for="Not" class="form-control" />
+        <br />
+        <label>Devamsızlık :</label>
+        <input asp-for="Devamsızlık" class="form-control" />
+        <br />
+
+
+
+        <div class="mb-3">
+            <button class="btn btn-primary" type="submit">Güncelle</button>
+        </div>
+        <br />
+        <div class="mb-3">
+            <a class="btn btn-danger" asp-action="RemoveAppUserSessionLesson" asp-route-id="@Model.Id" asp-controller="Developer">Sil</a>
+        </div>
+        <div class="mb-3 text-bg-danger" asp-validation-summary="All">
+        </div>
+    </form>
+</div>

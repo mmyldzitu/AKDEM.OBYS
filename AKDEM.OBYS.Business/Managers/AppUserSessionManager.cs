@@ -1,6 +1,7 @@
 ﻿using AKDEM.OBYS.Business.Services;
 using AKDEM.OBYS.DataAccess.UnitOfWork;
 using AKDEM.OBYS.Dto.AppUserSessionDtos;
+using AKDEM.OBYS.Dto.AppUserSessionLessonDtos;
 using AKDEM.OBYS.Entities;
 using AutoMapper;
 using FluentValidation;
@@ -25,6 +26,19 @@ namespace AKDEM.OBYS.Business.Managers
             _uow = uow;
             _appBranchService = appBranchService;
             _appUserSessionLessonService = appUserSessionLessonService;
+        }
+
+
+        public async Task<List<AppUserSessionListDtoDeveloper>> GetAppUserSessionsDeveloper()
+        {
+            var query = _uow.GetRepositry<AppUserSession>().GetQuery();
+            var entities = await query.ToListAsync();
+            if (entities.Count != 0)
+            {
+                var lists = _mapper.Map<List<AppUserSessionListDtoDeveloper>>(entities);
+                return lists;
+            }
+            return new List<AppUserSessionListDtoDeveloper>();
         }
         public async Task CreateUserSessionAsync(List<AppUserSessionCreateDto> dtos)
         {
@@ -688,5 +702,64 @@ namespace AKDEM.OBYS.Business.Managers
             }
             return "";
         }
+
+        public async Task UpdateUserSessionDeveloper(AppUserSessionUpdateDtoDeveloper dto)
+        {
+            var entity = await _uow.GetRepositry<AppUserSession>().FindAsync(dto.Id);
+
+            if (entity != null)
+            {
+                entity.Average = dto.Average;
+                entity.SessionWarningCount = dto.SessionWarningCount;
+                entity.SessionLessonWarningCount = dto.SessionLessonWarningCount;
+                entity.SessionAbsentWarningCount = dto.SessionAbsentWarningCount;
+                entity.UserId = dto.UserId;
+                entity.SessionId=dto.SessionId;
+                entity.BranchId = dto.BranchId;
+                entity.ClassId = dto.ClassId;
+                entity.Status = dto.Status;
+
+                await _uow.SaveChangesAsync();
+            }
+
+
+
+        }
+        public async Task<AppUserSessionListDtoDeveloper> GetAppUserSessionDeveloper(int id)
+        {
+            var query = _uow.GetRepositry<AppUserSession>().GetQuery();
+            var entity = await query.Where(x => x.Id == id).SingleOrDefaultAsync();
+            if (entity != null)
+            {
+                var mapped = _mapper.Map<AppUserSessionListDtoDeveloper>(entity);
+                return mapped;
+            }
+            return new AppUserSessionListDtoDeveloper();
+        }
+        public async Task RemoveAppUserSessionDeveloper(int id)
+        {
+            var query = _uow.GetRepositry<AppUserSession>().GetQuery();
+            var entity = await query.Where(x => x.Id == id).SingleOrDefaultAsync();
+            if (entity != null)
+            {
+                _uow.GetRepositry<AppUserSession>().Remove(entity);
+                await _uow.SaveChangesAsync();
+
+            }
+
+        }
+        public async Task CreateUserSessionDeveloper(AppUserSessionCreateDtoDeveloper dto)
+        {
+            var control = _uow.GetRepositry<AppUserSession>().FindByFilterAsync(x => x.UserId == dto.UserId && x.SessionId == dto.SessionId);
+            if (control.Result == null)
+            {
+                var entity = _mapper.Map<AppUserSession>(dto);
+                await _uow.GetRepositry<AppUserSession>().CreateAsync(entity);
+                await _uow.SaveChangesAsync();
+            }
+               
+            
+        }
+
     }
 }

@@ -1,0 +1,24 @@
+﻿@model AppSessionBranchCreateDto
+
+@{
+    Layout = "_layout";
+}
+<div class="container-fluid">
+    <form asp-action="CreateAppSessionBranch" asp-controller="Developer" method="post">
+
+        <label>SessionId :</label>
+        <input asp-for="SessionId"  class="form-control" />
+        <br />
+        <label>BranchId :</label>
+        <input asp-for="BranchId" class="form-control" />
+        <br />
+        
+
+
+        <div class="mb-3">
+            <button class="btn btn-primary" type="submit">Oluştur</button>
+        </div>
+        <div class="mb-3 text-bg-danger" asp-validation-summary="All">
+        </div>
+    </form>
+</div>

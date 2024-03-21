@@ -13,7 +13,8 @@ namespace AKDEM.OBYS.Business.Mappings
     {
         public AppWarningProfile()
         {
-            CreateMap<AppWarningListDto, AppWarning>().ReverseMap();
+            CreateMap<AppWarningListDto, AppWarning>().ReverseMap(); 
+            CreateMap<AppWarningListDtoDeveloper, AppWarning>().ReverseMap(); 
             CreateMap<AppWarningCreateDto, AppWarning>().ReverseMap();
             CreateMap<AppWarningUpdateDto, AppWarning>().ReverseMap();
         }

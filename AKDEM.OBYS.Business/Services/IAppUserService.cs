@@ -28,7 +28,11 @@ namespace AKDEM.OBYS.Business.Services
         Task ChangeTeacherStatus(int userId);
         Task<List<string>> GetTeacherNameForPresident();
         Task<bool> IfEmailAlreadyExists(string definition);
-        
+        Task<List<AppUserListDtoDeveloper>> GetAppUsersDeveloper();
+        Task<AppUserListDtoDeveloper> GetAppUserDeveloper(int id);
+        Task UpdateUserDeveloper(AppUserUpdateDtoDeveloper dto);
+
+
 
 
 

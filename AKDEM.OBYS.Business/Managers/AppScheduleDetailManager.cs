@@ -23,6 +23,17 @@ namespace AKDEM.OBYS.Business.Managers
             _uow = uow;
             _mapper = mapper;
         }
+        public async Task<List<AppScheduleDetailListDtoDeveloper>> GetAppScheduleDetailsDeveloper()
+        {
+            var query = _uow.GetRepositry<AppScheduleDetail>().GetQuery();
+            var entites = await query.ToListAsync();
+            if (entites.Count != 0)
+            {
+                var lists = _mapper.Map<List<AppScheduleDetailListDtoDeveloper>>(entites);
+                return lists;
+            }
+            return new List<AppScheduleDetailListDtoDeveloper>();
+        }
         public async Task<List<string>> GetHoursByScheduleIdAsync(int scheduleId)
         {
             List<string> hours = new();

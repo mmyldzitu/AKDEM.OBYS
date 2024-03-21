@@ -14,7 +14,9 @@ namespace AKDEM.OBYS.Business.Mappings
         public AppUserSessionProfile()
         {
             CreateMap<AppUserSessionListDto, AppUserSession>().ReverseMap();
+            CreateMap<AppUserSessionListDtoDeveloper, AppUserSession>().ReverseMap();
             CreateMap<AppUserSessionCreateDto, AppUserSession>().ReverseMap();
+            CreateMap<AppUserSessionCreateDtoDeveloper, AppUserSession>().ReverseMap();
             CreateMap<AppUserSessionUpdateDto, AppUserSession>().ReverseMap();
         }
     }

@@ -16,6 +16,8 @@ namespace AKDEM.OBYS.Business.Mappings
             CreateMap<AppBranchListDto, AppBranch>().ReverseMap();
             CreateMap<AppBranchCreateDto, AppBranch>().ReverseMap();
             CreateMap<AppBranchUpdateDto, AppBranch>().ReverseMap();
+
+            CreateMap<AppBranchListDtoDeveloper,AppBranch>().ReverseMap();
         }
     }
 }

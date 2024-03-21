@@ -26,6 +26,18 @@ namespace AKDEM.OBYS.Business.Managers
             _appUserService = appUserService;
             _appSessionService = appSessionService;
         }
+
+        public async Task<List<AppGraduatedListDto>> GetGradutedStudentsDeveloper()
+        {
+            var query = _uow.GetRepositry<AppGraduated>().GetQuery();
+            var values = await query.ToListAsync();
+            if(values.Count!=0)
+            {
+                var lists = _mapper.Map<List<AppGraduatedListDto>>(values);
+                return lists;
+            }
+            return new List<AppGraduatedListDto>();
+        }
         public async Task GraduateStudents(int userId, int sessionId, int order)
         {
             string zeros = "0000";

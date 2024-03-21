@@ -28,6 +28,7 @@ namespace AKDEM.OBYS.Business.Services
         Task<bool> IfBranchAlreadyExists(string definition);
         Task RemoveEmptyBranches();
         Task<int> ReturnClassTypeOfUser(int userId);
+        Task<List<AppBranchListDtoDeveloper>> GetBranchesDeveloper();
     }
     
 }

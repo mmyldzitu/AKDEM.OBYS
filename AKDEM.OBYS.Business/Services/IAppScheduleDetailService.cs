@@ -24,6 +24,7 @@ namespace AKDEM.OBYS.Business.Services
         Task<List<AppScheduleDetailListDto>> GetScheduleDetailsByScheduleIdForTeacher(int scheduleId, int userId);
         Task<List<string>> GetHoursByScheduleIdAsync2(int sessionId, int userId);
         Task<List<AppScheduleDetailListDto>> GetScheduleDetailsByScheduleIdForTeacher2(int sessionId, int userId);
+        Task<List<AppScheduleDetailListDtoDeveloper>> GetAppScheduleDetailsDeveloper();
 
 
     }

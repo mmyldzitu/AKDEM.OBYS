@@ -27,6 +27,18 @@ namespace AKDEM.OBYS.Business.Managers
             _uow = uow;
             _mapper = mapper;
         }
+
+        public async Task<List<AppBranchListDtoDeveloper>> GetBranchesDeveloper()
+        {
+            var query= _uow.GetRepositry<AppBranch>().GetQuery();
+            var entites = await query.ToListAsync();
+            if (entites.Count != 0)
+            {
+                var lists = _mapper.Map<List<AppBranchListDtoDeveloper>>(entites);
+                return lists;
+            }
+            return new List<AppBranchListDtoDeveloper>();
+        }
         public async Task<bool> IfBranchAlreadyExists(string definition)
         {
             var query = _uow.GetRepositry<AppBranch>().GetQuery();

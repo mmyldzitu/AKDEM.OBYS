@@ -19,5 +19,6 @@ namespace AKDEM.OBYS.Business.Services
         Task AppLessonUpdate(AppLessonUpdateDto dto);
         Task<string> ReturnJustLessonName(int lessonId);
         Task<AppLessonListDto> GetLessonById(int lessonId);
+        Task<List<AppLessonListDtoDeveloper>> GetLessonsDeveloper();
     }
 }

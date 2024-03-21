@@ -28,6 +28,18 @@ namespace AKDEM.OBYS.Business.Managers
             _mapper = mapper;
             _createDtoValidator = createDtoValidator;
         }
+
+        public async Task<List<AppScheduleListDtoDeveloper>> GetAppSchedulesDeveloper()
+        {
+            var query = _uow.GetRepositry<AppSchedule>().GetQuery();
+            var entites = await query.ToListAsync();
+            if (entites.Count != 0)
+            {
+                var lists = _mapper.Map<List<AppScheduleListDtoDeveloper>>(entites);
+                return lists;
+            }
+            return new List<AppScheduleListDtoDeveloper>();
+        }
         public async Task<List<AppScheduleListDto>> GetSchedulesBySession(int id)
         {
             var query = _uow.GetRepositry<AppSchedule>().GetQuery();

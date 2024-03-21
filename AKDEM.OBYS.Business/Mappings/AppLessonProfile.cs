@@ -16,6 +16,8 @@ namespace AKDEM.OBYS.Business.Mappings
             CreateMap<AppLesson, AppLessonCreateDto>().ReverseMap();
             CreateMap<AppLesson, AppLessonUpdateDto>().ReverseMap();
             CreateMap<AppLesson, AppLessonListDto>().ReverseMap();
+
+            CreateMap<AppLesson, AppLessonListDtoDeveloper>().ReverseMap();
         }
     }
 }

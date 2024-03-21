@@ -1,0 +1,45 @@
+﻿@model List<AppLessonListDtoDeveloper>
+@{
+    Layout = "_Layout";
+}
+<table class="mt-3 table table-sm table-hover table-striped">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Definition</th>
+
+            <th>UserId</th>
+            <th>Status</th>
+            
+            
+
+
+            <th>Git</th>
+
+
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+
+            <tr>
+                <td>@item.Id</td>
+                <td>@item.Definition</td>
+                <td>@item.UserId</td>
+                <td>@item.Status</td>
+
+
+                
+
+                <td><a href="#">Git</a></td>
+
+
+
+
+
+            </tr>
+        }
+    </tbody>
+
+</table>

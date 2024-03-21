@@ -37,5 +37,6 @@ namespace AKDEM.OBYS.Business.Services
         Task RemoveUserSessionsBecauseOfBeingPassive(int sessionId, int userId);
         Task<string> ReturnPresidentName(int sessionId);
         Task RemoveSession(int sessionId);
+        Task<List<AppSessionListDto>> GetAppSessionsDeveloper();
     }
 }

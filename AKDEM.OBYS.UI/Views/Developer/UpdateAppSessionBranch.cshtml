@@ -1,0 +1,29 @@
+﻿@model AppSessionBranchUpdateDtoDeveloper
+
+@{
+    Layout = "_layout";
+}
+<div class="container-fluid">
+    <form asp-action="UpdateAppSessionBranch" asp-controller="Developer" method="post">
+
+        <input type="hidden" asp-for="Id"/>
+        <label>SessionId :</label>
+        <input asp-for="SessionId" class="form-control" />
+        <br />
+        <label>BranchId :</label>
+        <input asp-for="BranchId" class="form-control" />
+        <br />
+
+
+
+        <div class="mb-3">
+            <button class="btn btn-primary" type="submit">Güncelle</button>
+        </div>
+        <br />
+        <div class="mb-3">
+            <a class="btn btn-danger" asp-action="RemoveAppSessionBranch" asp-route-id="@Model.Id" asp-controller="Developer">Sil</a>
+        </div>
+        <div class="mb-3 text-bg-danger" asp-validation-summary="All">
+        </div>
+    </form>
+</div>

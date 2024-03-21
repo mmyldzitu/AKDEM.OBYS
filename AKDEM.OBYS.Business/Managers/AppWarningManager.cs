@@ -1,5 +1,6 @@
 ﻿using AKDEM.OBYS.Business.Services;
 using AKDEM.OBYS.DataAccess.UnitOfWork;
+using AKDEM.OBYS.Dto.AppUserSessionDtos;
 using AKDEM.OBYS.Dto.AppWarningDtos;
 using AKDEM.OBYS.Entities;
 using AutoMapper;
@@ -27,6 +28,17 @@ namespace AKDEM.OBYS.Business.Managers
             _appUserSessionService = appUserSessionService;
             _appStudentService = appStudentService;
             _appSessionService = appSessionService;
+        }
+        public async Task<List<AppWarningListDtoDeveloper>> GetAppWarningsDeveloper()
+        {
+            var query = _uow.GetRepositry<AppWarning>().GetQuery();
+            var entities = await query.ToListAsync();
+            if (entities.Count != 0)
+            {
+                var lists = _mapper.Map<List<AppWarningListDtoDeveloper>>(entities);
+                return lists;
+            }
+            return new List<AppWarningListDtoDeveloper>();
         }
         public async Task RemoveWarningByUserId(int userId)
         {
